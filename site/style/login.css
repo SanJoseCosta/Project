@@ -1,0 +1,23 @@
+.select-lng span {
+  color: #000000;
+}
+.block {
+  display: flex;
+  justify-content: space-between;
+  margin: 25px 0;
+}
+.dont-have-account {
+  display: flex;
+  flex-wrap: wrap;
+}
+.dont-have-account p {
+  margin-right: 10px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 405px) {
+  .block {
+    flex-direction: column;
+    margin: 15px 0;
+  }
+}

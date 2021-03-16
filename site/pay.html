@@ -1,0 +1,37 @@
+
+<head>
+<title>MALT.chat</title>
+<link rel="icon" href="favicon.ico?v=1.0" />
+<meta charset="UTF-8">
+</head>
+
+
+<body>
+<center>
+                
+    <div onclick="wait();">
+      <img src="assets/images/malt-logo.svg" alt="MALT">
+    </div>
+
+    <h1 class="font-bold text-center">Pay with Square</h1>
+  
+    <a class="button" href="https://checkout.square.site/pay/5e6adcca55db4895a8e59a5663fd5645"><img src=images/square.png></a>
+
+</body>
+
+<script>
+
+function wait()
+{
+    //console.log("w");
+    //document.getElementById("w").style.visibility = "visible";
+
+    var body = document.getElementsByTagName("BODY")[0];
+    var r = "<div class=spinner-fast><div class=spinner-fast><div class=spinner-fast><div class=spinner-fast></div></div></div></div>";
+
+    body.innerHTML = r;
+}
+
+</script>
+
+

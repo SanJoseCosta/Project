@@ -1,0 +1,15 @@
+.upload-block {
+  display: flex;
+  justify-content: center;
+}
+.upload-btn-wrapper {
+  width: 150px;
+  border-radius: 50%;
+}
+.upload-btn {
+  padding-top: 0;
+}
+
+.footer .fa-stack {
+  width: 2em;
+}

@@ -1,0 +1,153 @@
+*, html {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    text-align: center !important;
+    background-color: rgb(243, 239, 239);
+    xxxoverflow: hidden;
+}
+
+#header {
+    padding: 10px 40px;
+}
+
+#header img {
+    cursor: pointer;
+}
+
+.signBox {
+    max-width: 600px;
+    margin: 130px auto 0 auto;
+    width: 100%;
+    background-color: white;
+    border-radius: 5px;
+    padding: 30px 0;
+}
+
+.fd {
+    margin: 80px auto 0 auto !important;
+}
+
+.ed h4 {
+    text-transform: uppercase;
+}
+
+.signBox img {
+    margin-bottom: 20px;
+}
+
+.signBox h3 {
+    padding: 0 0 20px 0;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.signBox a {
+    color: blue;
+    text-decoration: none;
+}
+
+.inputEnt, select {
+    height: 40px;
+    background-color: rgb(243, 239, 239);
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    width: 90%;
+    border-color: white;
+    padding: 10px;
+}
+
+.change {
+    text-align: left;
+    padding-left: 30px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
+}
+
+.smallText {
+    margin-bottom: 15px;
+}
+
+.imageUp {
+    padding: 20px;
+    background-color: rgb(243, 239, 239);
+    width: 90%;
+    margin: 0 auto 15px auto;
+    border-radius: 5px;
+}
+
+.imageUp > div{
+    padding-top: 10px;
+    font-size: 15px;
+    padding-left: 40px;
+}
+
+.imageUp input {
+    outline: none;
+}
+
+.signBox p {
+    margin-bottom: 5px;
+}
+
+#loginb {
+  background-color: blue; 
+  border: none;
+  outline: none;
+  color: white;
+  width: 90%;
+  border-radius: 50px;
+  padding: 15px 20px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 16px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.editEnd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 40px 10px 40px;
+}
+
+.editEnd button {
+    background-color: blue; 
+    border: none;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    font-size: 15px;
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 480px) {
+    .signBox {
+        margin: 100px auto 0 auto;
+    }
+
+    .img1 {
+        width: 50%;
+    }
+
+    .fd {
+        margin: 40px auto 0 auto !important;
+        padding: 10px 0;
+    }
+
+    .editEnd {
+        margin: 10px 40px 0px 40px;
+    }
+
+    .signBox h3 {
+        padding: 0 0 10px 0;
+    }
+}
