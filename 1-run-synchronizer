@@ -1,0 +1,4 @@
+cd /Users/matt/Dropbox/Rainbow/JavaLibrary1/src/
+javac -proc:none -classpath /Users/matt/Desktop/jars/*:. ./com/worldchat/synch/*.java
+java -classpath /Users/matt/Desktop/jars/*:. com.worldchat.synch.SuperSimpleSynchronizer 0 /Users/matt/Desktop/Project/ 52.205.119.251:8899
+sleep 1000

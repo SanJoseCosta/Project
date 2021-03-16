@@ -1062,19 +1062,32 @@
 
         var box = singleChatSummary();
         
-        var timeSinceActive = tds(user.onlinestatus);
+        //var timeSinceActive = tds(user.onlinestatus);
+
+        var color;
+
+        if (user.onlinestatus <          3 * 60 * 1000) 
+            color = "green";
+        else if (user.onlinestatus <    15 * 60 * 1000) 
+            color = "yellow";
+        else
+            color = "red";
+
         var picurl = picturefile(user);
 
         var click = "\"talk('" + user.username + "')\"";
-        var bkgcolor = "blue";
-
-        box = replaceAll(box, "$$timesinceactive$$", timeSinceActive);
+        
+        //var bkgcolor = "blue";
+        //box = replaceAll(box, "$$timesinceactive$$", timeSinceActive);
+        
+        box = replaceAll(box, "$$color$$", color);
         box = replaceAll(box, "$$time$$", time);
         box = replaceAll(box, "$$picurl$$", picurl);
         box = replaceAll(box, "$$click$$", click);
         box = replaceAll(box, "$$msg$$", msg);
         box = replaceAll(box, "$$name$$", user.username);
-        box = replaceAll(box, "$$bkgcolor$$", bkgcolor);
+        
+        //box = replaceAll(box, "$$bkgcolor$$", bkgcolor);
 
         return box;
     }

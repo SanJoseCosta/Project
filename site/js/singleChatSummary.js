@@ -82,7 +82,7 @@ function singleChatSummary()
                 </div>
 
                 <div class="photobox photooverlay" 
-                style="position: absolute; background-color: red; top: 45px; left: 45px; width: 16px; height: 16px; border-radius: 50%; z-index: 1; opacity: 85%"> 
+                style="position: absolute; background-color: $$color$$; top: 45px; left: 45px; width: 16px; height: 16px; border-radius: 50%; z-index: 1; opacity: 85%"> 
                 </div>
 
             </div>
