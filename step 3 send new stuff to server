@@ -1,5 +1,5 @@
 cd /Users/matt/Desktop/Project
-git pull origin master
+git pull origin main
 git add *
 git commit -m "first commit"
 git branch -M main

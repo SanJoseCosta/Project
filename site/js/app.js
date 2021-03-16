@@ -643,7 +643,7 @@
     function requestTranslation(tolang, fromlang, text) //, callback)
     {
         var base = "https://translation.googleapis.com/language/translate/v2?";
-        var params = "target=" + tolang + "&source=" + fromlang + "&key=AIzaSyC31GV2BJqCIoXCM6NjOtLohY-lWV1bQ3Q&q=" + text;
+        var params = "target=" + tolang + "&source=" + fromlang + "&key=key=" + text; // key AI zaSyC31GV2 BJqCIoXCM6NjOtL ohY-lWV1bQ3Q&q
        
         //completeTranslation = callback;
 
