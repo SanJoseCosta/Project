@@ -643,9 +643,12 @@
     function requestTranslation(tolang, fromlang, text) //, callback)
     {
         var base = "https://translation.googleapis.com/language/translate/v2?";
-        var params = "target=" + tolang + "&source=" + fromlang + "&key=key=" + text; // key AI zaSyC31GV2 BJqCIoXCM6NjOtL ohY-lWV1bQ3Q&q
-       
-        //completeTranslation = callback;
+        var params = "target=" + tolang + "&source=" + fromlang + 
+        "&key=" + "AIzaSyC3" +
+                "1GV2BJqC" +
+                "IoXCM6Nj" +
+                "OtLohY-l" +
+                "WV1bQ3Q" + "=&q=" + text; // key 
 
         pageRequest(base, params, recieveTranslation);
 
@@ -1064,11 +1067,14 @@
         
         //var timeSinceActive = tds(user.onlinestatus);
 
+        var tsa = Date.now() - user.onlinestatus;
+        log("tsa " + tsa);
+
         var color;
 
-        if (user.onlinestatus <          3 * 60 * 1000) 
+        if (tsa <          3 * 60 * 1000) 
             color = "green";
-        else if (user.onlinestatus <    15 * 60 * 1000) 
+        else if (tsa <    15 * 60 * 1000) 
             color = "yellow";
         else
             color = "red";

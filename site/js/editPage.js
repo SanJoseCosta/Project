@@ -30,11 +30,12 @@ function editPage()
                     </div>
 
          
-                    <button onclick="processAccount(false);">create account</button>
-
-                    <br>
+                    <button onclick="processAccount(false);">update account</button>
+                    <br><br>
 
                     <button onclick="logout();">Logout</button>
+                    <br><br>
+                    
                  	<button onclick="cancelEdit();">Cancel</button>
                
                 </div>
