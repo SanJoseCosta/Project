@@ -1,5 +1,7 @@
 
     var separator = "-a7e3i-";
+
+// this is a test
     
     var numberOfFieldsInUserDescriptor = 12;
     var numberOfFieldsInMessageDescriptor = 5;
