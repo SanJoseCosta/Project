@@ -1068,7 +1068,8 @@
         //var timeSinceActive = tds(user.onlinestatus);
 
         var tsa = Date.now() - user.onlinestatus;
-        log("tsa " + tsa);
+        
+        //log("tsa " + tsa);
 
         var color;
 
@@ -2046,5 +2047,50 @@
         field.style.height = height + 'px';
 
     };
-    
+
+    function newchat()
+    {
+        log("newchat");
+
+        if (document.getElementById("myModal") == null)
+        {
+            var body = document.getElementsByTagName("BODY")[0];
+            body.innerHTML += newchatModal();
+        }
+        
+        openModal();
+    }
+
+    function invitation()
+    {
+        log("invitation");
+        
+        if (document.getElementById("myModal") == null)
+        {
+            var body = document.getElementsByTagName("BODY")[0];
+            body.innerHTML += newchatModal();
+        }
+
+        openModal();
+    }
+
+
+    function openModal()
+    {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+    }
+
+    function okModal()
+    {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+
+    function xModal()
+    {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+        
     run();
