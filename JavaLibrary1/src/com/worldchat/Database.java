@@ -196,6 +196,28 @@ public class Database
         }
     }
 
+    static ArrayList<User> allUsers()
+    {
+        DBCollection collection;
+        DBCursor cursor1;
+        int k;
+
+        ArrayList<User> users = new ArrayList<User>();
+
+        collection = database.getCollection(Users);
+        cursor1 = collection.find();
+        k = 0;
+        
+        while(cursor1.hasNext()) 
+        {
+            Record r = new Record((DBObject) cursor1.next(), Users);
+            User u = new User(r);
+            users.add(u);
+        }
+
+        return users;
+    }
+
     static String print()
     {
         DBCollection collection;

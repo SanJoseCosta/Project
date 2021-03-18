@@ -350,26 +350,43 @@ public class MessageProcessingThread extends Thread
     
     static void sendLCU(Connection connection) 
     {
-        ArrayList<User> conversingUsers = new ArrayList<User>();
-        
-        User local = User.findUserByUsername(connection.username);
-        conversingUsers.add(local);
-        
-        ArrayList<String> correspondents = Message.correspondents(connection.username);
-        
-        for (int i = 0; i < correspondents.size(); ++i)
-        {   
-            User u = User.findUserByUsername(correspondents.get(i));
-            if (u == null)
-                U.log("***** cannot find " + correspondents.get(i));
-            else
-            {
+        boolean Community = true;
+
+        if (Community)
+        {
+            ArrayList<User> users = Database.allUsers();
+
+            for (int i = 0; i < users.size(); ++i)
+            {   
+                User u = users.get(i);
                 u.lastMessage = Conversation.getLastMessage(Conversation.conversationName(connection.username, u.username()));
-                conversingUsers.add(u);
             }
+
+            sendUserList(connection, users, "X");
         }
-        
-        sendUserList(connection, conversingUsers, "X");
+        else
+        {
+            ArrayList<User> conversingUsers = new ArrayList<User>();
+            
+            User local = User.findUserByUsername(connection.username);
+            conversingUsers.add(local);
+            
+            ArrayList<String> correspondents = Message.correspondents(connection.username);
+            
+            for (int i = 0; i < correspondents.size(); ++i)
+            {   
+                User u = User.findUserByUsername(correspondents.get(i));
+                if (u == null)
+                    U.log("***** cannot find " + correspondents.get(i));
+                else
+                {
+                    u.lastMessage = Conversation.getLastMessage(Conversation.conversationName(connection.username, u.username()));
+                    conversingUsers.add(u);
+                }
+            }
+            
+            sendUserList(connection, conversingUsers, "X");
+        }
     }
     
     static boolean sendRefreshUsers(Connection connection, String[] parts)

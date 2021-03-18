@@ -148,7 +148,7 @@
 
     function remoteMessage(t)
     {
-        // todo filter html from messages
+        // filter html from messages
 
         t = t.replace("<", "V");
         var parts = t.split(separator);
@@ -378,7 +378,7 @@
         imageChanged = false;
         changePage("edit");
 
-        // server will send full local user info
+        // todo not ready until server sends full local user info
     }
     
     function languagePop()
@@ -1220,7 +1220,7 @@
             {
                 var ts = "(" + timeDisplayStringFromUnixTime(u.lastMessageId.substring(0, u.lastMessageId.length - 10)) +")";
 
-                // todo might need to use translation
+                // todo might need to use translation !!!!!!!!!!!!!!!!!!!!!
 
                 var unread = false;
 
@@ -1409,28 +1409,11 @@
         textarea.value = "";
     }
 
-    //function inviteUser()
-    //{
-    //    //log("invite");
-
-    //        document.getElementById("search").style.visibilityState = "visible";
-    //    document.getElementById("search").placeholder="invite: enter email of person to invite"
-    //}
-    /*
-    function searchUsersx()
-    {
-        log("search");
-
-        document.getElementById("search").style.visibilityState = "visible";
-        document.getElementById("search").placeholder="search: username or email of person to find"
-    }
-    */
-
     function chatSettings()
     {
         alert("not available yet");
     }
-
+    /*
     function chatsInput()
     {
         var e = document.getElementById("search");
@@ -1460,7 +1443,7 @@
 
         return true;
     }
-
+    */
     function backButton()
     {
         changePage(getCommunityStartPage());
@@ -2115,6 +2098,8 @@
 
     };
 
+    // todo logic for search and invite
+
     function newchat()
     {
         log("newchat");
@@ -2153,7 +2138,7 @@
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
 
-        // get data from textarea
+        // todo get data from textarea
 
         inviteUser("hxsquid@gmail.com");
     }
