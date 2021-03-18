@@ -207,7 +207,6 @@ public class Conversation
         {
             String s = "H" + WSServer.separator;
             
-            //U.log("SEND HISTORY - find messages in conversation " + conversationName());
             String[] fields = {"conversation", conversationName()};
             ArrayList<Record> ms = Database.getMessages(fields);
             
@@ -220,7 +219,7 @@ public class Conversation
                 if (i < ms.size() - 1) s += WSServer.separator;
             }
             boolean r = U.sendStringToCon(s, tocon, false);
-            U.log((r ? "Successfuly " : "Failed to ") + "send history message " + s + " to " + tocon.username);
+            U.log((r ? "Successfuly " : "Failed to ") + "send history message " + U.truncate(s, 30) + " to " + tocon.username);
         }
     }
 

@@ -1050,8 +1050,9 @@
 
         socket.send(message2send);
 
-        if (message2send.length > 20) message2send = message2send.substring(0, 20) + "(truncated)";
-        log("msg sent via websocket: " + message2send);
+        var pm = message2send;
+        //if (pm.length > 20) pm = pm.substring(0, 20) + "(truncated)";
+        log("msg sent via websocket: " + pm);
     }
 
     /*
@@ -1335,7 +1336,8 @@
     function CommunityPageRefresh()
     {
         log("refresh");
-        setTimeout(CommunityPageRefresh, RefreshTimeout);
+        
+        //setTimeout(CommunityPageRefresh, RefreshTimeout);
 
         if (pageMode <= 4)
             sendRefreshRequest();
@@ -1568,8 +1570,8 @@
 
         log("password value is [" + password1 + "]");
 
-        var password2 = null;
-        if (creating) password2 = get("p2").value.trim();
+        //var password2 = null;
+        //if (creating) password2 = get("p2").value.trim();
 
         var language = null;
         var languageElement = get("languageselect");
@@ -1609,16 +1611,16 @@
             stop = true;
             inputError("p1error", "password should have at least 8 characters");
         } 
-        else if (creating && (password2 == null || password2 == ("") || password2.length < 8))
-        {
-            stop = true;
-            inputError("p2error", "password should have at least 8 characters");
-        } 
-        else if (creating && (password1 != password2))
-        {
-            stop = true;
-            inputError("p2error", "please make sure passwords match");
-        } 
+        //else if (creating && (password2 == null || password2 == ("") || password2.length < 8))
+        //{
+        //    stop = true;
+        //    inputError("p2error", "password should have at least 8 characters");
+        //} 
+        //else if (creating && (password1 != password2))
+        //{
+        //    stop = true;
+        //    inputError("p2error", "please make sure passwords match");
+        //} 
         else if (language == null || language == ("") || language.length < 2)
         {
             stop = true;
@@ -1780,7 +1782,7 @@
         var username =  get("username");
         var email =     get("email");
         var password1 = get("p1");
-        var password2 = get("p2");
+        //var password2 = get("p2");
         var languageElement = get("language");
 
         //log("accountStart username " + username);
@@ -1949,8 +1951,8 @@
         clear("usernameerror");
         clear("emailerror");
         clear("p1error");
-        clear("p1error");
-        clear("p2error");
+        //clear("p1error");
+        //clear("p2error");
         clear("languageerror");
     }
 
@@ -2051,11 +2053,6 @@
         return base;
     }
 
-    function run()
-    {
-        initWebSocket();
-    }
-
     // if closed and reopened this must be changed
 
     function whenOpened()
@@ -2065,7 +2062,7 @@
         else
             changePage("login");
 
-        setTimeout(CommunityPageRefresh, RefreshTimeout);
+        setInterval(CommunityPageRefresh, RefreshTimeout);
 
         document.addEventListener("visibilitychange", function() 
         {
@@ -2126,7 +2123,6 @@
         openModal();
     }
 
-
     function openModal()
     {
         var modal = document.getElementById("myModal");
@@ -2147,6 +2143,11 @@
     {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
+    }
+
+    function run()
+    {
+        initWebSocket();
     }
         
     run();

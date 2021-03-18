@@ -110,9 +110,10 @@ public class User
     
     String userAnnounceString(boolean islocaluser, boolean isremoteuser) 
     {
-         U.log(     "[" + 
-                    
-                 
+         if (false) 
+                    U.log(     
+
+                    "[" +                  
                  
                         username                                                                    + "," + 
                         
@@ -127,8 +128,6 @@ public class User
                         "islocal=" + islocaluser                                                    + "," +
                                 
                         "picurl=" + picurl                                                          + "," + 
-                 
-                 
                  
                     "]")
                  
@@ -170,9 +169,6 @@ public class User
         }
         else
             return null;
-        
-        // Fri Jul 31 2020 10:24:34 GMT-0400 (Eastern Daylight Time): 
-        // sent to socket ###C~96854961315373496388513495112121~Harold###
     }
 
     static User findUserByUsername(String username) 

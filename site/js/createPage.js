@@ -17,9 +17,6 @@ function createPage()
                     <input id=p1 type="password" placeholder="your new password"/>
                     <div id=p1error></div>
 
-                    <input id=p2 type="password" placeholder="confirm password"/>
-                    <div id=p2error></div>
-
                     <span id=language></span>
                     <div class=smalltext id=languageerror></div>
 

@@ -589,4 +589,12 @@ public class U
             return null;
         }
     }
+
+    static String truncate(String s, int n)
+    {
+        if (s.length() < n)
+            return s;
+        else
+            return s.substring(0, n) + " ...";
+    }
 }

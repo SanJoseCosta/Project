@@ -19,13 +19,7 @@ public class Main {
     static String SupportUser = "support";
     
     public static void main(String[] args) 
-    {   
-        //U.sendemail("matt.kuenzel@gmail.com", "Email test", "This is a test of MALT email");
-        
-        //String to = "hxsquid@gmail.com";
-        //U.sendemail(to, "Invitation to chat on Malt.chat", to + 
-        // " has sent you an invitation to chat. Please click this link to begin chatting: " + "http://test.malt.chat");
-        
+    {
         if (new File("/home/ec2-user/").exists())
         {
             Site = "/home/ec2-user/put/site";

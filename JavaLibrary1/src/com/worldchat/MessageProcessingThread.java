@@ -48,7 +48,8 @@ public class MessageProcessingThread extends Thread
         U.log("processed the message in " + time + " ms");
 
         messageProcessedTimes.add(new Long(System.currentTimeMillis()));
-        U.log("messages received: " + messageProcessedTimes.size());
+        
+        //U.log("messages received: " + messageProcessedTimes.size());
     }
 
     static void addJob(Job j) 
@@ -125,6 +126,7 @@ public class MessageProcessingThread extends Thread
                 }
                 else
                 {
+                    U.log("not one of: " + message);
                     throw new CommunicationsException("xinvalidCommunityMessage:" + message);
                 }            
             }
@@ -138,13 +140,15 @@ public class MessageProcessingThread extends Thread
                 }
                 else
                 {
+                    U.log("not one of: " + message);
                     throw new CommunicationsException("xinvalidChatMessage:" + message);
                 }            
             }
         }
         catch (CommunicationsException e)
         {
-            U.log(e.getMessage());
+            U.log("exception message " + e.getMessage());
+            U.log("original message " + message);
             sendx(socket, e.getMessage());
         }
         
@@ -350,7 +354,7 @@ public class MessageProcessingThread extends Thread
     
     static void sendLCU(Connection connection) 
     {
-        boolean Community = true;
+        boolean Community = false;
 
         if (Community)
         {
@@ -426,7 +430,7 @@ public class MessageProcessingThread extends Thread
         try 
         {
             socket.send(msg);
-            U.log("sent string " + msg);
+            U.log("sendx sent the string " + U.truncate(msg, 20));
         } 
         catch (Exception e) 
         {
@@ -434,7 +438,7 @@ public class MessageProcessingThread extends Thread
             e.printStackTrace();
         }
     }
-    
+
     static boolean isOneOf(String m, String choices)
     {
         for (int i = 0; i < choices.length(); ++i)
