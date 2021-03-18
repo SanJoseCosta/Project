@@ -133,7 +133,7 @@ public class CDC
 			
 			U.log(name + " " + statearray.size());
 			
-			State state = new State(name);
+			State state = null;//new State(name);
 			nstates.add(state);
 			
 			for (int j = 0; j < statearray.size(); ++j)
@@ -154,7 +154,7 @@ public class CDC
 					
 				if (season == null) 
 				{
-					season = new Season(sname);
+					season = null;//new Season(sname);
 					state.seasons.add(season); 
 				}
 				
@@ -168,7 +168,7 @@ public class CDC
 				{
 					in = 0;
 					f = 0;
-					show(record);
+					//show(record);
 				}
 				
 				try
@@ -178,7 +178,7 @@ public class CDC
 				catch (Exception e)
 				{
 					f = -1;
-                                        show(record);
+                                        //show(record);
 				}
                                 float percent = 0;
                                 float influenza = 0;
@@ -191,14 +191,14 @@ public class CDC
 				}
 				catch (Exception e)
 				{
-					show(record);
+					//show(record);
 				}
 				
 					
 				if (record[9].equals("> 100%"))
 				{
 					p = 100;
-					Week w = new Week(in, f, 100, percent, influenza, pneumonia);
+					Week w = null;//new Week(in, f, 100, percent, influenza, pneumonia);
 					season.weeks.add(w);
 				}
 				else
@@ -214,7 +214,7 @@ public class CDC
 					
 					//U.log(season.name + " " + in + " " + p + " " + f + percent + " " + influenza+ " " + pneumonia);
 					
-					Week w = new Week(in, f, p, percent, influenza, pneumonia);
+					Week w = null;//new Week(in, f, p, percent, influenza, pneumonia);
 					season.weeks.add(w);
 				}		
 					
@@ -228,7 +228,7 @@ public class CDC
 
 		try
 		{
-			out = new PrintStream(dir + "cdc.txt");
+			//out = new PrintStream(dir + "cdc.txt");
 		}
 		catch (Exception e)
 		{
@@ -236,10 +236,10 @@ public class CDC
 		}
 
                 for (int i = 0; i < nstates.size(); ++i)
-			graph(nstates.get(i), i);
+			//graph(nstates.get(i), i);
 		
                 U.log("close");
-		out.close();
+		//out.close();
 	}
 	
 	PrintStream out;

@@ -12,8 +12,7 @@ public class Main {
     static String RequestLog;
     static String InfoLog;
     static String Site;
-    //static String BucketName = "rq732p-public";
-    static String Login = "https://malt.chat/login.html";
+    static String Login = "https://malt.chat/base.html?a=create";
     static String host = "0.0.0.0";
     static int port = 8887;
     static boolean Secure = true;
@@ -21,7 +20,7 @@ public class Main {
     
     public static void main(String[] args) 
     {   
-        U.sendemail("matt.kuenzel@gmail.com", "Email test", "This is a test of MALT email");
+        //U.sendemail("matt.kuenzel@gmail.com", "Email test", "This is a test of MALT email");
         
         //String to = "hxsquid@gmail.com";
         //U.sendemail(to, "Invitation to chat on Malt.chat", to + 
@@ -41,7 +40,7 @@ public class Main {
         RequestLog = Home + "/logs/r";
         InfoLog = Home + "/logs/i";
         
-        U.log("STARTUP");
+        U.log("STARTUP version 1");
 
         new StopDetector().start();
         

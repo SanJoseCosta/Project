@@ -37,12 +37,19 @@
     var Closed = 3;
 
     var RestartTimeout = 3000;
+    var RefreshTimeout = 5000;
+
     var initTime = 0;
 
     var Secure = true;
 
     // where to go up on receiving a 2 type response to a 1 type request
+
     var pendingHandler;
+
+    // last user list
+
+    var lastList = "";
 
     function getMobile()
     {
@@ -175,6 +182,8 @@
 
         var messages = false;
 
+        var skipPageUpdate = false;
+
         if (parts[0] == "M")
         {
             var m = makeMessage(parts[3], parts[1], parts[2], false, "0");
@@ -196,7 +205,27 @@
         } 
         else if (parts[0] == "U" || parts[0] == "X")
         {
-            receiveUsers(parts);
+            log(lastList.length);
+            log(t.length);
+
+            if (lastList.length != t.length)
+                receiveUsers(parts);
+            else
+            {
+                var r = Math.random();
+                if (r < 0.1)
+                {
+                    log("received close match user string so updating at random " + r);
+                    receiveUsers(parts);
+                }
+                else
+                {
+                    log("received close match user string so skipping update");
+                    skipPageUpdate = true;
+                }
+            }
+            
+            lastList = t;
         }
         else if (parts[0] == "I")
         {
@@ -249,7 +278,8 @@
             logError("*** invalid message received: " + t);
         }
 
-        pageUpdate(messages);
+        if (!skipPageUpdate)
+            pageUpdate(messages);
     }
 
     function sendAck(id, status)
@@ -929,6 +959,8 @@
     {
         messages = [];
         users = [];
+        lastList = "";
+        
         sendConnectMessage(currentToken, ru);
     }
 
@@ -1061,7 +1093,7 @@
         document.getElementById("chats-footer").innerHTML = chatsFooterDiv();
     }
 
-    function makebox(user, msg, time)
+    function makebox(user, msg, time, isdummy)
     {
         // make the box representing a single chat
 
@@ -1088,13 +1120,29 @@
         
         //var bkgcolor = "blue";
         //box = replaceAll(box, "$$timesinceactive$$", timeSinceActive);
+
+
         
         box = replaceAll(box, "$$color$$", color);
-        box = replaceAll(box, "$$time$$", time);
+        
         box = replaceAll(box, "$$picurl$$", picurl);
         box = replaceAll(box, "$$click$$", click);
-        box = replaceAll(box, "$$msg$$", msg);
         box = replaceAll(box, "$$name$$", user.username);
+
+
+        log("summary message: ==" + msg + "==");
+
+
+        if (isdummy)
+        {
+            box = replaceAll(box, "$$msg$$", "NEW!");
+            box = replaceAll(box, "$$time$$", "");
+        }
+        else
+        {
+            box = replaceAll(box, "$$msg$$", msg);
+            box = replaceAll(box, "$$time$$", time);
+        }
         
         //box = replaceAll(box, "$$bkgcolor$$", bkgcolor);
 
@@ -1166,7 +1214,7 @@
  
             if (u.lastMessageSender == null || u.lastMessageSender == "")
             {
-                t += makebox(u, "", "");
+                t += makebox(u, "", "", false);
             }
             else
             {
@@ -1193,7 +1241,7 @@
 
                 var m = b1 + u.lastMessageSender + ": " + lm + b2;
 
-                t += makebox(u, m, ts);
+                t += makebox(u, m, ts, u.lastMessage == "dummy");
             }
         }
 
@@ -1287,7 +1335,7 @@
     function CommunityPageRefresh()
     {
         log("refresh");
-        setTimeout(CommunityPageRefresh, 50000);
+        setTimeout(CommunityPageRefresh, RefreshTimeout);
 
         if (pageMode <= 4)
             sendRefreshRequest();
@@ -1361,13 +1409,13 @@
         textarea.value = "";
     }
 
-    function inviteUser()
-    {
-        //log("invite");
+    //function inviteUser()
+    //{
+    //    //log("invite");
 
-        document.getElementById("search").style.visibilityState = "visible";
-        document.getElementById("search").placeholder="invite: enter email of person to invite"
-    }
+    //        document.getElementById("search").style.visibilityState = "visible";
+    //    document.getElementById("search").placeholder="invite: enter email of person to invite"
+    //}
     /*
     function searchUsersx()
     {
@@ -1377,6 +1425,7 @@
         document.getElementById("search").placeholder="search: username or email of person to find"
     }
     */
+
     function chatSettings()
     {
         alert("not available yet");
@@ -1699,7 +1748,22 @@
             log("password value is [" + password1 + "]");
         }
 
+
         var userdata = ["username", username, "email", email, "password", password1, "language", language, "picurl", imageChanged];
+
+        log(userdata);
+
+        var v = getUrlVars("invite");
+
+        log("invite is " + v);
+
+        if (v != null && v != "")
+        {
+            userdata.push("invite");
+            userdata.push(v);
+        }
+
+        log(userdata);
 
         if (isCreating)
             upload(userdata, imageChanged, createduser, imageSrc, null);
@@ -1814,6 +1878,7 @@
 
     function cancelEdit()
     {
+        lastList = "";
         changePage(getCommunityStartPage());
         sendRefreshRequest();
     }
@@ -2017,7 +2082,7 @@
         else
             changePage("login");
 
-        setTimeout(CommunityPageRefresh, 50000);
+        setTimeout(CommunityPageRefresh, RefreshTimeout);
 
         document.addEventListener("visibilitychange", function() 
         {
@@ -2087,6 +2152,10 @@
     {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
+
+        // get data from textarea
+
+        inviteUser("hxsquid@gmail.com");
     }
 
     function xModal()

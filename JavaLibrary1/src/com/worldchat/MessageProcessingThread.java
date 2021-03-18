@@ -5,15 +5,15 @@ import java.util.ArrayList;
 
 public class MessageProcessingThread extends Thread 
 {
-    JobQueue queue = new JobQueue();
+    //JobQueue queue = new JobQueue();
 
-    long last = 0;
+    static ArrayList<Long> messageProcessedTimes = new ArrayList<Long>();
 
-    public void run() 
+    public void runxxx() 
     {
-        U.pause(100 * 3600 * 1000);
-        while (true) 
-        {
+        //U.pause(100 * 3600 * 1000);
+        //while (true) 
+        //{
             //Job j = queue.get();
             //if (j != null) 
             //{
@@ -21,13 +21,13 @@ public class MessageProcessingThread extends Thread
             //} 
             //else 
             
-                U.pause(3);
+          //      U.pause(3);
             
-        }
+        //}
         
     }
     
-    void process(Job j)
+    static void process(Job j)
     {
         long time = System.currentTimeMillis();
         try
@@ -46,15 +46,18 @@ public class MessageProcessingThread extends Thread
 
         time = System.currentTimeMillis() - time;
         U.log("processed the message in " + time + " ms");
+
+        messageProcessedTimes.add(new Long(System.currentTimeMillis()));
+        U.log("messages received: " + messageProcessedTimes.size());
     }
 
-    void addJob(Job j) 
+    static void addJob(Job j) 
     {
         //queue.add(j);
         process(j);
     }
     
-    boolean processMessage(WebSocket socket, String message) 
+    static boolean processMessage(WebSocket socket, String message) 
     {
         U.log("received " + message.substring(0, 1) + " =========================================================");
         Connection.setLastActivityTime(socket);
@@ -312,11 +315,16 @@ public class MessageProcessingThread extends Thread
         
         if (email != null && email.indexOf("@") > 0 && email.indexOf(".") > 0)
         {
+        	User u = User.findUserByUsername(connection.username);
+        	String invite = HTTPSWebRequestHandler.returnToken(u);
+        	
             boolean r = U.sendemail(email, "Invitation to chat on Malt.chat", 
                         connection.username + 
                         " has sent you an invitation to chat. " + 
                         "Please click this link to login or create a new account and begin chatting: " +
-                        Main.Login);
+                        Main.Login + "&invite=" + invite
+
+            		);
             if (r)
             {
                 sendx(connection, "I" + WSServer.separator + "ok");

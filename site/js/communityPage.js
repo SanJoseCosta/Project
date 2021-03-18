@@ -68,6 +68,7 @@ function communityPage()
             </table>
 
         </div>
+        <br>
 
     `
 

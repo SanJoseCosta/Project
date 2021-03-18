@@ -1,6 +1,6 @@
 
 package com.worldchat;
-
+/*
 public class Pair 
 {
         String name;
@@ -11,8 +11,7 @@ public class Pair
             value = v;
         }
 }
-
-
+*/
 
 
 

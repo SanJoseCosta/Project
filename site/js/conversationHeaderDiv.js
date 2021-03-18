@@ -34,7 +34,9 @@ function conversationHeaderDiv()
             <div style="float:right;">
                 <img style="cursor: pointer; border-radius: 50%; padding: 0px;" $$click$$ src=$$local$$ height=30>
                 <br>
-                $$localusername$$
+                <div style="font-size:10;">
+                    $$localusername$$
+                </div>
             </div>
         </div>
 

@@ -206,6 +206,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
         String password = U.findInPairs(pairs, "password");
         String language = U.findInPairs(pairs, "language");
         String picurl = U.findInPairs(pairs, "picurl");
+        String invite = U.findInPairs(pairs, "invite");
 
         if (       nullempty(username)
                 || nullempty(email)
@@ -266,7 +267,24 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 User.storeUser(u);
                 
                 if (create)
+                {
                     Message.saveInitMessage(username);
+
+                    if (invite != null)
+                    {
+                        
+                        User inviter = User.findUserByToken(invite);
+
+                        U.log("invite code is " + invite);
+                        U.log("invitee is " + u.username);
+                        U.log("inviter is " + inviter.username);
+
+
+
+
+                        Message.saveDummyMessage(inviter.username, u.username);
+                    }
+                }
                 
                 return returnToken(u);
             } 

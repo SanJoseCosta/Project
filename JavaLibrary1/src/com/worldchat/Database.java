@@ -249,6 +249,22 @@ public class Database
         }
 
         status += ("========================"); 
+        
+        
+        ArrayList<Long> z = MessageProcessingThread.messageProcessedTimes;
+
+        int l = 10;
+        
+        for (int i = 0; i < 3; ++i)
+        {
+            int count = 0;
+            for (int j = 0; j < z.size(); ++j)
+                if (z.get(j).longValue() > (System.currentTimeMillis() - (l * 1000)))
+                    count++;
+            status += "<br>messages in last " + l + " seconds: " + count + "<br>";
+            l = l * 10;
+        }
+        
         return status;
     }
 }

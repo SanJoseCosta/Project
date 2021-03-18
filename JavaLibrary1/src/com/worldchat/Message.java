@@ -78,7 +78,11 @@ public class Message
 
     public String toString() 
     {
-        return message + ", " + translation + ", " + mid; 
+        return  "[from=" +  fromUserName + 
+                ", to=" + toUsername + 
+                ", message=" + message + 
+                ", translation=" + translation + 
+                ", mid=" + mid + "]"; 
     }
    
     static ArrayList<String> correspondents(String username) 
@@ -143,10 +147,7 @@ public class Message
         
         String cnvName = Conversation.conversationName(from, nuser);
         
-        String mid = System.currentTimeMillis() + "";
-        
-        for (int i = 0; i < 10; ++i)
-            mid += (int) (Math.random() * 10) + "";
+        String mid = timeRandomString();
         
         // add the translation
         
@@ -185,6 +186,8 @@ public class Message
         String cnvName = Conversation.conversationName(from, nuser);
                 
         Message message = new Message(from, "dummy", "", "0", 2, nuser);
+
+        U.log("new dummy message " +  message);
         
         try 
         {
@@ -210,6 +213,16 @@ public class Message
         {
             e.printStackTrace();
         }
+    }
+    
+    static String timeRandomString()
+    {
+        String mid = System.currentTimeMillis() + "";
+        
+        for (int i = 0; i < 10; ++i)
+            mid += (int) (Math.random() * 10) + "";
+        
+        return mid;
     }
 
     static void storeMessage(Message m, Conversation c) 
