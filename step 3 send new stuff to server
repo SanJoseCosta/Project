@@ -3,6 +3,6 @@ git pull origin main
 git add *
 git commit -m "first commit"
 git branch -M main
-git remote add origin https://github.com/SanJoseCosta/Project.git
+git remote set-url origin https://github.com/SanJoseCosta/Project.git
 git push -u origin main
-sleep 50
+sleep 5
