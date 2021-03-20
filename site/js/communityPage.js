@@ -2,7 +2,6 @@ function communityPage()
 {
     var s = getMobile() ?
 
-
     `   
         <style>
 
@@ -24,23 +23,15 @@ function communityPage()
 
         </style>
 
-        <div>
 
+        <div style="height: 100%">
+        
+            <div id=community-header style="xxxheight: 50px">
+            </div>
+             
             <table style="border-spacing: 0px; width: 100%; height: 100%;">
-
+               
                 <tr>
-                    <td td class=t1>
-                        <div id=chats-header>
-                        </div>
-                    </td>
-
-                    <td class=t2>
-                        <div id=conversation-header>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr style="height: 80%;">
                     <td class=t1>
                         <div id=chats-list>
                         </div>
@@ -48,7 +39,6 @@ function communityPage()
 
                     <td class=t2>
                         <div id=messages-list style="display: flex; flex-direction: column;">
-                            
                         </div>
                     </td>
                 </tr>
@@ -68,8 +58,6 @@ function communityPage()
             </table>
 
         </div>
-        <br>
-
     `
 
     :

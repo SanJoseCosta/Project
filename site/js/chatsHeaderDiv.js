@@ -7,7 +7,7 @@ function chatsHeaderDiv()
         <div style="min-height: 50px;background-color: white">
 
                 <a href=index.html>
-                    <img height=30 style="padding: 10px;float:left; cursor: pointer;" src=assets/images/malt-logo.svg>
+                    <img height=30 style="padding: 10px;float:left; cursor: pointer;" src=images/logo.png>
                 </a> 
             
             </div>
@@ -36,7 +36,7 @@ function chatsHeaderDiv()
             <div style="min-height: 50px;background-color: white">
 
                 <a href=index.html>
-                    <img height=30 style="padding: 5px;float:left; cursor: pointer;" src=assets/images/malt-logo.svg>
+                    <img height=30 style="padding: 5px;float:left; cursor: pointer;" src=images/logo.png>
                 </a> 
             
             </div>

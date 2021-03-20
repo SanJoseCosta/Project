@@ -42,7 +42,7 @@ public class SuperSimpleSynchronizer extends WebSocketServer {
                     {
                         byte[] b = Base64.getDecoder().decode(parts[1]);
 
-                        System.out.println("save as " + dir + parts[0]);
+                        System.out.println("saved");
                         new File(dir + parts[0]).getParentFile().mkdirs();
 
                         FileOutputStream out = new FileOutputStream(dir + parts[0]);

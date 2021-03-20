@@ -1086,7 +1086,9 @@
 
     function chatsHeader()
     {
-        document.getElementById("chats-header").innerHTML = chatsHeaderDiv();
+        var p = document.getElementById("chats-header");
+        if (p != null)
+            p.innerHTML = chatsHeaderDiv();
     }
 
     function chatsFooter()
@@ -1270,19 +1272,45 @@
 
             log("make conversation header for " + luser.username + " with local pic " + getLocalPic());
 
-            var div = conversationHeaderDiv();
+            if (getMobile())
+            {
+                var div = communityHeader();
 
-            div = replaceAll(div, "$$picurl$$", picturefile(ru));
-            div = replaceAll(div, "$$local$$", getLocalPic());
+                div = replaceAll(div, "$$picurl$$", picturefile(ru));
+                div = replaceAll(div, "$$local$$", getLocalPic());
 
-            div = replaceAll(div, "$$localusername$$", luser.username);
+                div = replaceAll(div, "$$localusername$$", luser.username);
 
-            div = replaceAll(div, "$$name$$", ru.username);
-            div = replaceAll(div, "$$time$$", tds(ru.onlinestatus));
+                div = replaceAll(div, "$$name$$", ru.username);
+                div = replaceAll(div, "$$time$$", tds(ru.onlinestatus));
 
-            div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
+                div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
 
-            document.getElementById("conversation-header").innerHTML = div;
+                var p = document.getElementById("community-header");
+
+                if (p != null)
+                    p.innerHTML = div;
+            }
+            else
+            {
+                var div = conversationHeaderDiv();
+
+                div = replaceAll(div, "$$picurl$$", picturefile(ru));
+                div = replaceAll(div, "$$local$$", getLocalPic());
+
+                div = replaceAll(div, "$$localusername$$", luser.username);
+
+                div = replaceAll(div, "$$name$$", ru.username);
+                div = replaceAll(div, "$$time$$", tds(ru.onlinestatus));
+
+                div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
+
+                var p = document.getElementById("conversation-header");
+
+                if (p != null)
+                    p.innerHTML = div;
+            }
+
         }
 
         var s = "";
