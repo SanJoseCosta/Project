@@ -12,7 +12,7 @@ function messageDisplayedLeft()
                     <br><br>
                 </div>
 
-                <div style="float: left; border-radius: 10px; max-width: 70%; background-color: blue; color: white; padding: 15px;">
+                <div style="float: left; border-radius: 10px; max-width: 100%; background-color: blue; color: white; padding: 15px;">
                     <img style="border-radius: 50%;" src=$$pic$$ width=30 height=30>
                     $$msg$$<br>($$translation$$)
                 </div>
@@ -33,7 +33,7 @@ function messageDisplayedLeft()
                     <br><br>
                 </div>
 
-                <div style="float: left; border-radius: 10px; max-width: 70%; background-color: blue; color: white; padding: 15px;">
+                <div style="float: left; border-radius: 10px; max-width: 100%; background-color: blue; color: white; padding: 15px;">
                     <img style="border-radius: 50%;" src=$$pic$$ width=30 height=30>
                     $$msg$$<br>($$translation$$)
                 </div>
@@ -41,7 +41,7 @@ function messageDisplayedLeft()
             </div>
         </div>
     `
-    
+
     ;
     return s;
 }
@@ -92,7 +92,7 @@ function messageDisplayedRight()
             </div>
         </div>
     `
-    
+
     ;
 
     return s;
