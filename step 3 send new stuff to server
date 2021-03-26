@@ -5,4 +5,4 @@ git commit -m "first commit"
 git branch -M main
 git remote set-url origin https://github.com/SanJoseCosta/Project.git
 git push -u origin main
-sleep 5
+sleep 50
