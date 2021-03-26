@@ -1086,20 +1086,15 @@
 
         var click = "\"talk('" + user.username + "')\"";
         
-        //var bkgcolor = "blue";
-        //box = replaceAll(box, "$$timesinceactive$$", timeSinceActive);
-
-
-        
         box = replaceAll(box, "$$color$$", color);
         
         box = replaceAll(box, "$$picurl$$", picurl);
         box = replaceAll(box, "$$click$$", click);
-        box = replaceAll(box, "$$name$$", user.username);
 
+        var uname = user.username;
+        if (uname.length > 7) uname = uname.substring(0, 7) + "..";
 
-        log("summary message: ==" + msg + "==");
-
+        box = replaceAll(box, "$$name$$", uname);
 
         if (isdummy)
         {

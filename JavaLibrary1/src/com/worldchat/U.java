@@ -22,8 +22,8 @@ public class U
     static PrintStream req;
     static PrintStream inf;
     
-    static String GoogleUser = "hxsquid"; // maltchatmailer";
-    static String Password = "z$A6*T2=";
+    static String GoogleUser =  "support@malt.chat";    //"hxsquid"; // maltchatmailer";
+    static String Password =    "plexus11";             //"z$A6*T2=";
     
     public static void req(Object s) 
     {
@@ -494,7 +494,7 @@ public class U
     {
         try 
         {
-            String fromAddress = GoogleUser + "@gmail.com";
+            String fromAddress = GoogleUser;    // + "@gmail.com";
             String host = "smtp.gmail.com";
 
             // Get system properties
