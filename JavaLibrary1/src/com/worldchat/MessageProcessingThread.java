@@ -73,7 +73,23 @@ public class MessageProcessingThread extends Thread
         {
             if (messageType.equals("s"))
             {
-                Connection.removeConnection(socket);
+               if (connection != null)
+                {
+                    Connection.stopConnection(socket);
+                    if (connection.conversation != null)
+                        Conversation.deleteConversation(connection.conversation);
+                }  
+            }
+            else if (messageType.equals("S"))
+            {
+                if (connection != null)
+                {
+                    Connection.stopConnection(socket);
+                    if (connection.conversation != null)
+                        Conversation.deleteConversation(connection.conversation);
+                }
+                            
+                return signIn(socket, parts); 
             }
             else if (messageType.equals("1"))
             {
@@ -120,7 +136,7 @@ public class MessageProcessingThread extends Thread
             {
                 // community connection
 
-                if (isOneOf(messageType, "CFRI"))
+                if (isOneOf(messageType, "CFRIS"))
                 {
                    return handleCommunityMessage(parts, connection); 
                 }

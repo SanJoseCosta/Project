@@ -149,10 +149,12 @@ public class Message
         
         String mid = timeRandomString();
         
-        // add the translation
+        // todo add the translation
+
+        String m1 = "Welcome to MALT.chat. To get started, click the icons to Find another user, or, Invite someone new.";
         
-        Message message = new Message(Main.SupportUser, "Welcome to MALT.chat", "", mid, 2, nuser);
-        
+        Message message = new Message(Main.SupportUser,  m1, m1, mid, 2, nuser);
+
         try 
         {
             String[] fields = 

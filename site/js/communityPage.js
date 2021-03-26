@@ -5,57 +5,51 @@ function communityPage()
     `   
         <style>
 
-            .t1
-            {
-                
-                background-color:#76b333;;
-                width: 30%;
-                
+            .row {
+              display: flex;
             }
 
-            .t2
+            .column1 
             {
-                
-                background-color:#76b222;;
-                width: 70%;
-                
+              flex: 20%;
+              background-color:#76b333;;
+            }
+
+            .column2
+            {
+              flex: 80%;
+              background-color:#76b333;;
             }
 
         </style>
 
 
-        <div style="height: 100%">
+        <div style="height: 90%;">
         
-            <div id=community-header style="xxxheight: 50px">
+
+
+            <div class=row id=community-header style="height: 9%;">
             </div>
              
-            <table style="border-spacing: 0px; width: 100%; height: 100%;">
-               
-                <tr>
-                    <td class=t1>
-                        <div id=chats-list>
-                        </div>
-                    </td>
+            <div class=row style="height: 85%;">
+                <div class=column1>
+                    <div id=chats-list>
+                    </div>
+                </div>
 
-                    <td class=t2>
-                        <div id=messages-list style="display: flex; flex-direction: column;">
-                        </div>
-                    </td>
-                </tr>
+                <div class=column2>
+                    <div id=messages-list style="display: flex; flex-direction: column;">
+                    </div>
+                </div>
+            </div>
 
-                <tr>
-                    <td class=t1 style="background-color:#96d872;">
-                        <div id=chats-footer>
-                        </div>
-                    </td>
-                    <td class=t2 style="background-color:#96d872;">
-                        <div id=conversation-footer style="background-color:#96d872; padding:15px;">
-                            <textarea rows=1 onkeyup="messageBoxInput();" placeholder="Type ..." id=msg></textarea>
-                        </div>
-                    </td>
-                </tr>
+            <div class=row style="height: 9%;">
+                <div id=conversation-footer style="padding: 10px;">
+                    <textarea rows=1 onkeyup="messageBoxInput();" placeholder="New message ..." id=msg></textarea>
+                </div>
+            </div>
 
-            </table>
+            
 
         </div>
     `
@@ -85,7 +79,7 @@ function communityPage()
 
         <div>
 
-            <table style="border-spacing: 0px; width: 100%; height: 100%;">
+            <table style="width: 100%; height: 100%;">
 
                 <tr>
                     <td class=t1>
@@ -119,7 +113,7 @@ function communityPage()
                     </td>
                     <td class=t2 style="background-color:#96d872;">
                         <div id=conversation-footer style="background-color:#96d872; padding:15px;">
-                            <textarea rows=1 onkeyup="messageBoxInput();" placeholder="Type your message..." id=msg></textarea>
+                            <textarea rows=1 onkeyup="messageBoxInput();" placeholder="New message ..." id=msg></textarea>
                         </div>
                     </td>
                 </tr>

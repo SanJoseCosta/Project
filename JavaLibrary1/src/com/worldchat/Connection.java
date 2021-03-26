@@ -112,7 +112,8 @@ public class Connection
     {
         for (int i = 0; i < connections.size(); ++i) 
         {
-            if (connections.get(i) == c) {
+            if (connections.get(i) == c) 
+            {
                 connections.remove(i);
                 break;
             }

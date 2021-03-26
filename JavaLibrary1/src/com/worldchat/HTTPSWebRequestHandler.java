@@ -39,10 +39,6 @@ public class HTTPSWebRequestHandler implements HttpHandler
             r = t.getRequestURI().getPath();
             String q = t.getRequestURI().getQuery();
             
-            //U.log("request " + r);
-            
-            //currentMessage.getRequestHeaders().entrySet().forEach(n -> U.log("header:" + n));
-            
             if (q == null) q = "";
  
             if (t.getRequestMethod().toLowerCase().equals("head")) 
@@ -67,7 +63,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
             
             /////
             
-            if (r.trim().startsWith("/status.html"))
+            if (r.trim().startsWith("/status"))
             {
                 String response = Database.print();
                 result = sendMsg(response.getBytes(), t, TextMime, null);
@@ -153,8 +149,6 @@ public class HTTPSWebRequestHandler implements HttpHandler
 
     int sendFile(String file, HttpExchange t) 
     {
-        //U.log("send file " + file);
-        
         byte[] rb = getFile(Main.Site + file);
 
         if (rb == null || rb.length == 0) 

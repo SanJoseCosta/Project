@@ -3,7 +3,7 @@ function communityHeader()
     var s = getMobile() ?
 
     `
-        <div style="display: flex; justify-content: center;  align-items: center; background-color: white; border-spacing: 0px; width: 100%;">
+        <div style="display: flex; justify-content: center;  align-items: center; background-color: white; width: 100%;">
 
         	<img onclick="home();" height=30 style="padding: 10px;float:left; cursor: pointer;" src=images/logo.png>
 
@@ -14,7 +14,7 @@ function communityHeader()
         	&nbsp;&nbsp;
 
         	<div style="flex-grow: 1;">
-                <b>$$name$$</b> active $$time$$
+                <b>$$name$$</b> <span style="font-size: 10px;">active $$time$$</span>
         	</div>
 
         	<span style="float:right; padding:10px;">

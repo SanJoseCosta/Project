@@ -19,6 +19,7 @@
 
     var pageMode = 99;
     var currentToken = null;
+    var CommunityPageRefreshStarted = false;
 
     // pageMode values
     // 0 = edit/create
@@ -631,17 +632,15 @@
 
         var ajax = new XMLHttpRequest();
 
-        /// todo the .html on these calls is unnecessary
-
         if (token == null)
         {
-            ajax.open("POST", serverRequest("/createuser.html"));
+            ajax.open("POST", serverRequest("/createuser"));
         }
         else
         {
             var params = "token=" + token;
             var encodedMessage = encodeURI(params);
-            var page = serverRequest("/edituser.html?") + encodedMessage;
+            var page = serverRequest("/edituser?") + encodedMessage;
 
             if (debug) log("upload to " + page);
 
@@ -1055,45 +1054,11 @@
         log("msg sent via websocket: " + pm);
     }
 
-    /*
-    function communityHeaderxxx()
-    {
-        var div = pageHeaderDiv();
-        var picurl;
-        var lu = findLocalUser();
-
-        if (lu == null) 
-        {
-            logError("*** the local user is null in header()");
-            return;
-        }
-
-        if (lu != null)
-            picurl = picturefile(lu);
-        else
-            picurl = imageRequest(DefaultProfilePic);
-
-        // clicking this goes to edit user settings
-
-        var click = "onclick=\"edit();\""; 
-
-        div = replaceAll(div, "$$picurl$$", picurl);
-        div = replaceAll(div, "$$click$$", click);
-
-        document.getElementById("header").innerHTML = div;
-    }
-    */
-
     function chatsHeader()
     {
         var p = document.getElementById("chats-header");
         if (p != null)
             p.innerHTML = chatsHeaderDiv();
-    }
-
-    function chatsFooter()
-    {
-        document.getElementById("chats-footer").innerHTML = chatsFooterDiv();
     }
 
     function makebox(user, msg, time, isdummy)
@@ -1253,7 +1218,6 @@
         pageHeader();
 
         chatsHeader();
-        chatsFooter();
     }
 
     function ConversationUpdate()
@@ -1443,37 +1407,7 @@
     {
         alert("not available yet");
     }
-    /*
-    function chatsInput()
-    {
-        var e = document.getElementById("search");
-
-        var n = e.value.charCodeAt(e.value.length - 1);
-        var v = e.value.substring(0, e.value.length - 1);
-
-        log("**" + v + "**, " + n);
-
-        if (n == 10)
-        {
-            if (true)
-            {
-                e.blur();
-                searchUsers(currentToken, v);
-            }
-            else
-            {
-                 // check input
-                inviteUser(v);
-            }
-
-            e.value = "";
-
-            return false;
-        }
-
-        return true;
-    }
-    */
+   
     function backButton()
     {
         changePage(getCommunityStartPage());
@@ -1505,11 +1439,6 @@
         if (stop)
             return;
 
-        //log("page request");
-
-        //var params = "username=" + email + "&password=" + password;
-        //pageRequest(serverRequest("/checklogin.html?"), params, checklogin);
-
         sendCheckRequest("checklogin", email, password);
         pendingHandler = checkloginresponse;
     }
@@ -1520,7 +1449,7 @@
         var password = get("password").value.trim();
 
 
-        var token = r;//.responseText;
+        var token = r;
         
 
         currentToken = token;
@@ -1662,9 +1591,6 @@
 
         if (creating)
         {
-            //var params = "username=" + username;
-            //pageRequest(serverRequest("/checkusername.html?"), params, checkusername);
-
             sendCheckRequest("checkusername", username, null);
             pendingHandler = checkusernameresponse;
         }
@@ -1682,9 +1608,6 @@
 
             if (email != local.email)
             {
-                //var params = "email=" + email;
-                //pageRequest(serverRequest("/checkemail.html?"), params, checkemail);
-
                 sendCheckRequest("checkemail", email, null);
                 pendingHandler = checkemailresponse;
             }
@@ -1701,16 +1624,11 @@
 
         log("checkusername response " + r.responseText);
 
-        //if (r.responseText == "dup")
-        
         if (r == "dup")
         {
             inputError("usernameerror", "that username is already taken, please choose another");
             return;
         }
-
-        //var params = "email=" + email;
-        //pageRequest(serverRequest("/checkemail.html?"), params, checkemail);
 
         sendCheckRequest("checkemail", email, null);
         pendingHandler = checkemailresponse;
@@ -1909,6 +1827,7 @@
     {
         var x = t;
 
+        t = t.trim();
         t = t.replace("\n", " ");
 
         if (x != t)
@@ -2024,15 +1943,15 @@
         if (time < 1)
             return "just now";
         if (time < 60)
-            return t2(time, "second");
+            return t2(time, "sec");
         time = time / 60;
-        if (time < 60)
-            return t2(time, "minute");
+        if (time < 200)
+            return t2(time, "min");
         time = time / 60;
-        if (time < 24)
-            return t2(time, "hour");
+        if (time < 50)
+            return t2(time, "hr");
         time = time / 24;
-        if (time < 7)
+        if (time < 25)
             return t2(time, "day");
         time = time / 7;
             return t2(time, "week");
@@ -2090,7 +2009,8 @@
         else
             changePage("login");
 
-        setInterval(CommunityPageRefresh, RefreshTimeout);
+        if (!CommunityPageRefreshStarted) setInterval(CommunityPageRefresh, RefreshTimeout);
+        CommunityPageRefreshStarted = true;
 
         document.addEventListener("visibilitychange", function() 
         {
@@ -2123,48 +2043,61 @@
 
     };
 
-    // todo logic for search and invite
+    ////////////////////////////////////////////////////////////////////
+
+    function popModal(p1, p2, p3)
+    {
+        var r = newchatModal();
+
+        r = replaceAll(r, "$$okclick$$", p1);
+
+        r = replaceAll(r, "$$cancelclick$$", p2);
+
+        r = replaceAll(r, "$$placeholder$$", p3);
+
+        var modal = document.getElementById("myModal");
+
+        if (modal != null)
+            modal.remove();
+
+        var body = document.getElementsByTagName("BODY")[0];
+        body.innerHTML += r;
+        
+        modal = document.getElementById("myModal");
+        modal.style.display = "block";
+    }
+
+    function closeModalReturnValue()
+    {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+        var textarea = document.getElementById("txa");
+        var r = textarea.value;
+        return r;
+    }
 
     function newchat()
     {
         log("newchat");
+        popModal("onclick='searchForNewChat();'", "onclick='xModal();'", "username or email");
+    }
 
-        if (document.getElementById("myModal") == null)
-        {
-            var body = document.getElementsByTagName("BODY")[0];
-            body.innerHTML += newchatModal();
-        }
-        
-        openModal();
+    function searchForNewChat()
+    {
+        var r = closeModalReturnValue();
+        searchUsers(currentToken, r);
     }
 
     function invitation()
     {
         log("invitation");
-        
-        if (document.getElementById("myModal") == null)
-        {
-            var body = document.getElementsByTagName("BODY")[0];
-            body.innerHTML += newchatModal();
-        }
-
-        openModal();
+        popModal("onclick='sendInvitation();'", "onclick='xModal();'", "email");
     }
 
-    function openModal()
+    function sendInvitation()
     {
-        var modal = document.getElementById("myModal");
-        modal.style.display = "block";
-    }
-
-    function okModal()
-    {
-        var modal = document.getElementById("myModal");
-        modal.style.display = "none";
-
-        // todo get data from textarea
-
-        inviteUser("hxsquid@gmail.com");
+        var r = closeModalReturnValue();
+        inviteUser(r);
     }
 
     function xModal()
