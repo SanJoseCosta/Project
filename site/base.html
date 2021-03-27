@@ -8,77 +8,75 @@
 
 <style>
 
-  	html, body 
-  	{
-  		    font-family: "Helvetica Neue";
-  		    xxxheight: 90vh;
-          margin: 0;
-          border-spacing: 0px;
-  		    border:0;
-  	}
+    html, body 
+    {
+    font-family: "Helvetica Neue";
+    xxxheight: 90vh;
+    margin: 0;
+    border-spacing: 0px;
+    border:0;
+    }
 
     td, th, tr
     {
-      padding:0
+    padding:0
     }
 
     #messages-list
     {
-        overflow-y: scroll;
-        height: 100%;
+    overflow-y: scroll;
+    height: 100%;
     }
 
     #chats-list
     {
-        overflow-y: scroll;
-        height: 100%;
+    overflow-y: scroll;
+    height: 100%;
     }
 
-	.block
-	{
-		padding:10px;
-		background-color:#76b852;;
-	}
+    .block
+    {
+    padding:10px;
+    background-color:#76b852;;
+    }
 
-	.block.right 
-  {
-		align-self: flex-end;
-	}
+    .block.right 
+    {
+    align-self: flex-end;
+    }
 
 
-	.textl
-	{
-		background-color:#76b852;;
-		padding:10px;
-	}
+    .textl
+    {
+    background-color:#76b852;;
+    padding:10px;
+    }
 
-	.textr
-	{
-		background-color:#76b852;;
-		padding:10px;
-	}
+    .textr
+    {
+    background-color:#76b852;;
+    padding:10px;
+    }
 
-	textarea
-	{
+    textarea
+    {
     width:50%;
-    resize: none;
-    xxxvertical;
+    xxxresize: none;
     padding:15px;
     border-radius:15px;
     border:0;
     box-shadow:4px 4px 10px rgba(0,0,0,0.55);
-    xxxheight:50px;
-    font-size: 100%;
-	}
+    font-size: 16px;
+    }
 
-		@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+    @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
-  .login-page {
+    .login-page {
     width: 360px;
     padding: 8% 0 0;
     margin: auto;
-  }
-  .form {
+    }
+    .form {
     position: relative;
     z-index: 1;
     background: #FFFFFF;
@@ -87,8 +85,8 @@
     padding: 45px;
     text-align: center;
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-  }
-  .form input {
+    }
+    .form input {
     font-family: "Roboto", sans-serif;
     outline: 0;
     background: #f2f2f2;
@@ -97,9 +95,9 @@
     margin: 0 0 15px;
     padding: 15px;
     box-sizing: border-box;
-    font-size: 14px;
-  }
-  .form button {
+    font-size: 16px;
+    }
+    .form button {
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
     outline: 0;
@@ -108,60 +106,60 @@
     border: 0;
     padding: 15px;
     color: #FFFFFF;
-    font-size: 14px;
+    font-size: 16px;
     -webkit-transition: all 0.3 ease;
     transition: all 0.3 ease;
     cursor: pointer;
-  }
-  .form button:hover,.form button:active,.form button:focus {
+    }
+    .form button:hover,.form button:active,.form button:focus {
     background: #43A047;
-  }
-  .form .message {
+    }
+    .form .message {
     margin: 15px 0 0;
     color: #b3b3b3;
     font-size: 12px;
-  }
-  .form .message a {
+    }
+    .form .message a {
     color: #4CAF50;
     text-decoration: none;
-  }
-  .form .register-form {
+    }
+    .form .register-form {
     display: none;
-  }
-  .container {
+    }
+    .container {
     position: relative;
     z-index: 1;
     max-width: 300px;
     margin: 0 auto;
-  }
-  .container:before, .container:after {
+    }
+    .container:before, .container:after {
     content: "";
     display: block;
     clear: both;
-  }
-  .container .info {
+    }
+    .container .info {
     margin: 50px auto;
     text-align: center;
-  }
-  .container .info h1 {
+    }
+    .container .info h1 {
     margin: 0 0 15px;
     padding: 0;
     font-size: 36px;
     font-weight: 300;
     color: #1a1a1a;
-  }
-  .container .info span {
+    }
+    .container .info span {
     color: #4d4d4d;
     font-size: 12px;
-  }
-  .container .info span a {
+    }
+    .container .info span a {
     color: #000000;
     text-decoration: none;
-  }
-  .container .info span .fa {
+    }
+    .container .info span .fa {
     color: #EF3B3A;
-  }
-  body {
+    }
+    body {
     background: #76b852; /* fallback for old browsers */
     background: -webkit-linear-gradient(right, #76b852, #8DC26F);
     background: -moz-linear-gradient(right, #76b852, #8DC26F);
@@ -170,93 +168,93 @@
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;      
-  }
-	
-   @media screen and (max-width: 645px) {
-        textarea {
-            width: 100%;
-        }
+    }
+
+    @media screen and (max-width: 645px) {
+    textarea {
+    width: 100%;
+    }
     }
 
 
-        .summarybox
-        {
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                color: white; 
-                background-color: #5845f0; 
-                padding: 10px; 
-                border-radius: 10px; 
-                cursor: pointer;
-        }
+    .summarybox
+    {
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      color: white; 
+      background-color: #5845f0; 
+      padding: 10px; 
+      border-radius: 10px; 
+      cursor: pointer;
+    }
 
-        .summaryboxm
-        {
-                align-items: center; 
-                justify-content: center; 
-                color: white; 
-                background-color: #5845f0; 
-                padding: 10px; 
-                border-radius: 10px; 
-                cursor: pointer;
-        }
+    .summaryboxm
+    {
+      align-items: center; 
+      justify-content: center; 
+      color: white; 
+      background-color: #5845f0; 
+      padding: 10px; 
+      border-radius: 10px; 
+      cursor: pointer;
+    }
 
 
-        .photocontainer {
-            width: 50px;
-            height: 50px;
-            position: relative;
-          }
-          .photobox {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            xxxopacity: 0.7;
-          }
-          .photooverlay {
-            z-index: 9;
-            background: #009938;
-          }
-        
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-          }
+    .photocontainer {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    }
+    .photobox {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    xxxopacity: 0.7;
+    }
+    .photooverlay {
+    z-index: 9;
+    background: #009938;
+    }
 
-          /* Modal Content/Box */
-          .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 35%; /* Could be more or less, depending on screen size */
-          }
+    .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
 
-          /* The Close Button */
-          .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-          }
+    /* Modal Content/Box */
+    .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 35%; /* Could be more or less, depending on screen size */
+    }
 
-          .close:hover,
-          .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-          }
+    /* The Close Button */
+    .close {
+    color: #aaa;
+    float: right;
+    font-size: 16px;
+    font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    }
           	 
 </style>
 
