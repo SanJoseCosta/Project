@@ -94,18 +94,41 @@ public class Conversation
         if (tocon != null) 
         {
             // if message is not successfully sent then status = 1
-            status = 1;
             // if message is successfully sent then status = 2
-            String t = Message.formatToSend("M", msg, translation, mid, 2, false); 
+
+            status = 1;
+
+            ArrayList<String> messages = new ArrayList<String>();
+            String message = Message.jsonToSend(msg, translation, mid, 2, false); 
+            messages.add(message);
+
+            String mstring = Json.array("message", "messages", messages);
+            U.log("******** message: " + mstring);
+
+            boolean r = MessageProcessingThread.sendx(tocon, mstring);
+            U.log((r ? "Successfuly " : "Failed to ") + "forward message " + U.truncate(mstring, 30) + " to " + tocon.username);
             
-            if (U.sendStringToCon(t, tocon, false))
-            {
-                status = 2;
-                U.log("Forwarded message " + msg + " from " + fromcon.username + " to " + tocon.username);
-                
-                // should receive an ack very soon
-            }
+            if (r) status = 2;
         }
+       
+        String oside = otherSide(User.findUserByUsername(fromcon.username)).username();
+        
+        Message m = new Message(fromcon.username, msg, translation, mid, status, oside);
+        
+        U.log("storing new message " + m);
+        
+        Message.storeMessage(m, this);
+        
+        // update the other person's chat list info if that person is online
+        
+        User ouser = User.findUserByUsername(oside);
+        Connection oconn = Connection.findConnection(ouser);
+        if (oconn != null) MessageProcessingThread.sendLCU(oconn);
+    }
+
+
+
+
         /*
         else if (!EmailSent)
         {
@@ -123,24 +146,8 @@ public class Conversation
         }
         */
        
-        String oside = otherSide(User.findUserByUsername(fromcon.username)).username();
-        
-        Message m = new Message(
-                fromcon.username, 
-                msg, translation, mid, status, 
-                oside);
-        
-        
-        U.log("storing new message " + m);
-        
-        Message.storeMessage(m, this);
-        
-        // update the other person's chat list info if that person is online
-        
-        User ouser = User.findUserByUsername(oside);
-        Connection oconn = Connection.findConnection(ouser);
-        if (oconn != null) MessageProcessingThread.sendLCU(oconn);
-    }
+
+
     
     Message findMessage(String mid) 
     {
@@ -176,8 +183,16 @@ public class Conversation
 
         if (tocon != null)    
         {
-            String t = Message.formatToSend("A", m.message, m.translation, mid, userstatus, false);
-            boolean r = U.sendStringToCon(t, tocon, false);
+            ArrayList<String> messages = new ArrayList<String>();
+            String message = Message.jsonToSend(m.message, m.translation, mid, userstatus, false); 
+            messages.add(message);
+
+            String mstring = Json.array("ack", "messages", messages);
+            U.log("******** ack: " + mstring);
+
+            //String t = Message.formatToSend("A", m.message, m.translation, mid, userstatus, false);
+            
+            boolean r = MessageProcessingThread.sendx(tocon, mstring);
             U.log((r ? "Successfuly " : "Failed to ") + "forward ack " + mid + " from " + fromcon.username + " to " + tocon.username);
         }
         else
@@ -203,35 +218,26 @@ public class Conversation
     
     void sendHistory(Connection tocon) 
     {
-        if (tocon != null)
-        {
-            String s = "H" + WSServer.separator;
-            
-            String[] fields = {"conversation", conversationName()};
-            ArrayList<Record> ms = Database.getMessages(fields);
-            
-            for (int i = 0; i < ms.size(); ++i)
-            {
-                Message m = new Message(ms.get(i));
-                String tc = m.formatToSend(tocon);
-                
-                s += tc;
-                if (i < ms.size() - 1) s += WSServer.separator;
-            }
-            boolean r = U.sendStringToCon(s, tocon, false);
-            U.log((r ? "Successfuly " : "Failed to ") + "send history message " + U.truncate(s, 30) + " to " + tocon.username);
-        }
-    }
-
-    boolean sendMessageTo(Message m, Connection tocon) 
-    {
-        boolean local = (m.fromUserName.equals(tocon.username));
+        if (tocon == null) return;
         
-        String t = Message.formatToSend("H", m.message, m.translation, m.mid, m.status(), local);
-        boolean r = U.sendStringToCon(t, tocon, false);
-        U.log((r ? "Successfuly " : "Failed to ") + "send history message " + t + " from " + m.fromUserName + " to " + tocon.username);
+        String[] fields = {"conversation", conversationName()};
 
-        return r;
+        ArrayList<Record> ms = Database.getMessages(fields);
+
+        ArrayList<String> messages = new ArrayList<String>();
+        
+        for (int i = 0; i < ms.size(); ++i)
+        {
+            Message m = new Message(ms.get(i));
+            String j2send = m.jsonToSend(tocon);
+            messages.add(j2send);
+        }
+      
+        String a = Json.array("history", "messages", messages);
+        U.log("******** history: " + a);
+
+        boolean r = MessageProcessingThread.sendx(tocon, a);
+        U.log((r ? "Successfuly " : "Failed to ") + "send history message " + U.truncate(a, 30) + " to " + tocon.username);
     }
   
     public String toString() 

@@ -68,6 +68,10 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 String response = Database.print();
                 result = sendMsg(response.getBytes(), t, TextMime, null);
             }
+
+
+
+            /*
             else if (r.trim().startsWith("/checkusername")) 
             {
                 String response = (User.findUserByUsername(username) != null) ? "dup" : "ok";
@@ -85,7 +89,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 String response;
                 if (User.findUserByEmail(email) != null)
                 {
-                   response = "dupemail";
+                    response = "dupemail";
                 }
                 else if (User.findUserByUsername(username) != null)
                 {
@@ -103,7 +107,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 String response = login(username, password);
                 U.log("checklogin sending " + response);
                 result = sendMsg(response.getBytes(), t, TextMime, null);
-            } 
+            }
+            */
+
+
+
             else if (r.trim().startsWith("/createuser") || r.trim().startsWith("/edituser")) 
             {
                 if (t.getRequestMethod().equals("POST")) 
@@ -158,39 +166,8 @@ public class HTTPSWebRequestHandler implements HttpHandler
         }
         else
         {
-            //U.log("sending " + file);
             return sendMsg(rb, t, getMimeType(file), file);
         }
-    }
-
-    static String login(String username, String password) 
-    {
-        U.log("login");
-        
-        String r;
-        User u = User.findUserByUsername(username);
-        
-        if (u == null) 
-            u = User.findUserByEmail(username);
-        
-        if (u == null) 
-            r = "xnouser";
-        else
-        {
-            U.log("login " + u.password + " " + password);
-            if (!u.password.equals(password)) 
-            {
-                r = "xwrongpassword";
-            }
-            else
-            {
-                String t = returnToken(u);
-                U.log("token " + t);
-                r = t;
-            }
-        }
-        
-        return r;
     }
 
     String create(ArrayList<Pair> pairs, boolean create) 
@@ -320,7 +297,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
             t.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             
             
-            //==//============ expires in 60 secs
+            //==//============ expires in 200 secs
             
             
             t.getResponseHeaders().set("Expires", httpDate(200000));
@@ -339,7 +316,6 @@ public class HTTPSWebRequestHandler implements HttpHandler
             os.write(rb);
             os.close();
 
-            //U.log("sending response, length = " + rb.length);
             return rb.length;
         } 
         catch (Exception e) 
@@ -401,47 +377,6 @@ public class HTTPSWebRequestHandler implements HttpHandler
     
     static byte[] getRequestBody(HttpExchange t) 
     {
-        /*
-        int k = 0;
-        
-        // this can be a buffer that expands as necessary
-        
-        byte[] bodybuffer = U.getBuffer();
-
-        while (true) 
-        {
-            try 
-            {
-                
-                int rq = t.getRequestBody().read(bodybuffer, k, bodybuffer.length - k);
-                if (rq < 0) 
-                {
-                    break;
-                } 
-                else 
-                {
-                    k += rq;
-                }
-                
-            } 
-            catch (Exception e) 
-            {
-                e.printStackTrace();
-                break;
-            }
-        }
-        
-        byte[] r = new byte[k];
-        
-        for (int i = 0; i < k; ++i) 
-        {
-            r[i] = bodybuffer[i];
-        }
-        
-        return r;
-        */
-        
-        
         return U.readInputStream(t.getRequestBody());
     }
 

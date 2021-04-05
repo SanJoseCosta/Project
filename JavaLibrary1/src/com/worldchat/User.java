@@ -54,10 +54,8 @@ public class User
                 "picurl", n.picurl,
                 "lastActivityTime", n.lastActivityTime + ""
             };
-            
-            boolean result1 = Database.addUser(fields1, uname);
 
-            if (!result1)
+            if (!Database.addUser(fields1, uname))
                 U.log("***** database returns false on attempt to store user " + uname);
         } 
         catch (Exception e) 
@@ -84,13 +82,13 @@ public class User
         }  
     }
     
-    User(String u, String e, String p, String l, String pic, String t) 
+    User(String u, String e, String p, String l, String picurl, String t) 
     {
         username = u;
         email = e;
         password = p;
         language = l;
-        picurl = pic;
+        picurl = picurl;
         try
         {
             lastActivityTime = Long.parseLong(t);
@@ -107,7 +105,39 @@ public class User
         return  "[" + username + "," + email + "," + password + "," + language + "," + 
                 picurl + "," + lastActivityTime + "," + (lastMessage == null ? "no last message" : lastMessage.message) + "]";
     }
-    
+
+    String jsonToSend(boolean islocaluser, boolean isremoteuser)
+    {
+        Json j = new Json();
+
+        j.add("picurl",             picurl);
+        j.add("username",           username);
+        j.add("lastActivityTime",   lastActivityTime + "");
+        j.add("remote",             (isremoteuser ? "true" : "false"));
+        j.add("local",              (islocaluser ? "true" : "false"));
+        j.add("language",           language);
+        j.add("email",              email);
+
+        if (lastMessage == null)
+        {
+            j.add("lastMessage",        "null");
+            j.add("lastTranslation",    "null");
+            j.add("lastMessageId",      "null");
+            j.add("lastStatus",         "null");
+            j.add("lastMessageSender",  "null");
+        }
+        else
+        {
+            j.add("lastMessage",        lastMessage.message);
+            j.add("lastTranslation",    lastMessage.translation);
+            j.add("lastMessageId",      lastMessage.mid);
+            j.add("lastStatus",         lastMessage.status + "");
+            j.add("lastMessageSender",  lastMessage.fromUserName);
+        }
+
+        return j.get();
+    }
+    /*
     String userAnnounceString(boolean islocaluser, boolean isremoteuser) 
     {
          if (false) 
@@ -116,17 +146,11 @@ public class User
                     "[" +                  
                  
                         username                                                                    + "," + 
-                        
                         language                                                                    + "," + 
-
                         (lastMessage == null ? "no last message" : lastMessage.message)             + "," + 
-
                         (lastMessage == null ? "no from" : lastMessage.fromUserName)                + "," +
-                                
                         "isremote=" + isremoteuser                                                  + "," + 
-                                
                         "islocal=" + islocaluser                                                    + "," +
-                                
                         "picurl=" + picurl                                                          + "," + 
                  
                     "]")
@@ -148,7 +172,7 @@ public class User
                 email +                                                             WSServer.separator
                 ;
     }
-
+    */
     static User findUserByToken(String token) 
     {
         if (U.invalid(token))

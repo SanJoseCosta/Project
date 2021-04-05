@@ -1,22 +1,7 @@
 package com.worldchat;
 
 import java.util.ArrayList;
-
-// message statuses
-// process 1
-// 1 successfully received
-// 2 sent to the recipient
-// 3 ack received from recipient
-// 4 ack1 sent to sender (with message status of 1)
-// 5 recipient receives message and updates server
-// 6 ack2 sent to sender (with message status of 2)
-// process 2
-// 1 successfully received
-// 2 sent to the recipient
-// 3 ack received from recipient
-////////////////////// 4 ack1 sent to sender (with message status of 1)
-////////////////////// 5 recipient receives message and updates server
-// 6 ack2 sent to sender (with message status of 2)
+import org.json.*;
 
 public class Message 
 {
@@ -27,7 +12,6 @@ public class Message
     //	3 = delivered
     //	4 = read
 
-    //private User from;
     String fromUserName;
     String toUsername;
     String message;
@@ -259,52 +243,30 @@ public class Message
         }
     }
     
-    String formatToSend(Connection to)
+    String jsonToSend(boolean local)
     {
-       return formatToSend(fromUserName.equals(to.username)); 
+        Json j = new Json();
+        j.add("message", message);
+        j.add("translation", translation);
+        j.add("mid", mid);
+        j.add("status", status + "");
+        j.add("localSender", (local ? "true" : "false"));
+        return j.get();
     }
-    
-    static String formatToSend(String type0, String msg0, String translation0, String mid0, int status0, boolean local0)
+
+    String jsonToSend(Connection to)
     {
-        return      type0 + WSServer.separator
-                    + msg0 + WSServer.separator
-                    + translation0 + WSServer.separator
-                    + mid0 + WSServer.separator
-                    + status0 + WSServer.separator
-                    + (local0 ? "true" : "false")
-                ;
+       return jsonToSend(fromUserName.equals(to.username)); 
     }
-    
-    String formatToSend(boolean local)
+
+    static String jsonToSend(String msg0, String translation0, String mid0, int status0, boolean local0)
     {
-        return  
-                      message + WSServer.separator
-                    + translation + WSServer.separator
-                    + mid + WSServer.separator
-                    + status + WSServer.separator
-                    + (local ? "true" : "false")
-                ;
+        Json j = new Json();
+        j.add("message", msg0);
+        j.add("translation", translation0);
+        j.add("mid", mid0);
+        j.add("status", status0 + "");
+        j.add("localSender", (local0 ? "true" : "false"));
+        return j.get();
     }
-    
-    /*
-    static String tc()
-            {
-                boolean local = (m.fromUser().username().equals(tocon.username));
-                String t =  m.msg() +         WSServer.separator + 
-                            m.translation + WSServer.separator + 
-                            m.mid +          WSServer.separator + 
-                            m.status() +    WSServer.separator + 
-                            (local ? "true" : "false");
-            }
-    */
-    /*
-    static String formatToSavexxx(Message m, String from)
-    {
-        return      (from != null ? from : m.fromUser.username()) + WSServer.separator
-                    + m.msg + WSServer.separator
-                    + m.translation + WSServer.separator
-                    + m.id + WSServer.separator
-                    + m.status;
-    }
-    */
 }

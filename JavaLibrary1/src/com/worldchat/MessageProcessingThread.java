@@ -2,6 +2,78 @@ package com.worldchat;
 
 import org.java_websocket.WebSocket;
 import java.util.ArrayList;
+import org.json.*;
+
+/*
+
+
+
+client to server
+
+------------------------------------------
+{
+    type: "message",
+    message: message,
+    translation: translation,
+    mid: mid
+}
+------------------------------------------
+{
+    type: "ack",
+    status: status,
+    mid: mid
+}
+------------------------------------------
+{
+    type: "refresh"
+}
+------------------------------------------
+{
+    type: "find",
+    token: token,
+    username: username
+}
+------------------------------------------
+{
+    type: "invite",
+    email: email,
+}
+------------------------------------------
+{
+    type: "signin",
+    token: token,
+}
+------------------------------------------
+{
+    type: "connect",
+    token: token,
+    username: username
+}
+------------------------------------------
+{
+    type: "signout",
+}
+------------------------------------------
+{
+    type: "checkemail", 
+    email: email 
+}
+------------------------------------------
+{
+    type: "checkusername", 
+    username: username 
+}
+------------------------------------------
+{
+    type: "checklogin", 
+    emailorusername: email, 
+    password: password 
+}
+------------------------------------------
+
+
+*/
+
 
 public class MessageProcessingThread extends Thread 
 {
@@ -60,18 +132,19 @@ public class MessageProcessingThread extends Thread
     
     static boolean processMessage(WebSocket socket, String message) 
     {
-        U.log("received " + message.substring(0, 1) + " =========================================================");
+        U.log("received: " + message + " =========================================================\n");
+
         Connection.setLastActivityTime(socket);
         
         Connection connection = Connection.findConnection(socket);
-        String[] parts = message.split(WSServer.separator);
-        
-        String messageType = "";
-        if (parts != null && parts.length > 0)  messageType = parts[0];
-        
+
+        JSONObject json = new JSONObject(message);
+    
+        String messageType = json.getString("type");
+
         try 
         {
-            if (messageType.equals("s"))
+            if (messageType.equals("signout"))
             {
                if (connection != null)
                 {
@@ -80,156 +153,133 @@ public class MessageProcessingThread extends Thread
                         Conversation.deleteConversation(connection.conversation);
                 }  
             }
-            else if (messageType.equals("S"))
+            else if (messageType.equals("checkusername"))
             {
-                if (connection != null)
-                {
-                    Connection.stopConnection(socket);
-                    if (connection.conversation != null)
-                        Conversation.deleteConversation(connection.conversation);
-                }
-                            
-                return signIn(socket, parts); 
+                String username = json.getString("username").toLowerCase();
+                String response = (User.findUserByUsername(username) != null) ? "dup" : "ok";
+
+                String[] m = {"type", "checkusername", "response", response};
+                sendx(socket, m);
+
+                //"2" + WSServer.separator + response);
             }
-            else if (messageType.equals("1"))
+            else if (messageType.equals("checkemail"))
             {
-                // type=1 request=checkusername param=username
-                if (parts[1].equals("checkusername"))
-                {
-                    String username = parts[2].toLowerCase();
-                    String response = (User.findUserByUsername(username) != null) ? "dup" : "ok";
-                    sendx(socket, "2" + WSServer.separator + response);
-                }
-                // type=1 request=checkemail param=email
-                else if (parts[1].equals("checkemail"))
-                {
-                    String email = parts[2].toLowerCase();
-                    String response = (User.findUserByEmail(email) != null) ? "dup" : "ok";
-                    sendx(socket, "2" + WSServer.separator + response);                
-                }
-                // type=1 request=checklogin param=username param=password
-                else if (parts[1].equals("checklogin"))
-                {
-                    String username = parts[2].toLowerCase();
-                    String password = parts[3].toLowerCase();
-                    
-                    // xwrongpassword or token
-                    
-                    String response = HTTPSWebRequestHandler.login(username, password);
-                    sendx(socket, "2" + WSServer.separator + response);
-                }
+                String email = json.getString("email").toLowerCase();
+                String response = (User.findUserByEmail(email) != null) ? "dup" : "ok";
+
+                String[] m = {"type", "checkemail", "response", response};
+                sendx(socket, m);
+
+                //sendx(socket, "2" + WSServer.separator + response);                
+            }
+            else if (messageType.equals("checklogin"))
+            {
+                String username = json.getString("emailorusername").toLowerCase();
+                String password = json.getString("password");
+
+                String response = login(username, password);
+
+                String[] m = {"type", "checklogin", "response", response};
+                sendx(socket, m);
+
+                //sendx(socket, "2" + WSServer.separator + response);
             }
             else if (connection == null)
             {
-                // havent seen this guy before sending valid messages
-
-                if (isOneOf(messageType, "SC"))
-                {
-                   return handleNewMessage(socket, parts); 
-                }
-                else
-                {
-                    throw new CommunicationsException("xinvalidFirstMessage:" + message + " " + parts[0]);
-                }                
+                return handleNewMessage(socket, json);           
             }
             else if (connection.conversation == null)
             {
-                // community connection
-
-                if (isOneOf(messageType, "CFRIS"))
-                {
-                   return handleCommunityMessage(parts, connection); 
-                }
-                else
-                {
-                    U.log("not one of: " + message);
-                    throw new CommunicationsException("xinvalidCommunityMessage:" + message);
-                }            
+                return handleCommunityMessage(json, connection);       
             }
             else
             {
-                // chat connection
-
-                if (isOneOf(messageType, "VMARCIF"))
-                {
-                   return handleChatMessage(parts, connection); 
-                }
-                else
-                {
-                    U.log("not one of: " + message);
-                    throw new CommunicationsException("xinvalidChatMessage:" + message);
-                }            
+                return handleChatMessage(json, connection);     
             }
         }
         catch (CommunicationsException e)
         {
             U.log("exception message " + e.getMessage());
             U.log("original message " + message);
-            sendx(socket, e.getMessage());
+
+            String[] m = {"type", "error", "response", e.getMessage()};
+            sendx(socket, m);
+
+            //sendx(socket, e.getMessage());
         }
         
         return false;
     }
     
-    static boolean handleNewMessage(WebSocket socket, String[] parts) throws CommunicationsException
+    static boolean handleNewMessage(WebSocket socket, JSONObject json) throws CommunicationsException
     {
-        if (parts[0].equals("C")) 
-            return startConversation(null, socket, parts);
-        else if (parts[0].equals("S")) 
-            return signIn(socket, parts); 
+        String messageType = json.getString("type");
+        if (messageType.equals("connect")) 
+            return startConversation(null, socket, json);
+        else if (messageType.equals("signin")) 
+            return signIn(socket, json); 
         else
-            throw new CommunicationsException("xinvalidNewMessageType");
+            throw new CommunicationsException("xinvalidMessageType");
     }
     
-    static boolean handleCommunityMessage(String[] parts, Connection connection) throws CommunicationsException
+    static boolean handleCommunityMessage(JSONObject json, Connection connection) throws CommunicationsException
     {
-        if (parts[0].equals("C")) 
-            return startConversation(connection, null, parts);
-        else if (parts[0].equals("F")) 
-            return sendMatchingUsers(connection, parts);
-        else if (parts[0].equals("R")) 
-            return sendRefreshUsers(connection, parts);
-        else if (parts[0].equals("I")) 
-            return sendInvite(connection, parts);
+        String messageType = json.getString("type");
+        if (messageType.equals("connect")) 
+            return startConversation(connection, null, json);
+        else if (messageType.equals("find")) 
+            return sendMatchingUsers(connection, json);
+        else if (messageType.equals("refresh")) 
+            return sendRefreshUsers(connection, json);
+        else if (messageType.equals("invite")) 
+            return sendInvite(connection, json);
         else
-            throw new CommunicationsException("invalidCommunityMessageType");
+            throw new CommunicationsException("invalidMessageType");
     }
     
-    static boolean handleChatMessage(String[] parts, Connection connection) throws CommunicationsException
+    static boolean handleChatMessage(JSONObject json, Connection connection) throws CommunicationsException
     {
-        if (parts[0].equals("C")) 
-            return startConversation(connection, null, parts);
-        else if (parts[0].equals("M")) 
-            // type, text, mid
-            connection.conversation.newMessage(parts[1], parts[2], parts[3], connection);
-        else if (parts[0].equals("A")) 
-            // type, mid, received status
-            connection.conversation.ackReceived(parts[1], new Integer(parts[2]).intValue(), connection);
-        else if (parts[0].equals("R")) 
-            return sendRefreshUsers(connection, parts);
-        else if (parts[0].equals("I")) 
-            return sendInvite(connection, parts);
-        else if (parts[0].equals("F")) 
-            return sendMatchingUsers(connection, parts);
-        else
-            throw new CommunicationsException("xinvalidChatMessageType");
-        
-        return false;
-    }
-    
-    static boolean signIn(WebSocket socket, String[] parts) throws CommunicationsException
-    {
-        if (parts.length < 2)
-            throw new CommunicationsException("xinvalidSigninMessage");
-         
-        // signin S, token
+        String messageType = json.getString("type");
+        if (messageType.equals("connect")) 
+            return startConversation(connection, null, json);
+        else if (messageType.equals("message")) 
+        {
+            String message = json.getString("message").toLowerCase();
+            String translation = json.getString("translation").toLowerCase();
+            String mid = json.getString("mid").toLowerCase();
 
-        User u = User.findUserByToken(parts[1]);
+            connection.conversation.newMessage(message, translation, mid, connection);
+            return false;
+        }
+        else if (messageType.equals("ack")) 
+        {
+            String mid = json.getString("mid").toLowerCase();
+            String status = json.getString("status").toLowerCase();
+
+            connection.conversation.ackReceived(mid, new Integer(status).intValue(), connection);
+            return false;
+        }
+        else if (messageType.equals("refresh")) 
+            return sendRefreshUsers(connection, json);
+        else if (messageType.equals("invite")) 
+            return sendInvite(connection, json);
+        else if (messageType.equals("find")) 
+            return sendMatchingUsers(connection, json);
+        else
+            throw new CommunicationsException("xinvalidMessageType");
+    }
+    
+    static boolean signIn(WebSocket socket, JSONObject json) throws CommunicationsException
+    {
+        String token = json.getString("token").toLowerCase();
+
+        User u = User.findUserByToken(token);
 
         if (u == null) 
-            throw new CommunicationsException("xuserNotFoundByToken " + parts[1]);
+            throw new CommunicationsException("xuserNotFoundByToken");
         
-        //U.log("signing in " + u.username());
+        U.log("signing in " + u.username());
         
         Connection connection = new Connection(socket, u.username(), null);
         Connection.addConnection(connection);
@@ -239,22 +289,20 @@ public class MessageProcessingThread extends Thread
         return false;
     }
    
-    static boolean startConversation(Connection connection, WebSocket socket, String[] parts) throws CommunicationsException
+    static boolean startConversation(Connection connection, WebSocket socket, JSONObject json) throws CommunicationsException
     {
-        if (parts.length < 3)
-            throw new CommunicationsException("xinvalidConversationMessage");
-        
-        // type, token, otherid
-        
-        User local = User.findUserByToken(parts[1]);
+        String username = json.getString("username").toLowerCase();
+        String token = json.getString("token").toLowerCase();
+
+        User local = User.findUserByToken(token);
         
         if (local == null) 
-            throw new CommunicationsException("xlocalUserNotFoundByToken " + parts[1]);
+            throw new CommunicationsException("xlocalUserNotFoundByToken");
         
-        User remote = User.findUserByUsernameOrEmail(parts[2]);
+        User remote = User.findUserByUsernameOrEmail(username);
         
         if (remote == null) 
-            throw new CommunicationsException("xremoteUserNotFoundByNameOrEmail " + parts[2]);
+            throw new CommunicationsException("xremoteUserNotFoundByNameOrEmail");
         
         U.log("start conversation between " + local.username() + " and " + remote.username());
         
@@ -282,7 +330,11 @@ public class MessageProcessingThread extends Thread
             if (toclose != null)
             {
                 U.log("Conversation already in progress for local user " + local.username() + " closing connection " + toclose);
-                sendx(toclose.socket, "xlogoutPreviousConnectionInSameConversation");
+                
+                String[] m = {"type", "error", "response", "xlogoutPreviousConnectionInSameConversation"};
+                sendx(toclose.socket, m);
+                
+                //sendx(toclose.socket, );
             }
         }
         
@@ -296,42 +348,41 @@ public class MessageProcessingThread extends Thread
         return false;
     }
 
-    static boolean sendMatchingUsers(Connection connection, String[] parts) throws CommunicationsException
+    static boolean sendMatchingUsers(Connection connection, JSONObject json) throws CommunicationsException
     {
-        if (parts.length < 3)
-            throw new CommunicationsException("xinvalidSearchMessage"); 
+        String token = json.getString("token").toLowerCase();;
+        String username = json.getString("username").toLowerCase();
         
-        String token = parts[1];
-        String match = parts[2];
-        
-        U.log("search user ***" + match + "***");
+        U.log("search user ***" + username + "***");
+
+        ArrayList<User> list = new ArrayList<User>();
     
-        User user = User.findUserByUsernameOrEmail(match);
-        if (user != null)
+        User user = User.findUserByUsernameOrEmail(username);
+
+        if (user != null && !user.username().equals(connection.username))
         {
-            if (!user.username().equals(connection.username))
-            {
-                ArrayList<User> list = new ArrayList<User>();
-                U.log("found user " + user);
-                
-                Message.saveDummyMessage(connection.username, user.username);
-                
-                list.add(user);
-                sendUserList(connection, list, "F");
-            }
+            U.log("found user " + user);
+            Message.saveDummyMessage(connection.username, user.username);
+
+            list.add(user);
+            sendUserList(connection, list, "find");
         }
         else
         {
-            // send not found message = "F" 
-            sendx(connection, "F");
+            //String[] m = {"type", "find", "response", "xuserNotFound"};
+            //sendx(connection, m);
+
+            // return an empty list
+
+            sendUserList(connection, list, "find");
         }
         
         return false;
     }
 
-    static boolean sendInvite(Connection connection, String[] parts)
+    static boolean sendInvite(Connection connection, JSONObject json)
     {
-        String email = parts[1];
+        String email = json.getString("email").toLowerCase();
         
         if (email != null && email.indexOf("@") > 0 && email.indexOf(".") > 0)
         {
@@ -341,18 +392,23 @@ public class MessageProcessingThread extends Thread
             boolean r = U.sendemail(email, "Invitation to chat on Malt.chat", 
                         connection.username + 
                         " has sent you an invitation to chat. " + 
-                        "Please click this link to login or create a new account and begin chatting: " +
+                        "Please follow this link to login or create a new account and begin chatting: " +
                         Main.Login + "&invite=" + invite
 
             		);
             if (r)
             {
-                sendx(connection, "I" + WSServer.separator + "ok");
+                String[] m = {"type", "invite", "response", "ok"};
+                sendx(connection, m);
                 return true;
             }
         }
         
-        sendx(connection, "I" + WSServer.separator + "error");
+        String[] m = {"type", "invite", "response", "error"};
+        sendx(connection, m);
+        
+        //sendx(connection, "I" + WSServer.separator + "error");
+
         return false;
     }
     
@@ -361,6 +417,8 @@ public class MessageProcessingThread extends Thread
         User remote = null;
         
         User local = User.findUserByUsername(connection.username);
+
+        U.log("in remoteuser, connection.username = " + connection.username + ", local=" + local + ", conversation=" + connection.conversation);
         
         if (connection.conversation != null)
             remote = connection.conversation.otherSide(local);
@@ -382,7 +440,7 @@ public class MessageProcessingThread extends Thread
                 u.lastMessage = Conversation.getLastMessage(Conversation.conversationName(connection.username, u.username()));
             }
 
-            sendUserList(connection, users, "X");
+            sendUserList(connection, users, "users");
         }
         else
         {
@@ -405,60 +463,101 @@ public class MessageProcessingThread extends Thread
                 }
             }
             
-            sendUserList(connection, conversingUsers, "X");
+            sendUserList(connection, conversingUsers, "users");
         }
     }
     
-    static boolean sendRefreshUsers(Connection connection, String[] parts)
+    static boolean sendRefreshUsers(Connection connection, JSONObject json)
     {
         sendLCU(connection);        
         return false;
     }
     
-    static void sendUserList(Connection connection, ArrayList<User> list, String code)
+    static void sendUserList(Connection connection, ArrayList<User> list, String type)
     {
-        String t = code + WSServer.separator;
+        User remote = remoteUser(connection);
+
+        ArrayList<String> users = new ArrayList<String>();
         
-        for (int i = 0; i < list.size(); ++i) 
+        for (int i = 0; i < list.size(); ++i)
         {
             User user = list.get(i);
             
-            User remote = remoteUser(connection);
-            boolean isRemote = false;
-            if (remote != null)
-                if (user.username().equals(remote.username))
-                    isRemote = true;
+            boolean isRemote = (remote != null && user.username().equals(remote.username));
             boolean isLocal = user.username().equals(connection.username);
-              
-            t += user.userAnnounceString(isLocal, isRemote);
+
+            String j2send = user.jsonToSend(isLocal, isRemote);
+            users.add(j2send);
         }
+      
+        String a = Json.array(type, "users", users);
         
-        sendx(connection, t);
+        sendx(connection, a);
     }
-    
-    static void sendx(Connection connection, String msg)
+
+    static boolean sendx(Connection connection, String[] p)
     {
-        sendx(connection.socket, msg);
+        return sendx(connection.socket, p);
+    }
+
+    static boolean sendx(WebSocket socket, String[] p)
+    {
+        Json json = new Json();
+
+        for (int i = 0; i < p.length; i = i + 2)
+            json.add(p[i], p[i + 1]);
+        
+        return sendx(socket, json.get());
     }
     
-    static void sendx(WebSocket socket, String msg)
+    static boolean sendx(Connection connection, String msg)
+    {
+        return sendx(connection.socket, msg);
+    }
+    
+    static boolean sendx(WebSocket socket, String msg)
     {
         try 
         {
             socket.send(msg);
-            U.log("sendx sent the string " + U.truncate(msg, 20));
+            U.log("sendx sent the string " + U.truncate(msg, 30));
+            return true;
         } 
         catch (Exception e) 
         {
             U.log("***** FAILED to send string " + msg);
             e.printStackTrace();
+            return false;
         }
     }
 
-    static boolean isOneOf(String m, String choices)
+    static String login(String username, String password) 
     {
-        for (int i = 0; i < choices.length(); ++i)
-            if (choices.substring(i, i + 1).equals(m)) return true;
-        return false;
+        U.log("login");
+        
+        String r;
+        User u = User.findUserByUsername(username);
+        
+        if (u == null) 
+            u = User.findUserByEmail(username);
+        
+        if (u == null) 
+            r = "invaliduser";
+        else
+        {
+            U.log("login " + u.password + " " + password);
+            if (!u.password.equals(password)) 
+            {
+                r = "invalidpassword";
+            }
+            else
+            {
+                String t = HTTPSWebRequestHandler.returnToken(u);
+                U.log("token " + t);
+                r = t;
+            }
+        }
+        
+        return r;
     }
 }

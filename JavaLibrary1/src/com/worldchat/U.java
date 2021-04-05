@@ -22,8 +22,8 @@ public class U
     static PrintStream req;
     static PrintStream inf;
     
-    static String GoogleUser =  "support@malt.chat";    //"hxsquid"; // maltchatmailer";
-    static String Password =    "plexus11";             //"z$A6*T2=";
+    static String GoogleUser =  "support@malt.chat";
+    static String Password =    "plexus11";
     
     public static void req(Object s) 
     {
@@ -370,35 +370,6 @@ public class U
         }
     }
 
-    /*
-    public static String read(String file) {
-        byte[] b = new byte[10000000];
-        FileInputStream f = null;
-        try {
-            f = new FileInputStream(file);
-            int r = f.read(b);
-            if (f.available() > 0) {
-                return null;
-                //throw new Exception("Overflow of buffer on read in read()");
-            }
-            f.close();
-            // remove last 0x0a byte ???
-            return new String(b, 0, r);
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                if (f != null) {
-                    f.close();
-                }
-            } catch (IOException e) {
-                return null;
-            }
-
-        }
-    }
-    */
-    
     static String s1 = "\"city\": \""; 
     static String s2 = "\"country_name\": \"";
     
@@ -425,55 +396,6 @@ public class U
         }
         
         return null;
-    }
-    
-    static boolean sendStringToCon(String t, Connection tocon, boolean display) 
-    {
-        boolean ok = false;
-
-        String show = t;
-        if (show.length() > 50)
-            show = show.substring(0, 50);
-
-        if (tocon != null) 
-        {
-            if (sendString(t, tocon)) {
-                ok = true;
-                if (display) U.log("Sent message " + show + " to " + User.findUserByUsername(tocon.username));
-            } else {
-                ok = false;
-                U.log("***** FAILED to send message when connection is open and user connected  " + show);
-            }
-        } else {
-            U.log("***** cannot send message " + show + " on null connection");
-            ok = false;
-        }
-
-        return ok;
-    }
-    
-    static boolean sendString(String a, Connection tocon) 
-    {
-        try {
-            tocon.socket.send(a);
-            return true;
-        } catch (Exception e) {
-            // alert user
-            U.log("***** send string failed " + a + " connection: " + tocon);
-            return false;
-        }
-    }
-
-    static boolean sendString(String a, WebSocket socket) 
-    {
-        try {
-            socket.send(a);
-            return true;
-        } catch (Exception e) {
-            // alert user
-            U.log("***** send string failed " + a);
-            return false;
-        }
     }
     
     static String findInPairs(ArrayList<Pair> pairs, String key) 
@@ -596,5 +518,5 @@ public class U
             return s;
         else
             return s.substring(0, n) + " ...";
-    }
+    } 
 }

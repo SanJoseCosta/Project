@@ -3,9 +3,9 @@ package com.worldchat;
 import java.net.InetSocketAddress;
 import java.io.*;
 
-public class Main {
-    
-    // one cpu on the server handles about 200 http requests for static file per second
+public class Main 
+{
+    // one cpu on the server handles about 200 http requests for static files per second
     // todo: same calculation with ws connection
     
     static String Home;
@@ -34,7 +34,7 @@ public class Main {
         RequestLog = Home + "/logs/r";
         InfoLog = Home + "/logs/i";
         
-        U.log("STARTUP version 1");
+        U.log("STARTUP version 1.1");
 
         new StopDetector().start();
         

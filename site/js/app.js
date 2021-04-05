@@ -1,10 +1,6 @@
 
-    var separator = "-a7e3i-";
-
-// this is a test
-    
-    var numberOfFieldsInUserDescriptor = 12;
-    var numberOfFieldsInMessageDescriptor = 5;
+    //var numberOfFieldsInUserDescriptor = 12;
+    //var numberOfFieldsInMessageDescriptor = 5;
     var DefaultProfilePic = "/images/default.png";
     var users = [];
     var messages = [];
@@ -50,7 +46,7 @@
 
     // last user list
 
-    var lastList = "";
+    var lastListlen = 0;
 
     function getMobile()
     {
@@ -124,8 +120,13 @@
     {
         var mid = id();
 
-        // send to server
-        var m = "M" + separator + messageBeingTranslated + separator + translation + separator + mid;
+        var m = JSON.stringify(
+            {
+                type: "message",
+                message: messageBeingTranslated,
+                translation: translation,
+                mid: mid
+            });
 
         var status;
         try
@@ -141,7 +142,6 @@
 
         var msg = makeMessage(mid, messageBeingTranslated, translation, true, status);
                 
-        // add to conversation and display
         addMessage(msg, false);
 
         pageUpdate(true);
@@ -149,42 +149,169 @@
 
     function remoteMessage(t)
     {
-        // filter html from messages
-
-        t = t.replace("<", "V");
-        var parts = t.split(separator);
-
-        if (parts[0] == "M")
-            if (parts.length < 4) 
-            {
-                logError("*** invalid message received: " + t);
-                return;
-            }
-        if (parts[0] == "A")
-            if (parts.length < 5) 
-            {
-                logError("*** invalid message received: " + t);
-                return;
-            }
-        if (parts[0] == "H")
-            if (parts.length < 6 && parts[1] != "") 
-            {
-                logError("*** invalid message received: " + t + " length " + parts.length);
-                return;
-            }
-
-        var status = 4;
-        if (document.hidden)
-            status = 3;
-
-        // M, text, translation, id
-        // A, text, translation, id, receivedStatus
-        // H, text, translation, id, receivedStatus, local ...
+        var status = (document.hidden ? 3 : 4);
 
         var messages = false;
+        var updatePage = true;
 
-        var skipPageUpdate = false;
+        var obj = null;
 
+        try
+        {
+            obj = JSON.parse(t);
+        }
+        catch (exception)
+        {
+            
+        }
+
+        // must have type
+
+        if (obj == null || obj.type == null)
+        {
+            log("*** invalid message received: " + t);
+            return;
+        }
+        else if (obj.type == "history")
+        {
+            receiveHistoryJson(obj, status);
+            pageUpdate(true);
+            return;
+        }
+        else if (obj.type == "ack")
+        {
+            var m = makeMessageJson(obj.messages[0]);
+
+            // bug ****** / false
+            log("receive ack for " + m.message + " local = " + m.localSender);
+
+            m.localSender = true;
+            addMessage(m, true);
+
+            pageUpdate(true);
+            return;
+        }
+        else if (obj.type == "message")
+        {
+            var m = makeMessageJson(obj.messages[0]);
+            log("receive message " + m.message + " local = " + m.localSender);
+
+            m.localSender = false;
+            addMessage(m, false);
+
+            sendAck(m.mid, status);
+
+            pageUpdate(true);
+            return;
+        }
+        else  if (obj.type == "users")
+        {
+            if (receiveUsersJson(obj, t.length))
+                pageUpdate(false);
+
+            return;
+        }
+        else if (obj.type == "invite")
+        {
+             // todo make better notification boxes
+
+            if (obj.response == "ok")
+                alert("the invitation email was sent successfully");
+            else
+                alert("there was an error while trying to send the invitation email");
+
+            document.getElementById("search").style.visibilityState = "hidden";
+            return;
+        }
+        else if (obj.type == "find")
+        {
+            var json = obj.users;
+
+            if (json.length == 0)
+                alert("that username was not found");
+            else
+            {
+                var user = addOrUpdateUser(json[0]); 
+                talk(user.username);
+            }
+
+            return;
+        }
+        else if (obj.type == "error")
+        {
+            logError("***************************** received logout condition: " + t);
+            
+            //if (parts[0].indexOf("xinvalidSigninMessage") >= 0 || 
+            //    parts[0].indexOf("xuserNotFoundByToken") >= 0 ||
+            //    parts[0].indexOf("xlogoutPreviousConnectionInSameConversation") >= 0)
+            
+            logout();
+
+            return;
+        }
+        else if (obj.type == "checkusername")
+        {
+            var r = obj.response;
+            checkusernameresponse(r);
+            return;
+        }
+        else if (obj.type == "checkemail")
+        {
+            var r = obj.response;
+            checkemailresponse(r);
+            return;
+        }
+        else if (obj.type == "checklogin")
+        {
+            var r = obj.response;
+            checkloginresponse(r);
+            return;
+        }
+        else
+        {
+            log("*** invalid message received: " + t);
+            return;
+        }
+
+        // escape all input
+        // ...... t = t.replace("<", "V");
+        
+
+
+        if (updatePage)
+            pageUpdate(messages);
+
+
+        ///////////////////////////
+
+
+        //var parts = t.split(separator);
+
+        //if (parts[0] == "M")
+        //  /  if (parts.length < 4) 
+        //    {
+        //        logError("*** invalid message received: " + t);
+        //        return;
+        //    }
+        //if (parts[0] == "A")
+        //    if (parts.length < 5) 
+        //    {
+        //        logError("*** invalid message received: " + t);
+        //        return;
+        //    }
+
+
+
+
+        //if (parts[0] == "H")
+        //    if (parts.length < 6 && parts[1] != "") 
+        //    {
+        //        logError("*** invalid message received: " + t + " length " + parts.length);
+        //        return;
+        //    }
+
+       
+        /*
         if (parts[0] == "M")
         {
             var m = makeMessage(parts[3], parts[1], parts[2], false, "0");
@@ -204,88 +331,23 @@
             receiveHistory(parts, status);
             messages = true;
         } 
-        else if (parts[0] == "U" || parts[0] == "X")
-        {
-            log(lastList.length);
-            log(t.length);
+        else 
+        */
 
-            if (lastList.length != t.length)
-                receiveUsers(parts);
-            else
-            {
-                var r = Math.random();
-                if (r < 0.1)
-                {
-                    log("received close match user string so updating at random " + r);
-                    receiveUsers(parts);
-                }
-                else
-                {
-                    log("received close match user string so skipping update");
-                    skipPageUpdate = true;
-                }
-            }
-            
-            lastList = t;
-        }
-        else if (parts[0] == "I")
-        {
-            // todo make better notification boxes
 
-            if (parts[1] == "ok")
-                alert("the invitation email was sent successfully");
-            else
-                alert("there was an error while trying to send the invitation email");
 
-            document.getElementById("search").style.visibilityState = "hidden";
-        }
-        else if (parts[0] == "F")
-        {
-            if (parts.length < 2)
-            {
-                // todo make better notification boxes
-
-                alert("that username was not found");
-            }
-            else
-            {
-                // start conversation
-
-                receiveUsers(parts);
-                talk(parts[2]);
-            }
-
-            //document.getElementById("search").style.visibilityState = "hidden";
-        }
-        else if (parts[0].startsWith("x"))
-        {
-            logError("***************************** received error: " + parts[0]);
-            
-            if (parts[0].indexOf("xinvalidSigninMessage") >= 0 || 
-                parts[0].indexOf("xuserNotFoundByToken") >= 0 ||
-                parts[0].indexOf("xlogoutPreviousConnectionInSameConversation") >= 0)
-            {
-                logout();
-                return;
-            }
-        }
-        else if (parts[0] == "2")
-        {
-            log("reponse is " + parts[1]);
-            pendingHandler(parts[1]);
-        }
-        else
-        {
-            logError("*** invalid message received: " + t);
-        }
-
-        if (!skipPageUpdate)
-            pageUpdate(messages);
     }
 
-    function sendAck(id, status)
+    function sendAck(mid, status)
     {
-        var m = "A" + separator + id + separator + status;
+        //var m = "A" + separator + id + separator + status;
+
+        var m = JSON.stringify(
+            {
+                type: "ack",
+                status: status + "",
+                mid: mid
+            });
 
         try
         {
@@ -313,12 +375,9 @@
         }
     }
 
-    function sendCheckRequest(type, p1, p2)
+    function sendCheckRequest(obj)
     {
-        var m = "1" + separator + type + separator + p1 + separator;
-        if (p2 != null) m += p2;
-
-        log("send " + m);
+        var m = JSON.stringify(obj);
 
         try
         {
@@ -332,7 +391,10 @@
 
     function sendRefreshRequest()
     {
-        var m = "R" + separator;
+        var m = JSON.stringify(
+            {
+                type: "refresh"
+            });
 
         try
         {
@@ -344,11 +406,16 @@
         }
     }
 
-    function searchUsers(t, s)
+    function searchUsers(token, username)
     {
-        var m = "F" + separator + t + separator + s;
+        //var m = "F" + separator + t + separator + s;
 
-        log("send " + m);
+        var m = JSON.stringify(
+            {
+                type: "find",
+                token: token,
+                username: username
+            });
 
         try
         {
@@ -362,7 +429,13 @@
 
     function inviteUser(email)
     {
-        var m = "I" + separator + email + separator;
+        //var m = "I" + separator + email + separator;
+
+        var m = JSON.stringify(
+            {
+                type: "invite",
+                email: email,
+            });
 
         try
         {
@@ -402,24 +475,24 @@
         changePage("login");
     }
 
-    function makeUser(p, u, o, l, i, h, lastMessage , lastTranslation, lastMessageId, lastStatus, lastMessageSender, em)
+    function makeUser(json)
     {
-        var m = {};
+        var user = {};
 
-        m.pic = (p == "true");
-        m.username = u;
-        m.onlinestatus = parseInt(o);
-        m.language = l;
-        m.remote = i == "true";
-        m.local = h  == "true";
-        m.lastMessage =             lastMessage;
-        m.lastTranslation =         lastTranslation;
-        m.lastMessageId =           lastMessageId;
-        m.lastStatus =              lastStatus;
-        m.lastMessageSender =       lastMessageSender;  
-        m.email = em;
+        user.picurl =                       json.picurl;
+        user.username =                     json.username
+        user.lastActivityTime =             parseInt(json.lastActivityTime);
+        user.language =                     json.language;
+        user.remote =                       json.remote == "true";
+        user.local =                        json.local == "true";
+        user.lastMessage =                  json.lastMessage;
+        user.lastTranslation =              json.lastTranslation;
+        user.lastMessageId =                json.lastMessageId;
+        user.lastStatus =                   json.lastStatus;
+        user.lastMessageSender =            json.lastMessageSender;  
+        user.email =                        json.email;
 
-        return m;
+        return user;
     }
 
     function allUsers()
@@ -427,14 +500,12 @@
         for (var i = 0; i < users.length; ++i) displayUserInfo(users[i]);
     }
 
-// lm li ls
-
     function displayUserInfo(user)
     {
         log("----- user info:");
-        log("pic:                               " + user.pic);
+        log("picurl:                            " + user.picurl);
         log("username:                          " + user.username);
-        log("online status:                     " + user.onlinestatus);
+        log("lastActivityTime:                  " + user.lastActivityTime);
         log("language:                          " + user.language);
         log("is this remote user:               " + user.remote);
         log("is this local user:                " + user.local);
@@ -449,9 +520,7 @@
 
     function picturefile(user)
     {
-        //log("========= picture file finder " + user.username + " " + user.pic);
-
-        if (user.pic)
+        if (user.picurl != "0")
             return picturepath(user.username); 
         else
             return defaultPic();
@@ -467,38 +536,56 @@
         return imageRequest("/images/" + username + ".png"); 
     }
 
-    function addOrUpdateUser(pic, username, onlinestatus, language, remote, local, msg, trans, mid, status, sender, email)
+    function addOrUpdateUser(json)
     {
-        var newuser = makeUser(pic, username, onlinestatus, language, remote, local, msg, trans, mid, status, sender, email);
+        var newuser = makeUser(json);
+        
+        //displayUserInfo(newuser);
 
         for (var i = 0; i < users.length; ++i)
         {
             var u = users[i];
-            if (u.username == username)
+            if (u.username == newuser.username)
             {
                 users.splice(i, 1, newuser);
-                if (debug) log("updated user: " + username);
-                return;
+                //log("updated user: " + newuser.username);
+                return newuser;
             }
         }
 
         users.push(newuser);
-        if (debug) log("added user: " + username);
+        //log("added user: " + newuser.username);
+        return newuser;
     }
 
-    function receiveUsers(s)
+    function receiveUsersJson(json, len)
     {
-        for (var i = 1; i < s.length; i += numberOfFieldsInUserDescriptor)
-        {
-            if (i + numberOfFieldsInUserDescriptor - 1 < s.length)
-                addOrUpdateUser(s[i + 0], s[i + 1], s[i + 2], s[i + 3], s[i + 4], s[i + 5], s[i + 6], s[i + 7], s[i + 8], s[i + 9], s[i + 10], s[i + 11]);
-        }
+        var updatePage = false;
+
+        // todo  ---------------- also for F need to get the user returned
+         
+        if (lastListlen != len)
+            updatePage = true;
+        else if (Math.random() < 0.1)
+            updatePage = true;
+            
+        lastListlen = len;
+
+        json = json.users;
+
+        for (var i = 0; i < json.length; ++i)
+            addOrUpdateUser(json[i]); 
+
         if (debug)
         {
             log("--------------------------------------------");
             allUsers();
             log("--------------------------------------------");
         }
+
+        log("received " + json.length + " users");
+
+        return updatePage;
     }
 
     function findLocalUser()
@@ -565,12 +652,18 @@
         {
             // find latest
 
-            var max;
+            var max = 0;
             var index = -1;
 
             for (var i = k; i < gu.length; ++i)
             {
-                var time = parseInt(gu[i].lastMessageId.substring(0, gu[i].lastMessageId.length - 10));
+                var time;
+
+                if (gu[i].lastMessage != "null")
+                    time = parseInt(gu[i].lastMessageId.substring(0, gu[i].lastMessageId.length - 10));
+                else
+                    time = 2000000000;
+
                 if (time > max || index < 0)
                 {
                     max = time;
@@ -798,19 +891,34 @@
         }
     }
 
-    function makeMessage(id, t, tr, lg, s)
+    function makeMessageJson(json)
+    {
+        var m = {};
+
+        m.mid =                 json.mid;
+        m.message =             json.message;
+        m.translation =         json.translation;
+        m.localSender =         json.localSender == "true";
+        m.status =              parseInt(json.status);
+
+        log("make message: " + m.mid + ", " + m.message + ", " + m.translation + ", " + m.localSender + ", " + m.status);
+
+        return m;
+    }
+    
+    function makeMessage(id, msg, tr, lg, s)
     {
         var m = {};
 
         m.mid = id;
-        m.text = t;
+        m.message = msg;
         m.translation = tr;
         m.localSender = lg;
         m.status = parseInt(s);
 
-        return m
+        return m;
     }
-
+    
     function timeString(m)
     {
         return timeDisplayStringFromUnixTime(m.mid.substring(0, m.mid.length - 10));
@@ -839,10 +947,10 @@
             }
 
             messages.push(msg);
-            if (debug) log("Added message: " + msg.mid + " " + msg.text + " " + msg.status);
+            if (debug) log("Added message: " + msg.mid + " " + msg.message + " " + msg.status);
         }
     }
-
+    /*
     function receiveHistory(s, status)
     {
         for (var i = 1; i < s.length; i += numberOfFieldsInMessageDescriptor)
@@ -858,6 +966,33 @@
                         if (m.status != 4 && status == 4)
                             sendAck(m.mid, status);
                 }
+            }
+        }
+    }
+    */
+    function receiveHistoryJson(json, status)
+    {
+        json = json.messages;
+
+        for (var i = 0; i < json.length; ++i)
+        {
+            if (json[i].mid != "0")
+            {
+                //var m = {};
+
+                //m.mid =                 json[i].mid;
+                //m.message =             json[i].message;
+                //m.translation =         json[i].translation;
+                //m.localSender =         json[i].local == "true";
+                //m.status =              parseInt(json[i].status);
+
+                //log(m.mid + ", " + m.message + ", " + m.translation + ", " + m.localSender + ", " + m.status);
+
+                var m = makeMessageJson(json[i], false);
+                addMessage(m);
+
+                if (!m.localSender && m.status != 4 && status == 4)
+                    sendAck(m.mid, status);
             }
         }
     }
@@ -892,10 +1027,8 @@
 
     function onmessage(event)
     {
-        //if (debug) 
-            log("\n--- new message");
-        //if (debug) 
-            log("Message received: " +  event.data);
+        log("\n--- new message");
+        log("Message received: " +  truncate(event.data, 30));
         remoteMessage(event.data);
     }
 
@@ -958,28 +1091,31 @@
     {
         messages = [];
         users = [];
-        lastList = "";
+        lastListlen = 0;
         
         sendConnectMessage(currentToken, ru);
     }
 
-    function sendConnectMessage(token, u)
+    function sendConnectMessage(token, username)
     {
-        if (u == null || u == "undefined") 
+        if (username == null || username == "undefined") 
         {
             logError("*** trying to send connect message with null user");
             return;
         }
 
-        //if (debug) 
+        //var msg = "C" + separator + token + separator + u;
 
-        log("send connect with token " + token + " and user " + u);
-
-        var msg = "C" + separator + token + separator + u;
+        var m = JSON.stringify(
+            {
+                type: "connect",
+                token: token,
+                username: username
+            });
 
         try
         {
-            socketsend(msg);
+            socketsend(m);
         } 
         catch (err)
         {
@@ -994,16 +1130,17 @@
         sendSignInMessage(currentToken);
     }
 
-
-    function sendSignInMessage(t)
+    function sendSignInMessage(token)
     {
-        var msg = "S" + separator + t;
-
-        log("send signin with token " + t);
+        var m = JSON.stringify(
+            {
+                type: "signin",
+                token: token,
+            });
 
         try
         {
-            socketsend(msg);
+            socketsend(m);
         } 
         catch (err)
         {
@@ -1013,11 +1150,16 @@
 
     function sendSignOutMessage()
     {
-        var msg = "s" + separator;
+        //var msg = "s" + separator;
+
+        var m = JSON.stringify(
+            {
+                type: "signout",
+            });
 
         try
         {
-            socketsend(msg);
+            socketsend(m);
         } 
         catch (err)
         {
@@ -1049,9 +1191,7 @@
 
         socket.send(message2send);
 
-        var pm = message2send;
-        //if (pm.length > 20) pm = pm.substring(0, 20) + "(truncated)";
-        log("msg sent via websocket: " + pm);
+        log("*** msg sent via websocket: " + message2send);
     }
 
     function chatsHeader()
@@ -1067,12 +1207,8 @@
 
         var box = singleChatSummary();
         
-        //var timeSinceActive = tds(user.onlinestatus);
-
-        var tsa = Date.now() - user.onlinestatus;
+        var tsa = Date.now() - user.lastActivityTime;
         
-        //log("tsa " + tsa);
-
         var color;
 
         if (tsa <          3 * 60 * 1000) 
@@ -1175,7 +1311,7 @@
         {
             var u = gu[i];
  
-            if (u.lastMessageSender == null || u.lastMessageSender == "")
+            if (u.lastMessage == "null")
             {
                 t += makebox(u, "", "", false);
             }
@@ -1241,7 +1377,7 @@
                 div = replaceAll(div, "$$localusername$$", luser.username);
 
                 div = replaceAll(div, "$$name$$", ru.username);
-                div = replaceAll(div, "$$time$$", tds(ru.onlinestatus));
+                div = replaceAll(div, "$$time$$", tds(ru.lastActivityTime));
 
                 div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
 
@@ -1260,7 +1396,7 @@
                 div = replaceAll(div, "$$localusername$$", luser.username);
 
                 div = replaceAll(div, "$$name$$", ru.username);
-                div = replaceAll(div, "$$time$$", tds(ru.onlinestatus));
+                div = replaceAll(div, "$$time$$", tds(ru.lastActivityTime));
 
                 div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
 
@@ -1279,12 +1415,10 @@
             var message = messages[i];
             var time = timeString(message);
 
-            //log("message: " + message.text);
-
             if (message.localSender)
-                s += rmsg(message.text, message.translation, message.status, getLocalPic(), time);
+                s += rmsg(message.message, message.translation, message.status, getLocalPic(), time);
             else
-                s += lmsg(message.translation, message.text, message.status, getRemotePic(), time);
+                s += lmsg(message.translation, message.message, message.status, getRemotePic(), time);
         }
 
         var ml = document.getElementById("messages-list");
@@ -1434,7 +1568,12 @@
         if (stop)
             return;
 
-        sendCheckRequest("checklogin", email, password);
+        sendCheckRequest(
+            { 
+                type: "checklogin", 
+                emailorusername: email, 
+                password: password 
+            });
         pendingHandler = checkloginresponse;
     }
 
@@ -1443,13 +1582,15 @@
         var email = get("email").value.trim();
         var password = get("password").value.trim();
 
+        // invaliduser / invalidpassword / token
+
+        log("checkloginresponse: " +  r);
 
         var token = r;
-        
 
         currentToken = token;
 
-        if (token.startsWith("x"))
+        if (token.startsWith("invalid"))
         {
             inputError("emailerror", "Sorry, that email / username and password aren't correct");
             return;
@@ -1586,7 +1727,11 @@
 
         if (creating)
         {
-            sendCheckRequest("checkusername", username, null);
+            sendCheckRequest(
+                { 
+                    type: "checkusername", 
+                    username: username 
+                });
             pendingHandler = checkusernameresponse;
         }
         else 
@@ -1603,7 +1748,11 @@
 
             if (email != local.email)
             {
-                sendCheckRequest("checkemail", email, null);
+                sendCheckRequest(
+                    {
+                        type: "checkemail", 
+                        email: email 
+                    });
                 pendingHandler = checkemailresponse;
             }
             else
@@ -1615,9 +1764,7 @@
 
     function checkusernameresponse(r)
     {
-        var email = get("email").value.trim();
-
-        log("checkusername response " + r.responseText);
+        log("checkusername response " + r);
 
         if (r == "dup")
         {
@@ -1625,15 +1772,18 @@
             return;
         }
 
-        sendCheckRequest("checkemail", email, null);
+        var email = get("email").value.trim();
+        sendCheckRequest(
+            {
+                type: "checkemail", 
+                email: email 
+            });
         pendingHandler = checkemailresponse;
     }
 
     function checkemailresponse(r)
     {
-        log("checkemail response " + r); //r.responseText);
-
-        //if (r.responseText == "dup")
+        log("checkemail response " + r); 
 
         if (r == "dup")
         {
@@ -1804,7 +1954,7 @@
 
     function cancelEdit()
     {
-        lastList = "";
+        lastListlen = 0;
         changePage(getCommunityStartPage());
         sendRefreshRequest();
     }
@@ -2094,6 +2244,14 @@
         var r = closeModalReturnValue();
         inviteUser(r);
     }
+
+    function truncate(s, n)
+    {
+        if (s.length < n)
+            return s;
+        else
+            return s.substring(0, n) + " ...";
+    } 
 
     function xModal()
     {

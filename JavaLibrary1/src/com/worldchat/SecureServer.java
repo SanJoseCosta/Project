@@ -35,9 +35,12 @@ public class SecureServer
             httpsServer = HttpsServer.create(address, 0);
             SSLContext sslContext = getSslContext();
 
-            httpsServer.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
-                public void configure(HttpsParameters params) {
-                    try {
+            httpsServer.setHttpsConfigurator(new HttpsConfigurator(sslContext) 
+            {
+                public void configure(HttpsParameters params) 
+                {
+                    try 
+                    {
                         SSLContext context = getSSLContext();
                         SSLEngine engine = context.createSSLEngine();
                         params.setNeedClientAuth(false);
@@ -46,7 +49,8 @@ public class SecureServer
 
                         SSLParameters sslParameters = context.getSupportedSSLParameters();
                         params.setSSLParameters(sslParameters);
-                    } catch (Exception ex) {
+                    } 
+                    catch (Exception ex) {
                         System.out.println("Failed to create HTTPS port");
                     }
                 }

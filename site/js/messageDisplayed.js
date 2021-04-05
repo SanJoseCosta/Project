@@ -6,7 +6,7 @@ function messageDisplayedLeft()
         <div class=block>
             <div>
 
-              <div style="color: black; font-size: 10px;">
+                <div style="color: black; font-size: 10px;">
                     &nbsp;
                     $$time$$
                     <br><br>
@@ -27,7 +27,7 @@ function messageDisplayedLeft()
         <div class=block>
             <div>
 
-              <div style="color: black; font-size: 10px;">
+                <div style="color: black; font-size: 10px;">
                     &nbsp;
                     $$time$$
                     <br><br>
