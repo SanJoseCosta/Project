@@ -1,0 +1,111 @@
+
+------- client sends
+
+	type: checkemail, 
+  	email: email 
+
+server responds
+
+    type, checkemail, 
+    response, dup / ok
+
+------- client sends
+
+	type: checkusername, 
+    username: username 
+
+server responds
+
+    type, checkusername,
+    response, dup / ok
+
+------- client sends
+
+	type: checklogin, 
+  	emailorusername: email, 
+  	password: password 
+
+server responds
+
+    type, checklogin, 
+    response, invaliduser / invalidpassword / token
+
+------- client sends
+
+    type: signin,
+    token: token,
+
+server responds (this can be sent asynchronously)
+
+    type: users,
+    users: []
+
+------- client sends
+
+    type: connect,
+    token: token,
+    username: username
+
+server responds
+
+    type, message,
+    messages, [] 
+
+------- client sends
+
+    type: find,
+    token: token,
+    username: username
+
+server responds
+
+    type, find, 
+    response, xuserNotFound / ???
+    users: [] (singe user or empty)
+
+------- client sends
+
+
+
+
+
+
+
+
+
+
+
+
+
+    user object
+
+        username
+        picurl
+        lastActivityTime
+        language
+        email
+        remote
+        local
+        lastMessage
+        lastTranslation
+        lastMessageId
+        lastStatus
+        lastMessageSender
+
+
+
+    message object
+
+        mid
+        message
+        translation
+        localSender
+        status
+   
+
+
+
+
+
+
+

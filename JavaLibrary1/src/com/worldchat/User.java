@@ -71,6 +71,13 @@ public class User
         password = r.get("password");
         language = r.get("language");
         picurl = r.get("picurl");
+
+        if (picurl == null) picurl ="0";
+        if (picurl.equals("null")) picurl ="0";
+
+        if (picurl.equals("undefined")) picurl ="0";
+        if (picurl.equals("true")) picurl ="1";
+
         try
         {
             lastActivityTime = Long.parseLong(r.get("lastActivityTime"));
@@ -82,13 +89,18 @@ public class User
         }  
     }
     
-    User(String u, String e, String p, String l, String picurl, String t) 
+    User(String u, String e, String p, String l, String pp, String t) 
     {
         username = u;
         email = e;
         password = p;
         language = l;
-        picurl = picurl;
+        picurl = pp;
+
+        if (picurl.equals("null")) picurl ="0";
+        if (picurl.equals("undefined")) picurl ="0";
+        if (picurl.equals("true")) picurl ="1";
+
         try
         {
             lastActivityTime = Long.parseLong(t);
@@ -102,8 +114,20 @@ public class User
 
     public String toString() 
     {
-        return  "[" + username + "," + email + "," + password + "," + language + "," + 
-                picurl + "," + lastActivityTime + "," + (lastMessage == null ? "no last message" : lastMessage.message) + "]";
+        return  "[" +   username + "," + 
+                        email + "," + 
+                        password + "," + 
+                        language 
+                        + ", picurl: " + picurl + 
+                        //", remote: " + 
+                        //isremoteuser + 
+                        //", local: " + 
+                        //islocaluser + 
+                        ", lastActivityTime: " + 
+                        lastActivityTime + "," + 
+                        (lastMessage == null ? "no last message" : lastMessage.message) + 
+
+                "]";
     }
 
     String jsonToSend(boolean islocaluser, boolean isremoteuser)

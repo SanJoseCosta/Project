@@ -4,77 +4,6 @@ import org.java_websocket.WebSocket;
 import java.util.ArrayList;
 import org.json.*;
 
-/*
-
-
-
-client to server
-
-------------------------------------------
-{
-    type: "message",
-    message: message,
-    translation: translation,
-    mid: mid
-}
-------------------------------------------
-{
-    type: "ack",
-    status: status,
-    mid: mid
-}
-------------------------------------------
-{
-    type: "refresh"
-}
-------------------------------------------
-{
-    type: "find",
-    token: token,
-    username: username
-}
-------------------------------------------
-{
-    type: "invite",
-    email: email,
-}
-------------------------------------------
-{
-    type: "signin",
-    token: token,
-}
-------------------------------------------
-{
-    type: "connect",
-    token: token,
-    username: username
-}
-------------------------------------------
-{
-    type: "signout",
-}
-------------------------------------------
-{
-    type: "checkemail", 
-    email: email 
-}
-------------------------------------------
-{
-    type: "checkusername", 
-    username: username 
-}
-------------------------------------------
-{
-    type: "checklogin", 
-    emailorusername: email, 
-    password: password 
-}
-------------------------------------------
-
-
-*/
-
-
 public class MessageProcessingThread extends Thread 
 {
     //JobQueue queue = new JobQueue();
@@ -134,16 +63,14 @@ public class MessageProcessingThread extends Thread
     {
         U.log("received: " + message + " =========================================================\n");
 
-        Connection.setLastActivityTime(socket);
-        
-        Connection connection = Connection.findConnection(socket);
-
-        JSONObject json = new JSONObject(message);
-    
-        String messageType = json.getString("type");
-
         try 
         {
+            Connection.setLastActivityTime(socket);
+            Connection connection = Connection.findConnection(socket);
+
+            JSONObject json = new JSONObject(message);
+            String messageType = json.getString("type");
+
             if (messageType.equals("signout"))
             {
                if (connection != null)
@@ -205,8 +132,6 @@ public class MessageProcessingThread extends Thread
 
             String[] m = {"type", "error", "response", e.getMessage()};
             sendx(socket, m);
-
-            //sendx(socket, e.getMessage());
         }
         
         return false;
@@ -369,9 +294,6 @@ public class MessageProcessingThread extends Thread
         }
         else
         {
-            //String[] m = {"type", "find", "response", "xuserNotFound"};
-            //sendx(connection, m);
-
             // return an empty list
 
             sendUserList(connection, list, "find");
@@ -488,6 +410,8 @@ public class MessageProcessingThread extends Thread
 
             String j2send = user.jsonToSend(isLocal, isRemote);
             users.add(j2send);
+
+            U.log("sending user " + user);
         }
       
         String a = Json.array(type, "users", users);

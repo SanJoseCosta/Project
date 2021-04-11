@@ -179,11 +179,13 @@ public class HTTPSWebRequestHandler implements HttpHandler
         String picurl = U.findInPairs(pairs, "picurl");
         String invite = U.findInPairs(pairs, "invite");
 
-        if (       nullempty(username)
+        if  (      nullempty(username)
                 || nullempty(email)
                 || nullempty(password)
                 || nullempty(language)
-                || nullempty(picurl)) {
+                || nullempty(picurl)
+            ) 
+        {
             U.log("***** null parameter values in create/edit user");
             return "xcannotadd";
         } 
@@ -203,14 +205,12 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 }
             }
             
-            // for new user
             long lastActivity = System.currentTimeMillis();
             
             if (!create)
             {
-                U.log("edit user");
-                
                 User p = User.findUserByUsername(username);
+
                 if (p == null)
                 {
                     U.log("Cant find user being updated " + username);
@@ -218,19 +218,21 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 }
                 
                 // keep password the same if necessary
+
                 if (password.equals(NoChange))
                     password = p.password;
                 
                 // for existing user
+
                 lastActivity = p.lastActivityTime();
                 
-                if (p.picurl.equals("true")) 
-                    picurl = "true";
+                // picurl?
             }
             
             try 
             {
-                // set up new / changed user
+                // set up new user
+                
                 User u = new User(username, email, password, language, picurl, lastActivity + "");
             
                 U.log("add user " + u);
@@ -243,15 +245,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
 
                     if (invite != null)
                     {
-                        
                         User inviter = User.findUserByToken(invite);
 
                         U.log("invite code is " + invite);
                         U.log("invitee is " + u.username);
                         U.log("inviter is " + inviter.username);
-
-
-
 
                         Message.saveDummyMessage(inviter.username, u.username);
                     }

@@ -1,6 +1,4 @@
 
-    //var numberOfFieldsInUserDescriptor = 12;
-    //var numberOfFieldsInMessageDescriptor = 5;
     var DefaultProfilePic = "/images/default.png";
     var users = [];
     var messages = [];
@@ -708,7 +706,7 @@
         }
     }
 
-    function upload(userdata, imageChanged, callback, imageSrc, token)
+    function upload(userdata, callback, imageSrc, token)
     {
         var formData = new FormData();
         
@@ -1218,13 +1216,12 @@
         else
             color = "red";
 
-        var picurl = picturefile(user);
+        var picfile = picturefile(user);
 
         var click = "\"talk('" + user.username + "')\"";
         
         box = replaceAll(box, "$$color$$", color);
-        
-        box = replaceAll(box, "$$picurl$$", picurl);
+        box = replaceAll(box, "$$picurl$$", picfile);
         box = replaceAll(box, "$$click$$", click);
 
         var uname = user.username;
@@ -1824,8 +1821,13 @@
             log("password value is [" + password1 + "]");
         }
 
+        // todo add logic for changed picture
 
-        var userdata = ["username", username, "email", email, "password", password1, "language", language, "picurl", imageChanged];
+        var picurl2send = "0";
+        if (imageChanged)
+            picurl2send = "1";
+
+        var userdata = ["username", username, "email", email, "password", password1, "language", language, "picurl", picurl2send];
 
         log(userdata);
 
@@ -1842,9 +1844,9 @@
         log(userdata);
 
         if (isCreating)
-            upload(userdata, imageChanged, createduser, imageSrc, null);
+            upload(userdata, createduser, imageSrc, null);
         else
-            upload(userdata, imageChanged, editeduser, imageSrc, currentToken);
+            upload(userdata, editeduser, imageSrc, currentToken);
     }
 
     function createduser(r)
@@ -2257,6 +2259,11 @@
     {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
+    }
+
+    function help()
+    {
+        talk("support");
     }
 
     function run()

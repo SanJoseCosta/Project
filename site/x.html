@@ -1,0 +1,212 @@
+
+<head>
+<meta charset="UTF-8">
+</head>
+
+<div style="background-color: #f0f0ff; display: table; width:650px;">
+	
+	<div style="width:350px; display: table-cell;">
+		
+		<div style="padding:10px;" id=left></div>
+		<textarea style="resize: none; font-size:20px; width:350px" id=taleft></textarea>
+
+	</div>
+	
+	<div style="display: table-cell; width:100px;">
+		<img src=images/blank.png id=img>
+	</div>
+
+	<div style="width:350px; display: table-cell;">
+
+		<div style="padding:10px;" id=right></div>
+		<textarea style="resize: none; font-size:20px; width:350px" id=taright></textarea>
+
+	</div>
+</div>
+
+
+
+<script>
+
+var leftbox = 	"<div style='float:left; padding:10px; margin:10px; font-size:20px; width:230px; background-color:blue; color: white;'>";
+var rightbox = 	"<div style='float:right; padding:10px; margin:10px; font-size:20px; width:230px; background-color:blue; color: white;'>";
+
+var m1 = 
+
+	[	"您的订单将于明天发货。", 
+		"Your order will be shipped tomorrow.", 
+		"Su pedido se enviará mañana.", 
+		"Ваш заказ будет отправлен завтра.", 
+		"Ihre Bestellung wird morgen versendet."
+	];
+
+
+var m2 = 
+
+	[	"非常感谢！", 
+		"Very good, thank you!", 
+		"Muy bien, gracias!", 
+		"Очень хорошо Спасибо!", 
+		"Sehr gut danke Ihnen!"
+	];
+
+
+// init everything
+
+		// 0 chooser -- choose the two message indexes a, b
+
+		// 1 sleft -- focus left textarea
+		// 2 left -- left letters loop until end
+		// 3 aleft -- add message into left message box (on right side)
+		// 4 animatel2r -- pause with animation
+		// 5 aright -- add message into right message box (on left side) and pause
+		
+		// 6 sright -- focus right textarea
+		// 7 right -- right letters loop until end
+		// 8 aright -- add message into right message box (on right side)
+		// 9 animater2l -- pause with animation
+		// 10 aleft -- add message into left message box (on left side) and pause
+
+		// 11 pause long and back to chooser (0)
+
+
+var k;
+var state = 0;
+var msga, msgb;
+
+function process()
+{
+	var wait = 0;
+
+	switch(state) 
+	{
+	  	case 0:
+	  		while (true)
+	  		{
+	  			msga = Math.floor(Math.random() * m1.length);
+	  			msgb = Math.floor(Math.random() * m1.length);
+	  			if (msga != msgb) break;
+	  		}
+	  		state = 1;
+	  		document.getElementById("img").src = "images/blank.png";
+	  		document.getElementById("left").innerHTML = "";
+	  		document.getElementById("right").innerHTML = "";
+	    	break;
+	  	////////
+	  	case 1:
+	  		t = document.getElementById("taleft");
+			t.focus();
+			wait = 10;
+			k = 0;
+			state = 2;
+	    	break;
+	  	////////
+	  	case 2:
+  			if (k > m1[msga].length + 1)
+			{
+				alert("error 2");
+			}
+			else if (k == m1[msga].length + 1)
+			{
+				t.value = "";
+				wait = 50;
+				state = 3;
+			}
+			else
+			{
+				t.value = m1[msga].substring(0,k);
+				wait = 50;
+			}
+			++k;
+	    	break;
+	  	////////
+		case 3:
+			add(document.getElementById("left"), m1[msga] + "\n(" + m1[msgb] + ")", true);
+			state = 4;
+	    	break;
+	  	////////
+	  	case 4:
+	  		wait = 1000;
+	  		document.getElementById("img").src = "images/right.png";
+	  		state = 5;
+	    	break;
+	  	////////
+	  	case 5:
+			add(document.getElementById("right"), m1[msgb] + "\n(" + m1[msga] + ")", false);
+			wait = 100;
+	  		state = 6;
+	    	break;
+	  	////////
+	  	case 6:
+	  		t = document.getElementById("taright");
+			t.focus();
+			k = 0;
+			state = 7;
+	    	break;
+	  	////////
+	  	case 7:
+		  	if (k > m2[msgb].length + 1)
+			{
+				alert("error 7");
+			}
+			else if (k == m2[msgb].length + 1)
+			{
+				t.value = "";
+				wait = 50;
+				state = 8;
+			}
+			else
+			{
+				t.value = m2[msgb].substring(0,k);
+				wait = 50;
+			}
+			++k;
+	    	break;
+	  	////////
+	  	case 8:
+			add(document.getElementById("right"), m2[msgb] + "\n(" + m2[msga] + ")", true);
+			state = 9;
+	    	break;
+	  	////////
+	  	case 9:
+	  		wait = 1000;
+	  		document.getElementById("img").src = "images/left.png";
+	  		state = 10;
+	    	break;
+	  	////////
+	  	case 10:
+			add(document.getElementById("left"), m2[msga] + "\n(" + m2[msgb] + ")", false);
+			wait = 100;
+			state = 11;
+	    	break;
+	  	////////
+	  	case 11:
+	  		wait = 3000;
+	  		document.getElementById("img").src = "images/blank.png";
+	  		state = 12;
+	    	break;
+	  	////////
+	  	default:
+	  		state = 0;
+	  		wait = 1000;
+	  		break;
+	}
+
+	setTimeout(process, wait);
+}
+
+function add(e, m, right)
+{
+	var n;
+	if (right)
+		n = rightbox + m + "</div>";
+	else
+		n = leftbox + m + "</div>";
+	console.log(n);
+	e.innerHTML += n;
+}
+
+process();
+
+</script>
+

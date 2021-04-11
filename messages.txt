@@ -1,149 +1,68 @@
 messages.txt
 
-server to client
 
-------------------------------------------
 
-    type, checkusername,
-    response, dup / ok
 
-------------------------------------------
+    server to client
 
-    type, checkemail, 
-    response, dup / ok
 
-------------------------------------------
-
-    type, checklogin, 
-    response, invaliduser / invalidpassword / token
-
-------------------------------------------
 
     type, error, 
     response, xinvalidMessageType / xuserNotFoundByToken / xlocalUserNotFoundByToken / xremoteUserNotFoundByNameOrEmail / xlogoutPreviousConnectionInSameConversation
 
-------------------------------------------
-
-    type, find, 
-    response, xuserNotFound / ???
-    users: []
-
-------------------------------------------
 
     type, invite, 
     response, ok / ???
 
-------------------------------------------
+
 
     type, message,
     messages, [] (single message) 
 
-------------------------------------------
+
 
     type, ack,
     messages, [] (single message) 
 
-------------------------------------------
+
 
     type: history,
     messages: []
 
-------------------------------------------
 
-    type: users,
-    users: []
 
-------------------------------------------
 
-    user object
 
-        username
-        picurl
-        lastActivityTime
-        language
-        email
-        remote
-        local
-        lastMessage
-        lastTranslation
-        lastMessageId
-        lastStatus
-        lastMessageSender
-
-------------------------------------------
-
-    message object
-
-        mid
-        message
-        translation
-        localSender
-        status
-   
-------------------------------------------
 
 client to server
 
-------------------------------------------
+
 
     type: message,
     message: message,
     translation: translation,
     mid: mid
 
-------------------------------------------
+
 
     type: ack,
     status: status,
     mid: mid
 
-------------------------------------------
+
 
 	type: refresh
 
-------------------------------------------
 
-    type: find,
-    token: token,
-    username: username
-
-------------------------------------------
 
     type: invite,
     email: email,
 
-------------------------------------------
 
-    type: signin,
-    token: token,
 
-------------------------------------------
-
-    type: connect,
-    token: token,
-    username: username
-
-------------------------------------------
 
     type: signout,
 
-------------------------------------------
-
-	type: checkemail, 
-  	email: email 
-
-------------------------------------------
-
-	type: checkusername, 
-    username: username 
-
-------------------------------------------
-
-	type: checklogin, 
-  	emailorusername: email, 
-  	password: password 
-
-------------------------------------------
 
 
 

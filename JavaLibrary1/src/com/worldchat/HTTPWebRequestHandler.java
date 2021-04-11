@@ -23,7 +23,6 @@ public class HTTPWebRequestHandler implements HttpHandler
         catch (IOException e)
         {
             U.log("IO error on sending redirect");
-            e.printStackTrace();
         }
     }
 }
