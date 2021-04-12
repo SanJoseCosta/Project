@@ -3,27 +3,28 @@
 <meta charset="UTF-8">
 </head>
 
-<div style="background-color: #f0f0ff; display: table; width:650px;">
+<div style="background-color: white; display: table;">
 	
-	<div style="width:350px; display: table-cell;">
+	<div style="background-color: white; width:300px; display: table-cell;">
 		
-		<div style="padding:10px;" id=left></div>
-		<textarea style="resize: none; font-size:20px; width:350px" id=taleft></textarea>
+		<div style="padding:10px; min-height:250px;" id=left></div>
+		<textarea spellcheck=false style="resize: none; font-size:20px; width:350px" id=taleft></textarea>
 
 	</div>
 	
-	<div style="display: table-cell; width:100px;">
-		<img src=images/blank.png id=img>
+	<div style="display: table-cell; min-width:100px;">
+		<canvas height=250 width=100 id=can></canvas>
 	</div>
 
-	<div style="width:350px; display: table-cell;">
+	<div style="background-color: white; width:300px; display: table-cell;">
 
-		<div style="padding:10px;" id=right></div>
-		<textarea style="resize: none; font-size:20px; width:350px" id=taright></textarea>
+		<div style="padding:10px; min-height:250px;" id=right></div>
+		<textarea spellcheck=false style="resize: none; font-size:20px; width:350px" id=taright></textarea>
 
 	</div>
 </div>
 
+<img style="display: none;" id=icon height=25 src=images/i2.png>
 
 
 <script>
@@ -70,9 +71,9 @@ var m2 =
 		// 11 pause long and back to chooser (0)
 
 
-var k;
 var state = 0;
-var msga, msgb;
+var notrans = true;
+var msga, msgb, starta, k;
 
 function process()
 {
@@ -88,7 +89,7 @@ function process()
 	  			if (msga != msgb) break;
 	  		}
 	  		state = 1;
-	  		document.getElementById("img").src = "images/blank.png";
+	  		//document.getElementById("img").src = "images/blank.png";
 	  		document.getElementById("left").innerHTML = "";
 	  		document.getElementById("right").innerHTML = "";
 	    	break;
@@ -109,31 +110,59 @@ function process()
 			else if (k == m1[msga].length + 1)
 			{
 				t.value = "";
-				wait = 50;
+				wait = 10;
 				state = 3;
 			}
 			else
 			{
 				t.value = m1[msga].substring(0,k);
-				wait = 50;
+				wait = 80;
 			}
 			++k;
 	    	break;
 	  	////////
 		case 3:
-			add(document.getElementById("left"), m1[msga] + "\n(" + m1[msgb] + ")", true);
+			var trans = "\n(" + m1[msgb] + ")";
+			if (notrans) trans = "";
+			add(document.getElementById("left"), m1[msga] + trans, true);
 			state = 4;
+			wait = 50;
+			starta = new Date().getTime();
 	    	break;
 	  	////////
 	  	case 4:
-	  		wait = 1000;
-	  		document.getElementById("img").src = "images/right.png";
-	  		state = 5;
+	  		wait = 10;
+	  		
+	  		var p = new Date().getTime() - starta;
+
+	  		var canvas = document.getElementById("can");
+			var context = canvas.getContext("2d");
+
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.beginPath();
+
+			var x = (10 + p / 3) % 90;
+			var y = 50 - (50 - Math.abs(x - 50)) / 4;
+
+			var img = document.getElementById("icon");
+  			context.drawImage(img, x, y);
+
+  			//console.log("right " + x);
+
+	  		if (p > 2000)
+	  			state = 5;
+
 	    	break;
 	  	////////
 	  	case 5:
-			add(document.getElementById("right"), m1[msgb] + "\n(" + m1[msga] + ")", false);
-			wait = 100;
+	  		var canvas = document.getElementById("can");
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
+	  		
+	  		var trans = "\n(" + m1[msga] + ")";
+	  		if (notrans) trans = "";
+			add(document.getElementById("right"), m1[msgb] + trans, false);
+			wait = 1000;
 	  		state = 6;
 	    	break;
 	  	////////
@@ -142,6 +171,7 @@ function process()
 			t.focus();
 			k = 0;
 			state = 7;
+			wait = 100;
 	    	break;
 	  	////////
 	  	case 7:
@@ -158,31 +188,57 @@ function process()
 			else
 			{
 				t.value = m2[msgb].substring(0,k);
-				wait = 50;
+				wait = 80;
 			}
 			++k;
 	    	break;
 	  	////////
 	  	case 8:
-			add(document.getElementById("right"), m2[msgb] + "\n(" + m2[msga] + ")", true);
+	  		var trans = "\n(" + m2[msga] + ")";
+	  		if (notrans) trans = "";
+			add(document.getElementById("right"), m2[msgb] + trans, true);
 			state = 9;
+			starta = new Date().getTime();
 	    	break;
 	  	////////
 	  	case 9:
-	  		wait = 1000;
-	  		document.getElementById("img").src = "images/left.png";
-	  		state = 10;
+	  		wait = 10;
+	  		
+	  		var p = new Date().getTime() - starta;
+
+	  		var canvas = document.getElementById("can");
+			var context = canvas.getContext("2d");
+
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.beginPath();
+
+			var x = 100 - (10 + p / 3) % 90;
+			var y = 50 - (50 - Math.abs(x - 50)) / 4;
+
+			var img = document.getElementById("icon");
+  			context.drawImage(img, x, y);
+
+  			//console.log("left " + x);
+
+	  		if (p > 2000)
+	  			state = 10;
+
 	    	break;
 	  	////////
 	  	case 10:
-			add(document.getElementById("left"), m2[msga] + "\n(" + m2[msgb] + ")", false);
+	  		var canvas = document.getElementById("can");
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
+	  		var trans = "\n(" + m2[msgb] + ")";
+	  		if (notrans) trans = "";
+			add(document.getElementById("left"), m2[msga] + trans, false);
 			wait = 100;
 			state = 11;
 	    	break;
 	  	////////
 	  	case 11:
 	  		wait = 3000;
-	  		document.getElementById("img").src = "images/blank.png";
 	  		state = 12;
 	    	break;
 	  	////////
@@ -202,7 +258,7 @@ function add(e, m, right)
 		n = rightbox + m + "</div>";
 	else
 		n = leftbox + m + "</div>";
-	console.log(n);
+	//console.log(n);
 	e.innerHTML += n;
 }
 
