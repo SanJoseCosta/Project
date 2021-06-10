@@ -8,11 +8,13 @@ public class Main
     // one cpu on the server handles about 200 http requests for static files per second
     // todo: same calculation with ws connection
     
+    static String ProductName = "comprendo";
+
     static String Home;
     static String RequestLog;
     static String InfoLog;
     static String Site;
-    static String Login = "https://malt.chat/base.html?a=create";
+    static String Login = "https://" + ProductName + ".chat/base.html?a=create";
     static String host = "0.0.0.0";
     static int port = 8887;
     static boolean Secure = true;

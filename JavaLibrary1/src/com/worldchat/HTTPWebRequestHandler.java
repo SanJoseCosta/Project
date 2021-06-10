@@ -11,9 +11,9 @@ public class HTTPWebRequestHandler implements HttpHandler
     {
         try
         {          
-            U.log("HTTPWebRequestHandler redirecting " + t.getRequestURI());
+            //U.log("HTTPWebRequestHandler redirecting " + t.getRequestURI());
             
-            t.getResponseHeaders().add("Location", "https://malt.chat" + t.getRequestURI()) ;
+            t.getResponseHeaders().add("Location", "https://" + Main.ProductName + ".chat" + t.getRequestURI()) ;
             t.sendResponseHeaders(302, 0);
             
             OutputStream os = t.getResponseBody();

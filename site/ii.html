@@ -59,6 +59,331 @@
               <div class="hero-form flx_2">
                 
 
+<div style="background-color: white; display: table;">
+  
+  <div id=divleft>
+      
+    <div id=left></div>
+    <textarea spellcheck=false id=taleft></textarea>
+
+  </div>
+  
+  <div id=candiv>
+    <canvas id=can></canvas>
+  </div>
+
+  <div id=divright>
+
+    <div id=right></div>
+    <textarea spellcheck=false id=taright></textarea>
+
+  </div>
+</div>
+
+<img style="display: none;" id=icon height=10 src=images/i2.png>
+
+<img height=10 src=images/i2.png>
+
+
+<script>
+
+/*
+
+function get(s)
+{
+    return document.getElementById(s);
+}
+
+var mobile = /Mobi|Android/i.test(navigator.userAgent);
+
+console.log("mobile: " + mobile);
+
+var leftbox;// =   "<div style='float:left; padding:10px; margin:10px; font-size:20px; width:230px; background-color:blue; color: white;'>";
+var rightbox;// =  "<div style='float:right; padding:10px; margin:10px; font-size:20px; width:230px; background-color:blue; color: white;'>";
+
+if (mobile)
+{
+  leftbox =   "<div style='float:left; padding:3px; margin:3px; font-size:10px; width:110px; background-color:blue; color: white;'>";
+  rightbox =  "<div style='float:right; padding:3px; margin:3px; font-size:10px; width:110px; background-color:blue; color: white;'>";
+
+  get("divleft").style="background-color: white; width:150px; display: table-cell;";
+  get("divright").style="background-color: white; width:150px; display: table-cell;";
+
+  get("left").style="padding:3px; min-height:125px;";
+  get("right").style="padding:3px; min-height:125px;";
+
+  get("candiv").style="display: table-cell; min-width:40px;";
+
+  get("taleft").style="resize: none; font-size:10px; width:150px";
+  get("taright").style="resize: none; font-size:10px; width:150px";
+
+  get("can").style="height:125px; width:40px;";
+
+  //get("icon").height = 10;
+}
+else
+{
+  leftbox =   "<div style='float:left; padding:10px; margin:10px; font-size:20px; width:230px; background-color:blue; color: white;'>";
+  rightbox =  "<div style='float:right; padding:10px; margin:10px; font-size:20px; width:230px; background-color:blue; color: white;'>";
+
+  get("divleft").style="background-color: white; width:300px; display: table-cell;";
+  get("divright").style="background-color: white; width:300px; display: table-cell;";
+
+
+  get("left").style="padding:10px; min-height:250px;";
+  get("right").style="padding:10px; min-height:250px;";
+
+  get("candiv").style="display: table-cell; min-width:100px;";
+
+  get("taleft").style="resize: none; font-size:20px; width:350px";
+  get("taright").style="resize: none; font-size:20px; width:350px";
+
+  get("can").style="height:250; width:100;";
+
+  //get("icon").height = 25;
+}
+
+var m1 = 
+
+  [ "您的订单将于明天发货。", 
+    "Your order will be shipped tomorrow.", 
+    "Su pedido se enviará mañana.", 
+    "Ваш заказ будет отправлен завтра.", 
+    "Ihre Bestellung wird morgen versendet."
+  ];
+
+
+var m2 = 
+
+  [ "非常感谢！", 
+    "Very good, thank you!", 
+    "Muy bien, gracias!", 
+    "Очень хорошо Спасибо!", 
+    "Sehr gut danke Ihnen!"
+  ];
+
+
+// init everything
+
+    // 0 chooser -- choose the two message indexes a, b
+
+    // 1 sleft -- focus left textarea
+    // 2 left -- left letters loop until end
+    // 3 aleft -- add message into left message box (on right side)
+    // 4 animatel2r -- pause with animation
+    // 5 aright -- add message into right message box (on left side) and pause
+    
+    // 6 sright -- focus right textarea
+    // 7 right -- right letters loop until end
+    // 8 aright -- add message into right message box (on right side)
+    // 9 animater2l -- pause with animation
+    // 10 aleft -- add message into left message box (on left side) and pause
+
+    // 11 pause long and back to chooser (0)
+
+
+var state = 0;
+var notrans = true;
+var msga, msgb, starta, k;
+
+function process()
+{
+  var wait = 0;
+
+  switch(state) 
+  {
+      case 0:
+        while (true)
+        {
+          msga = Math.floor(Math.random() * m1.length);
+          msgb = Math.floor(Math.random() * m1.length);
+          if (msga != msgb) break;
+        }
+        state = 1;
+        //document.getElementById("img").src = "images/blank.png";
+        document.getElementById("left").innerHTML = "";
+        document.getElementById("right").innerHTML = "";
+        break;
+      ////////
+      case 1:
+        t = document.getElementById("taleft");
+      t.focus();
+      wait = 10;
+      k = 0;
+      state = 2;
+        break;
+      ////////
+      case 2:
+        if (k > m1[msga].length + 1)
+      {
+        alert("error 2");
+      }
+      else if (k == m1[msga].length + 1)
+      {
+        t.value = "";
+        wait = 10;
+        state = 3;
+      }
+      else
+      {
+        t.value = m1[msga].substring(0,k);
+        wait = 80;
+      }
+      ++k;
+        break;
+      ////////
+    case 3:
+      var trans = "\n(" + m1[msgb] + ")";
+      if (notrans) trans = "";
+      add(document.getElementById("left"), m1[msga] + trans, true);
+      state = 4;
+      wait = 50;
+      starta = new Date().getTime();
+        break;
+      ////////
+      case 4:
+        wait = 10;
+        
+        var p = new Date().getTime() - starta;
+
+        var canvas = document.getElementById("can");
+      var context = canvas.getContext("2d");
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.beginPath();
+
+      var x = (10 + p / 3) % 90;
+      var y = 50 - (50 - Math.abs(x - 50)) / 4;
+
+      var img = document.getElementById("icon");
+        context.drawImage(img, x, y);
+
+        //console.log("right " + x);
+
+        if (p > 2000)
+          state = 5;
+
+        break;
+      ////////
+      case 5:
+        var canvas = document.getElementById("can");
+      var context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+        
+        var trans = "\n(" + m1[msga] + ")";
+        if (notrans) trans = "";
+      add(document.getElementById("right"), m1[msgb] + trans, false);
+      wait = 1000;
+        state = 6;
+        break;
+      ////////
+      case 6:
+        t = document.getElementById("taright");
+      t.focus();
+      k = 0;
+      state = 7;
+      wait = 100;
+        break;
+      ////////
+      case 7:
+        if (k > m2[msgb].length + 1)
+      {
+        alert("error 7");
+      }
+      else if (k == m2[msgb].length + 1)
+      {
+        t.value = "";
+        wait = 50;
+        state = 8;
+      }
+      else
+      {
+        t.value = m2[msgb].substring(0,k);
+        wait = 80;
+      }
+      ++k;
+        break;
+      ////////
+      case 8:
+        var trans = "\n(" + m2[msga] + ")";
+        if (notrans) trans = "";
+      add(document.getElementById("right"), m2[msgb] + trans, true);
+      state = 9;
+      starta = new Date().getTime();
+        break;
+      ////////
+      case 9:
+        wait = 10;
+        
+        var p = new Date().getTime() - starta;
+
+        var canvas = document.getElementById("can");
+      var context = canvas.getContext("2d");
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.beginPath();
+
+      var x = 100 - (10 + p / 3) % 90;
+      var y = 50 - (50 - Math.abs(x - 50)) / 4;
+
+      var img = document.getElementById("icon");
+        context.drawImage(img, x, y);
+
+        //console.log("left " + x);
+
+        if (p > 2000)
+          state = 10;
+
+        break;
+      ////////
+      case 10:
+        var canvas = document.getElementById("can");
+      var context = canvas.getContext("2d");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+        var trans = "\n(" + m2[msgb] + ")";
+        if (notrans) trans = "";
+      add(document.getElementById("left"), m2[msga] + trans, false);
+      wait = 100;
+      state = 11;
+        break;
+      ////////
+      case 11:
+        wait = 3000;
+        state = 12;
+        break;
+      ////////
+      default:
+        state = 0;
+        wait = 1000;
+        break;
+  }
+
+  setTimeout(process, wait);
+}
+
+function add(e, m, right)
+{
+  var n;
+  if (right)
+    n = rightbox + m + "</div>";
+  else
+    n = leftbox + m + "</div>";
+  //console.log(n);
+  e.innerHTML += n;
+}
+
+process();
+
+*/
+
+</script>
+
+
+
+
+
+
                 
               </div>
             </div>

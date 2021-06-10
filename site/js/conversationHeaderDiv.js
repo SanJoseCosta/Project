@@ -3,19 +3,28 @@ function conversationHeaderDiv()
     var s = getMobile() ?
 
     `
-       
+        <div style="display: flex; justify-content: center;  align-items: center; background-color: white; width: 100%;">
 
-        <div style="float:right;">
-                <img style="cursor: pointer; border-radius: 50%; padding: 0px;" $$click$$ src=$$local$$ height=30>    
+            <img onclick="backButton();" height=30 style="padding: 10px;float:left; cursor: pointer;" src=images/barrow.png>
+
+            &nbsp;&nbsp;
+
+            <img height=30 src=$$picurl$$ style="border-radius: 50%;">
+
+            &nbsp;&nbsp;
+
+            <div style="flex-grow: 1;">
+                <b>$$name$$</b> <span style="font-size: 10px;">active $$time$$</span>
+            </div>
+
+
+
+            <span style="float:right; padding:10px;">
+            </span>
+
+
+
         </div>
-        <div style="float:left;">
-                <span>chatting with <b>$$name$$</b></span>
-                <br>
-                <span>
-                $$time$$
-                </span>
-        </div> 
-
       
     `
 

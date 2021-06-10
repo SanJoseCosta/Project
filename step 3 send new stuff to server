@@ -1,4 +1,4 @@
-cd /Users/matt/Desktop/Project
+cd /Users/matt/Dropbox/Project
 git pull origin main
 git add *
 git commit -m "first commit"

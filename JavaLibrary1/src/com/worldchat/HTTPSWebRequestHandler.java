@@ -43,7 +43,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
  
             if (t.getRequestMethod().toLowerCase().equals("head")) 
             {
-                requestLog("Reject head request " + t);
+                requestLog("reject head request " + t);
                 return;
             }
             
@@ -124,7 +124,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                         ArrayList<Pair> pairs = postparse(so);
 
                         String response = create(pairs, r.trim().startsWith("/createuser"));
-                        U.log("create/edit user sending " + response);
+                        U.inf("create/edit user sending " + response);
                         result = sendMsg(response.getBytes(), t, TextMime, null);
                     } 
                     else 
@@ -152,7 +152,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
             result = -1;
         }
         
-        U.log("https request for " +  r + " from " + currentMessage.getRemoteAddress().toString() + " result " + result);
+        requestLog("https request for " +  r + " from " + currentMessage.getRemoteAddress().toString() + " result " + result);
     }
 
     int sendFile(String file, HttpExchange t) 
@@ -186,7 +186,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 || nullempty(picurl)
             ) 
         {
-            U.log("***** null parameter values in create/edit user");
+            U.log("-- null parameter values in create/edit user");
             return "xcannotadd";
         } 
         else 
@@ -213,7 +213,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
 
                 if (p == null)
                 {
-                    U.log("Cant find user being updated " + username);
+                    U.log("-- cant find user being updated " + username);
                     return "cantfindusererror";
                 }
                 
@@ -235,7 +235,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 
                 User u = new User(username, email, password, language, picurl, lastActivity + "");
             
-                U.log("add user " + u);
+                U.inf("add user " + u);
                 
                 User.storeUser(u);
                 
@@ -247,9 +247,9 @@ public class HTTPSWebRequestHandler implements HttpHandler
                     {
                         User inviter = User.findUserByToken(invite);
 
-                        U.log("invite code is " + invite);
-                        U.log("invitee is " + u.username);
-                        U.log("inviter is " + inviter.username);
+                        U.inf("invite code is " + invite);
+                        U.inf("invitee is " + u.username);
+                        U.inf("inviter is " + inviter.username);
 
                         Message.saveDummyMessage(inviter.username, u.username);
                     }
@@ -274,7 +274,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
 
         if (!result) 
         {
-            U.log("***** database returns false on attempt to store token for " + u.username());
+            U.log("-- database returns false on attempt to store token for " + u.username());
         } 
         
         return token;
@@ -318,7 +318,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
         } 
         catch (Exception e) 
         {
-            U.log("***** failed to fulfill request for  " + name + " beacuse " + e.getMessage());
+            U.log("-- failed to fulfill request for  " + name + " beacuse " + e.getMessage());
             return -1;
         }
     }
@@ -406,7 +406,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                         show = show.substring(0, 40);
                     }
 
-                    U.log(data + "===" + show);
+                    U.inf(data + "===" + show);
                 }
             }
         } catch (Exception e) 

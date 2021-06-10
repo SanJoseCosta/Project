@@ -41,16 +41,16 @@ public class MessageProcessingThread extends Thread
         catch (Exception e)
         {
             // do invalid message process
-            U.log("*** Exception processing message");
+            U.log("-- Exception processing message");
             e.printStackTrace();
         }
 
         time = System.currentTimeMillis() - time;
-        U.log("processed the message in " + time + " ms");
+        U.inf("processed the message in " + time + " ms");
 
         messageProcessedTimes.add(new Long(System.currentTimeMillis()));
         
-        //U.log("messages received: " + messageProcessedTimes.size());
+        //U.inf("messages received: " + messageProcessedTimes.size());
     }
 
     static void addJob(Job j) 
@@ -61,7 +61,7 @@ public class MessageProcessingThread extends Thread
     
     static boolean processMessage(WebSocket socket, String message) 
     {
-        U.log("received: " + message + " =========================================================\n");
+        U.inf("received: " + message + " =========================================================\n");
 
         try 
         {
@@ -127,8 +127,8 @@ public class MessageProcessingThread extends Thread
         }
         catch (CommunicationsException e)
         {
-            U.log("exception message " + e.getMessage());
-            U.log("original message " + message);
+            U.log("-- exception message " + e.getMessage());
+            U.log("-- original message " + message);
 
             String[] m = {"type", "error", "response", e.getMessage()};
             sendx(socket, m);
@@ -204,7 +204,7 @@ public class MessageProcessingThread extends Thread
         if (u == null) 
             throw new CommunicationsException("xuserNotFoundByToken");
         
-        U.log("signing in " + u.username());
+        U.inf("signing in " + u.username());
         
         Connection connection = new Connection(socket, u.username(), null);
         Connection.addConnection(connection);
@@ -229,7 +229,7 @@ public class MessageProcessingThread extends Thread
         if (remote == null) 
             throw new CommunicationsException("xremoteUserNotFoundByNameOrEmail");
         
-        U.log("start conversation between " + local.username() + " and " + remote.username());
+        U.inf("start conversation between " + local.username() + " and " + remote.username());
         
         if (connection == null)
         {
@@ -254,7 +254,7 @@ public class MessageProcessingThread extends Thread
             
             if (toclose != null)
             {
-                U.log("Conversation already in progress for local user " + local.username() + " closing connection " + toclose);
+                U.inf("Conversation already in progress for local user " + local.username() + " closing connection " + toclose);
                 
                 String[] m = {"type", "error", "response", "xlogoutPreviousConnectionInSameConversation"};
                 sendx(toclose.socket, m);
@@ -263,7 +263,7 @@ public class MessageProcessingThread extends Thread
             }
         }
         
-        U.log("New conversation between " + local + " and " + remote);
+        U.inf("New conversation between " + local + " and " + remote);
 
         connection.conversation = Conversation.createConversation(local.username(), remote.username());
         
@@ -278,7 +278,7 @@ public class MessageProcessingThread extends Thread
         String token = json.getString("token").toLowerCase();;
         String username = json.getString("username").toLowerCase();
         
-        U.log("search user ***" + username + "***");
+        U.inf("search user ***" + username + "***");
 
         ArrayList<User> list = new ArrayList<User>();
     
@@ -286,7 +286,7 @@ public class MessageProcessingThread extends Thread
 
         if (user != null && !user.username().equals(connection.username))
         {
-            U.log("found user " + user);
+            U.inf("found user " + user);
             Message.saveDummyMessage(connection.username, user.username);
 
             list.add(user);
@@ -311,7 +311,7 @@ public class MessageProcessingThread extends Thread
         	User u = User.findUserByUsername(connection.username);
         	String invite = HTTPSWebRequestHandler.returnToken(u);
         	
-            boolean r = U.sendemail(email, "Invitation to chat on Malt.chat", 
+            boolean r = U.sendemail(email, "Invitation to chat on " + Main.ProductName + ".chat", 
                         connection.username + 
                         " has sent you an invitation to chat. " + 
                         "Please follow this link to login or create a new account and begin chatting: " +
@@ -340,7 +340,7 @@ public class MessageProcessingThread extends Thread
         
         User local = User.findUserByUsername(connection.username);
 
-        U.log("in remoteuser, connection.username = " + connection.username + ", local=" + local + ", conversation=" + connection.conversation);
+        //U.inf("in remoteuser, connection.username = " + connection.username + ", local=" + local + ", conversation=" + connection.conversation);
         
         if (connection.conversation != null)
             remote = connection.conversation.otherSide(local);
@@ -377,7 +377,7 @@ public class MessageProcessingThread extends Thread
             {   
                 User u = User.findUserByUsername(correspondents.get(i));
                 if (u == null)
-                    U.log("***** cannot find " + correspondents.get(i));
+                    U.log("-- cannot find in sendLCU " + correspondents.get(i));
                 else
                 {
                     u.lastMessage = Conversation.getLastMessage(Conversation.conversationName(connection.username, u.username()));
@@ -411,7 +411,7 @@ public class MessageProcessingThread extends Thread
             String j2send = user.jsonToSend(isLocal, isRemote);
             users.add(j2send);
 
-            U.log("sending user " + user);
+            //U.log("sending user " + user);
         }
       
         String a = Json.array(type, "users", users);
@@ -444,12 +444,12 @@ public class MessageProcessingThread extends Thread
         try 
         {
             socket.send(msg);
-            U.log("sendx sent the string " + U.truncate(msg, 30));
+            U.inf("sendx sent the string " + U.truncate(msg, 30));
             return true;
         } 
         catch (Exception e) 
         {
-            U.log("***** FAILED to send string " + msg);
+            U.log("-- FAILED to send string " + msg);
             e.printStackTrace();
             return false;
         }
@@ -457,7 +457,7 @@ public class MessageProcessingThread extends Thread
 
     static String login(String username, String password) 
     {
-        U.log("login");
+        U.inf("login");
         
         String r;
         User u = User.findUserByUsername(username);
@@ -469,7 +469,7 @@ public class MessageProcessingThread extends Thread
             r = "invaliduser";
         else
         {
-            U.log("login " + u.password + " " + password);
+            U.inf("login " + u.password + " " + password);
             if (!u.password.equals(password)) 
             {
                 r = "invalidpassword";
@@ -477,7 +477,7 @@ public class MessageProcessingThread extends Thread
             else
             {
                 String t = HTTPSWebRequestHandler.returnToken(u);
-                U.log("token " + t);
+                U.inf("token " + t);
                 r = t;
             }
         }

@@ -14,15 +14,12 @@ function conversationPage()
         </style>
         
 		<div class="grid-container">
-            <div id=header class=hdr></div>
     
-            <div id=conversation class=mai>
+            <div id=conversation>
     
-                <div id=conversation-header>
-                </div>          
+                <div id=conversation-header></div>          
 
-                <div id=messages-list>
-                </div>
+                <div id=messages-list></div>
 
                 <div id=conversation-footer>
                
@@ -33,7 +30,6 @@ function conversationPage()
     
             </div>
     
-            <div class=foo id=footer></div>
         </div>
 	`;
 	return s;

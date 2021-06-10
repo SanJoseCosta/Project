@@ -66,7 +66,7 @@ public class Database
         DBCollection collection = database.getCollection(tablename);
         if (collection == null)
         {
-            U.log("create " + tablename);
+            U.inf("create " + tablename);
 
             database.createCollection(tablename, null);
             collection = database.getCollection(tablename);
@@ -98,7 +98,7 @@ public class Database
         }
         catch (Exception e) 
         {
-            U.log(e.getMessage());
+            U.log("-- error adding record " + e.getMessage());
             return false;
         }
 

@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 public class SecureServer 
 {
     // !!! Your keystore file name goes here:
-    static String filename = "/home/ec2-user/mykeystore.jks";
+    static String filename = "/home/ec2-user/" + Main.ProductName + "keystore.jks";
 
     // !!! Your password goes here
     static char[] password = "plexus".toCharArray();

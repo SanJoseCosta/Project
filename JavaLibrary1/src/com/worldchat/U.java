@@ -40,16 +40,11 @@ public class U
     
     public static void inf(Object s) 
     {
-        if (true) 
-        {
-            log(s);
-            return;
-        }
         try 
         {
             if (inf == null) inf = new PrintStream(Main.InfoLog);
             inf.append(new Date() + ": " + s + "\n");
-            log(s);
+            //log(s);
         }
         catch (Exception e)
         {
@@ -298,7 +293,8 @@ public class U
             //stackTrace(e);
         }
 
-        U.log("getPage " + url + " response code " + rs);
+        //U.log("getPage " + url + " response code " + rs);
+        
         return s;
     }
 

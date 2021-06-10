@@ -135,7 +135,7 @@ public class Message
         
         // todo add the translation
 
-        String m1 = "Welcome to MALT.chat. To get started, click the icons to Find another user, or, Invite someone new.";
+        String m1 = "Welcome! Click the icons to Find a user, or, Invite someone new.";
         
         Message message = new Message(Main.SupportUser,  m1, m1, mid, 2, nuser);
 

@@ -83,7 +83,7 @@ public class WSServer extends WebSocketServer
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) 
     {
-        U.log("new connection to " + conn.getRemoteSocketAddress());
+        U.inf("new connection to " + conn.getRemoteSocketAddress());
     }
 
     static void stopserver() 

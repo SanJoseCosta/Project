@@ -41,7 +41,7 @@ class Test extends Thread
             {
                 try
                 {
-                    String r = U.getPageDirect("https://malt.chat/base.html");
+                    String r = U.getPageDirect("https://" + ProductName + ".chat/base.html");
                     U.log((itotal() * 1000)/(System.currentTimeMillis() - start + 1));
                     last = System.currentTimeMillis();
                 }

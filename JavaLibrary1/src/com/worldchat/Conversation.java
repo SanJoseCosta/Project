@@ -19,7 +19,7 @@ public class Conversation
         username1 = id1;
         username2 = id2;
         
-        U.log("new conversation");
+        //U.log("new conversation");
         
         user1 = User.findUserByUsername(username1);
         user2 = User.findUserByUsername(username2);
@@ -139,7 +139,7 @@ public class Conversation
                 User to = otherSide(User.findUserByUsername(fromcon.username));
                 U.sendemail(to.email, "New message from " + to.username(), 
                             to.username() + 
-                            " has sent you a new message on MALT.chat. Please click this link to login and read your new message: " +
+                            " has sent you a new message on " + ProductName + ".chat. Please click this link to login and read your new message: " +
                             Main.Login);
                 EmailSent = true;
             }
@@ -234,10 +234,12 @@ public class Conversation
         }
       
         String a = Json.array("history", "messages", messages);
-        U.log("******** history: " + a);
+        
+        //U.log("******** history: " + a);
 
         boolean r = MessageProcessingThread.sendx(tocon, a);
-        U.log((r ? "Successfuly " : "Failed to ") + "send history message " + U.truncate(a, 30) + " to " + tocon.username);
+        
+        //U.log((r ? "Successfuly " : "Failed to ") + "send history message " + U.truncate(a, 30) + " to " + tocon.username);
     }
   
     public String toString() 

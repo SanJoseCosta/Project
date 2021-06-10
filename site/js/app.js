@@ -33,71 +33,18 @@
 
     var RestartTimeout = 3000;
     var RefreshTimeout = 5000;
-
     var initTime = 0;
-
     var Secure = true;
+    var DomainName = "comprendo.chat"; //"malt.chat"
 
     // where to go up on receiving a 2 type response to a 1 type request
 
     var pendingHandler;
+    var message2send;
 
     // last user list
 
     var lastListlen = 0;
-
-    function getMobile()
-    {
-        return mobile;
-    }
-
-    function readyString()
-    {
-        if (socket == null) return "Socket null";
-        var n = socket.readyState
-        var s = "readyState = ";
-        if (n == 0) return s + "Connecting";
-        if (n == 1) return s + "Open";
-        if (n == 2) return s + "Closing";
-        if (n == 3) return s + "Closed";
-        return "readyState unknown";
-    }
-
-    function serverRequest(s)
-    {
-        return Protocol() + Domain() + s;
-    }
-
-    function imageRequest(s)
-    {
-        return Protocol() + Domain() + s;
-    }
-
-    function htmlRequest(s)
-    {
-        return "." + s;
-    }
-
-    function Protocol() 
-    { 
-        if (Secure)
-            return "https://"; 
-        else
-            return "http://"; 
-    }
-
-    function Domain() 
-    { 
-        return "malt.chat"; 
-    }
-
-    function WebSocketProtocol()
-    {
-        if (Secure)
-            return "wss://";
-        else
-            return "ws://";
-    }
 
     function localInput(t)
     {
@@ -112,37 +59,6 @@
             completeTranslation(text);
         else
             requestTranslation(tolang, fromlang, text) //, completeTranslation);
-    }
-
-    function completeTranslation(translation)
-    {
-        var mid = id();
-
-        var m = JSON.stringify(
-            {
-                type: "message",
-                message: messageBeingTranslated,
-                translation: translation,
-                mid: mid
-            });
-
-        var status;
-        try
-        {
-            socketsend(m);
-            status = 1;
-        } 
-        catch (err)
-        {
-            logError("*** error while sending message to server: " + err.message);
-            status = -1;
-        }
-
-        var msg = makeMessage(mid, messageBeingTranslated, translation, true, status);
-                
-        addMessage(msg, false);
-
-        pageUpdate(true);
     }
 
     function remoteMessage(t)
@@ -278,83 +194,6 @@
 
         if (updatePage)
             pageUpdate(messages);
-
-
-        ///////////////////////////
-
-
-        //var parts = t.split(separator);
-
-        //if (parts[0] == "M")
-        //  /  if (parts.length < 4) 
-        //    {
-        //        logError("*** invalid message received: " + t);
-        //        return;
-        //    }
-        //if (parts[0] == "A")
-        //    if (parts.length < 5) 
-        //    {
-        //        logError("*** invalid message received: " + t);
-        //        return;
-        //    }
-
-
-
-
-        //if (parts[0] == "H")
-        //    if (parts.length < 6 && parts[1] != "") 
-        //    {
-        //        logError("*** invalid message received: " + t + " length " + parts.length);
-        //        return;
-        //    }
-
-       
-        /*
-        if (parts[0] == "M")
-        {
-            var m = makeMessage(parts[3], parts[1], parts[2], false, "0");
-            addMessage(m, false);
-            sendAck(parts[3], status);
-
-            messages = true;
-        }
-        else if (parts[0] == "A")
-        {
-            var m = makeMessage(parts[3], parts[1], parts[2], true, parts[4]);
-            addMessage(m, true);
-            messages = true;
-        } 
-        else if (parts[0] == "H")
-        {
-            receiveHistory(parts, status);
-            messages = true;
-        } 
-        else 
-        */
-
-
-
-    }
-
-    function sendAck(mid, status)
-    {
-        //var m = "A" + separator + id + separator + status;
-
-        var m = JSON.stringify(
-            {
-                type: "ack",
-                status: status + "",
-                mid: mid
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending ack to server: " + err.message);
-        }
     }
 
     function statusUpdate()
@@ -370,78 +209,6 @@
                 message.status = 4;
                 sendAck(message.mid, 4);
             }
-        }
-    }
-
-    function sendCheckRequest(obj)
-    {
-        var m = JSON.stringify(obj);
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending request to server: " + err.message);
-        }
-    }
-
-    function sendRefreshRequest()
-    {
-        var m = JSON.stringify(
-            {
-                type: "refresh"
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending refresh request to server: " + err.message);
-        }
-    }
-
-    function searchUsers(token, username)
-    {
-        //var m = "F" + separator + t + separator + s;
-
-        var m = JSON.stringify(
-            {
-                type: "find",
-                token: token,
-                username: username
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending search request to server: " + err.message);
-        }
-    }
-
-    function inviteUser(email)
-    {
-        //var m = "I" + separator + email + separator;
-
-        var m = JSON.stringify(
-            {
-                type: "invite",
-                email: email,
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending invite request to server: " + err.message);
         }
     }
 
@@ -471,369 +238,6 @@
         localStorage.setItem("token", null);
         sendSignOutMessage();
         changePage("login");
-    }
-
-    function makeUser(json)
-    {
-        var user = {};
-
-        user.picurl =                       json.picurl;
-        user.username =                     json.username
-        user.lastActivityTime =             parseInt(json.lastActivityTime);
-        user.language =                     json.language;
-        user.remote =                       json.remote == "true";
-        user.local =                        json.local == "true";
-        user.lastMessage =                  json.lastMessage;
-        user.lastTranslation =              json.lastTranslation;
-        user.lastMessageId =                json.lastMessageId;
-        user.lastStatus =                   json.lastStatus;
-        user.lastMessageSender =            json.lastMessageSender;  
-        user.email =                        json.email;
-
-        return user;
-    }
-
-    function allUsers()
-    {
-        for (var i = 0; i < users.length; ++i) displayUserInfo(users[i]);
-    }
-
-    function displayUserInfo(user)
-    {
-        log("----- user info:");
-        log("picurl:                            " + user.picurl);
-        log("username:                          " + user.username);
-        log("lastActivityTime:                  " + user.lastActivityTime);
-        log("language:                          " + user.language);
-        log("is this remote user:               " + user.remote);
-        log("is this local user:                " + user.local);
-        log("lastMessage:                       " + user.lastMessage);
-        log("lastTranslation:                   " + user.lastTranslation);
-        log("lastMessageId:                     " + user.lastMessageId);
-        log("lastStatus:                        " + user.lastStatus);
-        log("lastMessageSender:                 " + user.lastMessageSender);
-        log("email:                             " + user.email);
-        log("-----")
-    }
-
-    function picturefile(user)
-    {
-        if (user.picurl != "0")
-            return picturepath(user.username); 
-        else
-            return defaultPic();
-    }
-
-    function defaultPic()
-    {
-        return imageRequest(DefaultProfilePic);
-    }
-
-    function picturepath(username)
-    {
-        return imageRequest("/images/" + username + ".png"); 
-    }
-
-    function addOrUpdateUser(json)
-    {
-        var newuser = makeUser(json);
-        
-        //displayUserInfo(newuser);
-
-        for (var i = 0; i < users.length; ++i)
-        {
-            var u = users[i];
-            if (u.username == newuser.username)
-            {
-                users.splice(i, 1, newuser);
-                //log("updated user: " + newuser.username);
-                return newuser;
-            }
-        }
-
-        users.push(newuser);
-        //log("added user: " + newuser.username);
-        return newuser;
-    }
-
-    function receiveUsersJson(json, len)
-    {
-        var updatePage = false;
-
-        // todo  ---------------- also for F need to get the user returned
-         
-        if (lastListlen != len)
-            updatePage = true;
-        else if (Math.random() < 0.1)
-            updatePage = true;
-            
-        lastListlen = len;
-
-        json = json.users;
-
-        for (var i = 0; i < json.length; ++i)
-            addOrUpdateUser(json[i]); 
-
-        if (debug)
-        {
-            log("--------------------------------------------");
-            allUsers();
-            log("--------------------------------------------");
-        }
-
-        log("received " + json.length + " users");
-
-        return updatePage;
-    }
-
-    function findLocalUser()
-    {
-        for (var i = 0; i < users.length; ++i)
-        {
-            var u = users[i];
-            if (u.local)
-                return u;
-        }
-        return null;
-    }
-
-    function findRemoteUser()
-    {
-        if (debug) log("find remote user with id " + remoteUsername);
-
-        if (debug) log("---all users");
-        if (debug) for (var i = 0; i < users.length; ++i) log(i + " " + users[i].username + " is remote = " + users[i].remote);
-        if (debug) log("---end users");
-
-        for (var i = 0; i < users.length; ++i)
-        {
-            var u = users[i];
-            if (u.username == remoteUsername)
-            {
-                if (debug) log("findremoteuser returns");
-                if (debug) displayUserInfo(u);
-                return u;
-            }
-        }
-
-        if (debug) log("findremoteuser returns null");
-        return null;
-    }
-
-    function getLocalPic()
-    {
-        if (findLocalUser() != null)
-            return picturefile(findLocalUser());
-        else
-            return defaultPic();
-    }
-
-    function getRemotePic()
-    {
-        if (findRemoteUser() != null)
-            return picturefile(findRemoteUser());
-        else
-            return defaultPic();
-    }
-
-    function sortedUsersExceptLocal()
-    {
-        var gu = [];
-        
-        for (var i = 0; i < users.length; ++i) 
-            if (!users[i].local)
-                gu.push(users[i]);
-
-        var k = 0;
-
-        while (true)
-        {
-            // find latest
-
-            var max = 0;
-            var index = -1;
-
-            for (var i = k; i < gu.length; ++i)
-            {
-                var time;
-
-                if (gu[i].lastMessage != "null")
-                    time = parseInt(gu[i].lastMessageId.substring(0, gu[i].lastMessageId.length - 10));
-                else
-                    time = 2000000000;
-
-                if (time > max || index < 0)
-                {
-                    max = time;
-                    index = i;
-                }
-            }
-
-            if (index < 0)
-                break;
-
-            if (index != k)
-            {
-                var h = gu[index];
-                gu[index] = gu[k];
-                gu[k] = h;
-            }
-            
-            k++;
-        }
-
-        return gu;
-    }
-
-    function changeImage(input)
-    {
-        var reader;
-        imageChanged = true;
-
-        if (debug) log("image changed");
-
-        if (input.files && input.files[0]) 
-        {
-            reader = new FileReader();
-
-            reader.onload = 
-                function (e) 
-                {
-                    get("previewimage").setAttribute("src", e.target.result);
-                }
-
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function upload(userdata, callback, imageSrc, token)
-    {
-        var formData = new FormData();
-        
-        if (imageChanged)
-        {
-            formData.append("image", imageSrc);
-        }
-
-        for (var i = 0; i < userdata.length; i = i + 2)
-        {
-            formData.append(userdata[i], userdata[i + 1]);
-            if (debug) log(userdata[i] + "=" + userdata[i + 1]);
-        }
-
-        var ajax = new XMLHttpRequest();
-
-        if (token == null)
-        {
-            ajax.open("POST", serverRequest("/createuser"));
-        }
-        else
-        {
-            var params = "token=" + token;
-            var encodedMessage = encodeURI(params);
-            var page = serverRequest("/edituser?") + encodedMessage;
-
-            if (debug) log("upload to " + page);
-
-            ajax.open("POST", page);
-        }
-        
-        ajax.onload = function (e)
-        {
-            callback(ajax);
-        }
-
-        ajax.onreadystatechange = function(e) 
-        {
-            if (ajax.readyState === 4) 
-            {
-                if (debug) 
-                    if (ajax.status === 200) 
-                        log("post request successful");
-                    else
-                        log("post request error: " + ajax.status);
-            }
-        }
-
-        // ajax.upload.onprogress = function (e) {};
-
-        ajax.send(formData);
-
-        log("uploaded data");
-    }
-
-    function requestTranslation(tolang, fromlang, text) //, callback)
-    {
-        var base = "https://translation.googleapis.com/language/translate/v2?";
-        var params = "target=" + tolang + "&source=" + fromlang + 
-        "&key=" + "AIzaSyC3" +
-                "1GV2BJqC" +
-                "IoXCM6Nj" +
-                "OtLohY-l" +
-                "WV1bQ3Q" + "=&q=" + text; // key 
-
-        pageRequest(base, params, recieveTranslation);
-
-        // todo set a timeout in case the translation doesnt return
-    }
-
-    function parseTranslationResponse(r)
-    {
-        var search = "\"translatedText\": \"";
-        var k = r.indexOf(search);
-
-        if (k >= 0)
-        {
-            r = r.substring(k + search.length);
-            k = r.indexOf("\"");
-            if (k > 0)
-            {
-                return r.substring(0, k);
-            }
-        }
-
-        return null;
-    }
-
-    function recieveTranslation(r)
-    {
-        var translateResponse = r.responseText;
-
-        if (debug) log("received translation response " + translateResponse);
-
-        var translation;
-        if (translateResponse == null)
-        {
-            translation = "-unknown response from translator-";
-        } 
-        else
-        {
-            // now pull out the translated text
-
-            translation = parseTranslationResponse(translateResponse);
-            if (translation == null)
-                translation = "-unknown response from translator-";
-        }
-
-        completeTranslation(translation);
-    }
-    
-    function pageRequest(url, params, processfunction)
-    {
-        var encodedMessage = encodeURI(params);
-        url = url + encodedMessage;
-
-        var request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.send(null);
-
-        log("page request for " + url);
-
-        request.onload =
-        function (e)
-        {
-            processfunction(request);
-        }
     }
 
     function changePage(url)
@@ -887,309 +291,6 @@
         {
             body.innerHTML = termsPage();
         }
-    }
-
-    function makeMessageJson(json)
-    {
-        var m = {};
-
-        m.mid =                 json.mid;
-        m.message =             json.message;
-        m.translation =         json.translation;
-        m.localSender =         json.localSender == "true";
-        m.status =              parseInt(json.status);
-
-        log("make message: " + m.mid + ", " + m.message + ", " + m.translation + ", " + m.localSender + ", " + m.status);
-
-        return m;
-    }
-    
-    function makeMessage(id, msg, tr, lg, s)
-    {
-        var m = {};
-
-        m.mid = id;
-        m.message = msg;
-        m.translation = tr;
-        m.localSender = lg;
-        m.status = parseInt(s);
-
-        return m;
-    }
-    
-    function timeString(m)
-    {
-        return timeDisplayStringFromUnixTime(m.mid.substring(0, m.mid.length - 10));
-    }
-
-    function addMessage(msg, mustExist)
-    {
-        var replaced = false;
-
-        for (var i = 0; i < messages.length; ++i)
-        {
-            if (messages[i].mid == msg.mid)
-            {
-                messages.splice(i, 1, msg);
-                replaced = true;
-                break;
-            }
-        }
-
-        if (!replaced)
-        {
-            if (mustExist)
-            {
-                logError("*** cannot find message: " + msg);
-                return;
-            }
-
-            messages.push(msg);
-            if (debug) log("Added message: " + msg.mid + " " + msg.message + " " + msg.status);
-        }
-    }
-    /*
-    function receiveHistory(s, status)
-    {
-        for (var i = 1; i < s.length; i += numberOfFieldsInMessageDescriptor)
-        {
-            if (i + numberOfFieldsInMessageDescriptor - 1 < s.length)
-            {
-                if (s[i + 2] != "0")
-                {
-                    var m = makeMessage(s[i + 2], s[i + 0], s[i + 1], s[i + 4] == "true", s[i + 3]);
-                    addMessage(m, false);
-
-                    if (!m.localSender)
-                        if (m.status != 4 && status == 4)
-                            sendAck(m.mid, status);
-                }
-            }
-        }
-    }
-    */
-    function receiveHistoryJson(json, status)
-    {
-        json = json.messages;
-
-        for (var i = 0; i < json.length; ++i)
-        {
-            if (json[i].mid != "0")
-            {
-                //var m = {};
-
-                //m.mid =                 json[i].mid;
-                //m.message =             json[i].message;
-                //m.translation =         json[i].translation;
-                //m.localSender =         json[i].local == "true";
-                //m.status =              parseInt(json[i].status);
-
-                //log(m.mid + ", " + m.message + ", " + m.translation + ", " + m.localSender + ", " + m.status);
-
-                var m = makeMessageJson(json[i], false);
-                addMessage(m);
-
-                if (!m.localSender && m.status != 4 && status == 4)
-                    sendAck(m.mid, status);
-            }
-        }
-    }
-
-    function onopen(event)
-    {
-        log("websocket opened");
-        whenOpened();
-    }
-
-    function onerror(error)
-    {
-        var s = "null socket";
-
-        if (socket != null)
-            s = readyString();
-
-        log("socket error: " + error + ", " + s);
-
-        // todo we should restart everything
-    }
-
-    function onclose(event)
-    {
-        var s = "null socket";
-
-        if (socket != null)
-            s = readyString();
-
-        log("websocket connection closed, code = " + event.code + ", reason = " + event.reason + ", " + s + ", wait the restart timeout ...");
-    }
-
-    function onmessage(event)
-    {
-        log("\n--- new message");
-        log("Message received: " +  truncate(event.data, 30));
-        remoteMessage(event.data);
-    }
-
-    function initWebSocket()
-    {
-        var waitTime = new Date().getTime() - initTime;
-
-        if (socket == null)
-        {
-            log("initWebSocket - socket is null");
-            iws();
-        }
-        else if (socket.readyState == Closed)
-        {
-            log("initWebSocket - socket is Closed -- restart");
-            iws();
-        }
-        else if (socket.readyState == Open)
-        {
-            //log("initWebSocket - " + readyString());
-        }
-        else if (socket.readyState == Connecting || socket.readyState == Closing)
-        {
-            if (waitTime > RestartTimeout)
-            {
-                // close then wait
-
-                log("initWebSocket - timeout exceeded -  closing");
-                socket.close();
-                initTime = new Date().getTime();
-            }
-            else
-            {
-                log("initWebSocket - already " + readyString() + " ... waiting " + waitTime);
-            }
-        }
-
-        setTimeout(initWebSocket, RestartTimeout / 10);
-    }
-
-    function iws()
-    {
-        log("------------------ beging iws- " + readyString());
-        initTime = new Date().getTime();
-
-        var ep = WebSocketProtocol() + Domain() + ":8887/";
-
-        socket = new WebSocket(ep);
-
-        log("initWebSocket - created new websocket, " + readyString());
-
-        socket.onopen = onopen;
-        socket.onclose = onclose;
-        socket.onerror = onerror;
-
-        socket.onmessage = onmessage;
-    }
-    
-    function connect(currentToken, ru)
-    {
-        messages = [];
-        users = [];
-        lastListlen = 0;
-        
-        sendConnectMessage(currentToken, ru);
-    }
-
-    function sendConnectMessage(token, username)
-    {
-        if (username == null || username == "undefined") 
-        {
-            logError("*** trying to send connect message with null user");
-            return;
-        }
-
-        //var msg = "C" + separator + token + separator + u;
-
-        var m = JSON.stringify(
-            {
-                type: "connect",
-                token: token,
-                username: username
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending message to server: " + err.message + ", " + readyString());
-        }
-    }
-
-    function signin(currentToken)
-    {
-        messages = [];
-        users = [];
-        sendSignInMessage(currentToken);
-    }
-
-    function sendSignInMessage(token)
-    {
-        var m = JSON.stringify(
-            {
-                type: "signin",
-                token: token,
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending message to server: " + err.message + ", " + readyString());
-        }
-    }
-
-    function sendSignOutMessage()
-    {
-        //var msg = "s" + separator;
-
-        var m = JSON.stringify(
-            {
-                type: "signout",
-            });
-
-        try
-        {
-            socketsend(m);
-        } 
-        catch (err)
-        {
-            logError("*** error while sending message to server: " + err.message + ", " + readyString());
-        }
-    }
-
-    var message2send;
-
-    function socketsend(msg)
-    {
-        message2send = msg;
-        socketsender();
-    }
-
-    function socketsender()
-    {
-        if (socket == null)
-        {
-            logError("*** cannot send - socket is null");
-            return;
-        }
-        else if (socket.readyState != Open)
-        {
-            setTimeout(socketsender, 50);
-            if (debug) log("wait till socket open");
-            return;
-        }
-
-        socket.send(message2send);
-
-        log("*** msg sent via websocket: " + message2send);
     }
 
     function chatsHeader()
@@ -1249,7 +350,7 @@
     {
         if (pageMode == 0)
         {
-            log("page update with mode 0");
+            //log("page update with mode 0");
         }
         else if (pageMode == 1)
         {
@@ -1327,7 +428,6 @@
                         unread = true;
                     }
 
-
                 var b1 = unread ? "<b><i>" : "";
                 var b2 = unread ? "</b></i>" : "";
 
@@ -1343,7 +443,7 @@
 
         document.getElementById("chats-list").innerHTML = t;
 
-        pageHeader();
+        //pageHeader();
 
         chatsHeader();
     }
@@ -1364,9 +464,12 @@
 
             log("make conversation header for " + luser.username + " with local pic " + getLocalPic());
 
+
+            var div = conversationHeaderDiv();
+
             if (getMobile())
             {
-                var div = communityHeader();
+                
 
                 div = replaceAll(div, "$$picurl$$", picturefile(ru));
                 div = replaceAll(div, "$$local$$", getLocalPic());
@@ -1378,14 +481,14 @@
 
                 div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
 
-                var p = document.getElementById("community-header");
+                var p = document.getElementById("conversation-header");
 
                 if (p != null)
                     p.innerHTML = div;
             }
             else
             {
-                var div = conversationHeaderDiv();
+                
 
                 div = replaceAll(div, "$$picurl$$", picturefile(ru));
                 div = replaceAll(div, "$$local$$", getLocalPic());
@@ -1431,6 +534,9 @@
         remoteUsername = p;
 
         connect(currentToken, p);
+
+        if (mobile)
+            changePage("conversation");
     }
 
     function defaultConversationUsername()
@@ -1453,11 +559,11 @@
 
     function CommunityPageRefresh()
     {
-        log("refresh");
+        log("refresh " + pageMode);
         
         //setTimeout(CommunityPageRefresh, RefreshTimeout);
 
-        if (pageMode <= 4)
+        if (pageMode >= 1 && pageMode <= 3)
             sendRefreshRequest();
     }
 
@@ -1501,8 +607,6 @@
 
     function messageBoxInput(e)
     {
-        //log(e);
-
         var textarea = document.getElementById("msg");
         var n = textarea.value.charCodeAt(textarea.value.length - 1);
 
@@ -1537,316 +641,8 @@
     function backButton()
     {
         changePage(getCommunityStartPage());
-        sendRefreshRequest();
-    }
-
-    function login()
-    {
-        var email = get("email").value.trim();
-        var password = get("password").value.trim();
-
-        // if errors back to same page
-        
-        var stop = false;
-
-        if (debug) log("login " + email + ", " + password);
-
-        if (email == null || email == (""))
-        {
-            stop = true;
-            get("emailerror").innerText = "please enter your username or email address";
-        } 
-        else if (password== null || password == (""))
-        {
-            stop = true;
-            get("passworderror").innerText = "please enter your password";
-        }
-
-        if (stop)
-            return;
-
-        sendCheckRequest(
-            { 
-                type: "checklogin", 
-                emailorusername: email, 
-                password: password 
-            });
-        pendingHandler = checkloginresponse;
-    }
-
-    function checkloginresponse(r)
-    {
-        var email = get("email").value.trim();
-        var password = get("password").value.trim();
-
-        // invaliduser / invalidpassword / token
-
-        log("checkloginresponse: " +  r);
-
-        var token = r;
-
-        currentToken = token;
-
-        if (token.startsWith("invalid"))
-        {
-            inputError("emailerror", "Sorry, that email / username and password aren't correct");
-            return;
-        }
-       
-        if (get("checkbox-remember").checked)
-            localStorage.setItem("token", token);
-        else
-            localStorage.setItem("token", null);
-
-        signin(currentToken);
-        changePage(getCommunityStartPage());
-    }
-
-    function loginStart(body)
-    {
-        pageMode = 99;
-
-        var token = localStorage.getItem("token");
-
-        // if token is invalid then the return message will be invalidSignIn or 
-        // similar ... receiving that message will trigger the app to return to login
-
-        if (token != null && token != "null" && token != "")
-        {
-            currentToken = token;
-
-            signin(currentToken);
-            changePage(getCommunityStartPage());
-
-            return;
-        }
-
-        body.innerHTML = loginPage();
-
-        get("email").addEventListener("onfocus", function(){ allclear(); });
-        get("password").addEventListener("onfocus", function(){ allclear(); });
-    }
-
-    function processAccountCreate()
-    {
-        processAccount(true);
-    }
-
-    function processAccountEdit()
-    {
-        processAccount(false);
-    }
-
-    function processAccount(creating)
-    {
-        var pcheck = true;
-
-        isCreating = creating;
-
-        var username = null;
-
-        if (get("username").value != null)
-            username = get("username").value.trim();
-
-        var email = get("email").value.trim();
-
-        var password1 = get("p1").value.trim();
-
-        //log("password value is [" + password1 + "]");
-
-        if (!creating)
-            if (password1 == "")
-                password1 = NoChangePassword; 
-
-        log("password value is [" + password1 + "]");
-
-        //var password2 = null;
-        //if (creating) password2 = get("p2").value.trim();
-
-        var language = null;
-        var languageElement = get("languageselect");
-
-        if (languageElement != null)
-        {
-            var k = languageElement.selectedIndex;
-            
-            //log("language index " + k);
-
-            language = languageElement.options[k].value
-            if (languageElement.selectedIndex == 0)
-                language = null;
-        }
-
-        // if errors back to same page
-
-        var stop = false;
-
-        if (creating && (username == null || username == ("") || username.length < 3))
-        {
-            stop = true;
-            inputError("usernameerror", "username should have at least 3 characters");
-        } 
-        else if (creating && (username.indexOf(" ") >= 0))
-        {
-            stop = true;
-            inputError("usernameerror", "user name cannot contain space characters");
-        } 
-        else if (email.indexOf("@") < 0 || email.indexOf(" ") >= 0)
-        {
-            stop = true;
-            inputError("emailerror", "please enter a valid email address");
-        } 
-        else if (pcheck && (password1 == null || password1 == ("") || password1.length < 8 || password1.indexOf(" ") >= 0))
-        {
-            stop = true;
-            inputError("p1error", "password should have at least 8 characters");
-        } 
-        //else if (creating && (password2 == null || password2 == ("") || password2.length < 8))
-        //{
-        //    stop = true;
-        //    inputError("p2error", "password should have at least 8 characters");
-        //} 
-        //else if (creating && (password1 != password2))
-        //{
-        //    stop = true;
-        //    inputError("p2error", "please make sure passwords match");
-        //} 
-        else if (language == null || language == ("") || language.length < 2)
-        {
-            stop = true;
-            inputError("languageerror", "please choose a language");
-        }
-
-        //log("errors on page = " + stop);
-
-        if (stop)
-            return;
-
-        if (creating)
-        {
-            sendCheckRequest(
-                { 
-                    type: "checkusername", 
-                    username: username 
-                });
-            pendingHandler = checkusernameresponse;
-        }
-        else 
-        {
-            var local = findLocalUser();
-
-            if (local == null) 
-            {
-                if (debug) log("local user is " + local);
-                return;
-            }
-
-            if (debug) log("local username=" + local.username + " picture file=" + picturefile(local) + " local=" + local);
-
-            if (email != local.email)
-            {
-                sendCheckRequest(
-                    {
-                        type: "checkemail", 
-                        email: email 
-                    });
-                pendingHandler = checkemailresponse;
-            }
-            else
-            {
-                continueUpload();
-            }
-        }
-    }
-
-    function checkusernameresponse(r)
-    {
-        log("checkusername response " + r);
-
-        if (r == "dup")
-        {
-            inputError("usernameerror", "that username is already taken, please choose another");
-            return;
-        }
-
-        var email = get("email").value.trim();
-        sendCheckRequest(
-            {
-                type: "checkemail", 
-                email: email 
-            });
-        pendingHandler = checkemailresponse;
-    }
-
-    function checkemailresponse(r)
-    {
-        log("checkemail response " + r); 
-
-        if (r == "dup")
-        {
-            inputError("emailerror", "that email already has an account, please choose another or login");
-            return;
-        }
-
-        continueUpload();
-    }
-
-    function continueUpload()
-    {
-        var username;
-
-        if (get("username").value != null && get("username").value != "")
-            username = get("username").value.trim();
-        else
-            username = get("username").innerText;
-
-        log("continueUpload for " + username + " username tag = " + get("username").tagName + " creating = " + isCreating);
-
-        var email =     get("email").value.trim();
-        var password1 = get("p1").value.trim();
-
-        var language = "en";
-        var languageElement = get("languageselect");
-        language = languageElement.options[languageElement.selectedIndex].value.trim();
-        
-        var imageSrc = get("previewimage").src;
-
-        if (get("username").tagName == "H4")
-        {
-            log("password value is [" + password1 + "]");
-
-            if (password1 == "")
-                password1 = NoChangePassword; 
-
-            log("password value is [" + password1 + "]");
-        }
-
-        // todo add logic for changed picture
-
-        var picurl2send = "0";
-        if (imageChanged)
-            picurl2send = "1";
-
-        var userdata = ["username", username, "email", email, "password", password1, "language", language, "picurl", picurl2send];
-
-        log(userdata);
-
-        var v = getUrlVars("invite");
-
-        log("invite is " + v);
-
-        if (v != null && v != "")
-        {
-            userdata.push("invite");
-            userdata.push(v);
-        }
-
-        log(userdata);
-
-        if (isCreating)
-            upload(userdata, createduser, imageSrc, null);
-        else
-            upload(userdata, editeduser, imageSrc, currentToken);
+        ChatsUpdate();
+        //sendRefreshRequest();
     }
 
     function createduser(r)
@@ -1868,92 +664,6 @@
         changePage(getCommunityStartPage());
     }
 
-    function accountStart(creating)
-    {
-        log("create/edit with token " + currentToken);
-
-        var username =  get("username");
-        var email =     get("email");
-        var password1 = get("p1");
-        //var password2 = get("p2");
-        var languageElement = get("language");
-
-        //log("accountStart username " + username);
-        //log("accountStart p1 " + p1);
-        //log("accountStart languageElement " + languageElement);
-        
-        var fileupload = document.getElementById("file-upload");
-        
-        if (fileupload != null)
-        {
-            fileupload.addEventListener("change", function () 
-            {
-                changeImage(this);
-            });
-        }
-
-        languageElement.innerHTML = languagePop();
-
-        pageMode = 99;
-
-        if (!creating)
-         {
-            pageMode = 0; 
-
-            var local = findLocalUser();
-
-            if (local == null)
-            {
-                log("cannot edit -- no local user");
-                return;
-            }
-
-            log("Edit update ... render the page header for " + local.username + " picture file = " + picturefile(local));
-
-            var languageElement = get("language");
-
-            get("username").innerText = local.username;
-            get("email").value = local.email;
-            get("previewimage").src = picturefile(local);
-
-            var e = document.getElementById("languageselect");
-            for (var i = 0; i < e.options.length; i++) 
-            {
-               if (e.options[i].value == local.language) 
-               {
-                    e.options[i].selected = true;
-                    break;
-               }
-            }
-        }
-    }
-    
-    function pageHeader()
-    {
-        /*
-        var div = pageHeaderDiv();
-
-        var picurl;
-        var lu = findLocalUser();
-
-        if (lu != null)
-            picurl = picturefile(lu);
-        else
-            picurl = imageRequest(DefaultProfilePic);
-
-        // clicking this goes to edit user settings
-
-        var click = "onclick=\"edit();\""; 
-
-        div = replaceAll(div, "$$picurl$$", picurl);
-        div = replaceAll(div, "$$click$$", click);
-
-        log("=================================================== make pageheader " + div);
-
-        document.getElementById("header").innerHTML = div;
-        */
-    }
-
     function cancelEdit()
     {
         lastListlen = 0;
@@ -1963,24 +673,10 @@
 
     function getCommunityStartPage()
     {
-        //if (mobile)
-        //    return "chats";
-        //else
-            
-        return "community";
-    }
-
-    function cleanedString(t)
-    {
-        var x = t;
-
-        t = t.trim();
-        t = t.replace("\n", " ");
-
-        if (x != t)
-            log("original message: " + x + " corrected message: " + t);
-
-        return t;
+        if (mobile)
+            return "chats";
+        else
+            return "community";
     }
 
     function forgot()
@@ -1993,68 +689,7 @@
         changePage("terms");
     }
 
-    function inputError(n, t)
-    {
-        var f = ["usernameerror", "emailerror", "p1error", "p2error", "languageerror"];
-        for (var i = 0; i < f.length; ++i)
-            if (get(f[i]) != null)
-                    get(f[i]).innerText = "";
-        log("inputerror set " + n + " with " + t);
-        if (get(n) != null)
-            get(n).innerText = t;
-    }
-
-    function getUrlVars(s)
-    {
-        var vars = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-            vars[key] = value;
-        });
-        if (vars[s] != null)
-          return decodeURI(vars[s]);
-        else
-          return null;
-    }
-
-    function id()
-    {
-        var d = new Date();
-        var n = d.getTime();
-
-        n = n + "";
-        for (var i = 0; i < 10; ++i)
-            n += Math.floor(Math.random() * 10) + "";
-
-        return n;
-    }
-
-    function log(s)
-    {
-        var d = new Date();
-        console.log(d + ": " + s);
-    }
-
-    function get(s)
-    {
-        return document.getElementById(s);
-    }
-
-    function allclear()
-    {
-        log("clear");
-        clear("usernameerror");
-        clear("emailerror");
-        clear("p1error");
-        //clear("p1error");
-        //clear("p2error");
-        clear("languageerror");
-    }
-
-    function clear(n)
-    {
-        get(n).innerText = "";
-    }
-
+    /*
     // this handles community and chat
 
     function setUnload()
@@ -2076,59 +711,8 @@
     
         pageSetup()
     }
-
-    function timeDisplayStringFromUnixTime(t)
-    {
-        var time = parseInt(t);
-        return tds(time);
-    }
-
-    function tds(time)
-    {
-        time = Date.now() - time;
-        time = time / 1000;
-        if (time < 1)
-            return "just now";
-        if (time < 60)
-            return t2(time, "sec");
-        time = time / 60;
-        if (time < 200)
-            return t2(time, "min");
-        time = time / 60;
-        if (time < 50)
-            return t2(time, "hr");
-        time = time / 24;
-        if (time < 25)
-            return t2(time, "day");
-        time = time / 7;
-            return t2(time, "week");
-        
-        //else
-        //{
-        //    var d = new Date(time);
-        //    return d.toLocaleDateString() + " " + d.toLocaleTimeString();
-        //}
-    }
-
-    function t2(t, s)
-    {
-        t = Math.floor(t);
-        if (t == 1)
-            return t + " " + s + " ago";
-        else
-            return t + " " + s + "s ago";
-    }
-
-    function logError(s)
-    {
-        log(s);
-    }
-   
-    function reportError(s)
-    {
-        log(s);
-    }
-
+    */
+    
     function checkboxclicked()
     {
         var pcheck = true;
@@ -2136,39 +720,6 @@
             pcheck = document.getElementById("pcheck").checked;
         document.getElementById("p1").disabled = !pcheck;
         log("checkbox enabled = " + !pcheck);
-    }
-
-    function replaceAll(base, find, rep)
-    {
-        while (base.indexOf(find) >= 0)
-        {
-            base = base.replace(find, rep);
-        }
-        return base;
-    }
-
-    // if closed and reopened this must be changed
-
-    function whenOpened()
-    {
-        if (getUrlVars("a") == "create")
-            changePage("create");
-        else
-            changePage("login");
-
-        if (!CommunityPageRefreshStarted) setInterval(CommunityPageRefresh, RefreshTimeout);
-        CommunityPageRefreshStarted = true;
-
-        document.addEventListener("visibilitychange", function() 
-        {
-            statusUpdate();
-        });
-
-        document.addEventListener('input', function (event) 
-        {
-            if (event.target.tagName.toLowerCase() !== 'textarea') return;
-            autoExpand(event.target);
-        }, false);
     }
 
     var autoExpand = function (field) 
@@ -2192,83 +743,9 @@
 
     ////////////////////////////////////////////////////////////////////
 
-    function popModal(p1, p2, p3)
-    {
-        var r = newchatModal();
-
-        r = replaceAll(r, "$$okclick$$", p1);
-
-        r = replaceAll(r, "$$cancelclick$$", p2);
-
-        r = replaceAll(r, "$$placeholder$$", p3);
-
-        var modal = document.getElementById("myModal");
-
-        if (modal != null)
-            modal.remove();
-
-        var body = document.getElementsByTagName("BODY")[0];
-        body.innerHTML += r;
-        
-        modal = document.getElementById("myModal");
-        modal.style.display = "block";
-    }
-
-    function closeModalReturnValue()
-    {
-        var modal = document.getElementById("myModal");
-        modal.style.display = "none";
-        var textarea = document.getElementById("txa");
-        var r = textarea.value;
-        return r;
-    }
-
-    function newchat()
-    {
-        log("newchat");
-        popModal("onclick='searchForNewChat();'", "onclick='xModal();'", "username or email");
-    }
-
-    function searchForNewChat()
-    {
-        var r = closeModalReturnValue();
-        searchUsers(currentToken, r);
-    }
-
-    function invitation()
-    {
-        log("invitation");
-        popModal("onclick='sendInvitation();'", "onclick='xModal();'", "email");
-    }
-
-    function sendInvitation()
-    {
-        var r = closeModalReturnValue();
-        inviteUser(r);
-    }
-
-    function truncate(s, n)
-    {
-        if (s.length < n)
-            return s;
-        else
-            return s.substring(0, n) + " ...";
-    } 
-
-    function xModal()
-    {
-        var modal = document.getElementById("myModal");
-        modal.style.display = "none";
-    }
-
-    function help()
-    {
-        talk("support");
-    }
-
     function run()
     {
         initWebSocket();
     }
-        
-    run();
+
+
