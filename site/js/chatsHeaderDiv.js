@@ -12,9 +12,9 @@ function chatsHeaderDiv()
                     </span>
 
                     <span style="float:right; padding:5px;">
-                        <img onclick="newchat();" style="cursor: pointer" src=/images/newchat.png height=30>
-                        <img onclick="invitation();" style="cursor: pointer" src=/images/invitation.png height=30>
-                        <img onclick="edit();" style="cursor: pointer"src=/images/edit.png height=30>
+                        <img onclick="newchat();" style="cursor: pointer" src=images/newchat.png height=30>
+                        <img onclick="invitation();" style="cursor: pointer" src=images/invitation.png height=30>
+                        <img onclick="edit();" style="cursor: pointer"src=images/edit.png height=30>
                     </span>
                 </div>
 
@@ -34,8 +34,8 @@ function chatsHeaderDiv()
                     </span>
 
                     <span style="float:right; padding:5px;">
-                        <img onclick="newchat();" style="cursor: pointer" src=/images/newchat.png height=30>
-                        <img onclick="invitation();" style="cursor: pointer" src=/images/invitation.png height=30>
+                        <img onclick="newchat();" style="cursor: pointer" src=images/newchat.png height=30>
+                        <img onclick="invitation();" style="cursor: pointer" src=images/invitation.png height=30>
                     </span>
                 </div>
 
