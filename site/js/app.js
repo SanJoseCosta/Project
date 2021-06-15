@@ -253,12 +253,13 @@
         else if (url == "edit") 
         {
             body.innerHTML = editPage();
+            pageMode = 0;
             accountStart(false);
         }
         else if (url == "create") 
         {
             body.innerHTML = createPage();
-            //log("body " + body.innerHTML);
+            pageMode = 0;  
             accountStart(true);
         }
         else if (url == "community") 
@@ -462,13 +463,13 @@
         {
             var luser = findLocalUser();
 
-            log("make conversation header for " + luser.username + " with local pic " + getLocalPic());
-
+            if (!getMobile())
+                log("make conversation header for " + luser.username + " with local pic " + getLocalPic());
 
             var div = conversationHeaderDiv();
 
-            if (getMobile())
-            {
+            //if (getMobile())
+            //{
                 
 
                 div = replaceAll(div, "$$picurl$$", picturefile(ru));
@@ -485,7 +486,10 @@
 
                 if (p != null)
                     p.innerHTML = div;
-            }
+
+                
+            //}
+            /*
             else
             {
                 
@@ -505,6 +509,7 @@
                 if (p != null)
                     p.innerHTML = div;
             }
+            */
 
         }
 
@@ -561,8 +566,6 @@
     {
         log("refresh " + pageMode);
         
-        //setTimeout(CommunityPageRefresh, RefreshTimeout);
-
         if (pageMode >= 1 && pageMode <= 3)
             sendRefreshRequest();
     }

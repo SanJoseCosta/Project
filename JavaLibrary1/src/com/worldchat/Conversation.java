@@ -124,31 +124,29 @@ public class Conversation
         User ouser = User.findUserByUsername(oside);
         Connection oconn = Connection.findConnection(ouser);
         if (oconn != null) MessageProcessingThread.sendLCU(oconn);
+
+        notifyRecipient(fromcon);
     }
 
+    void notifyRecipient(Connection fromcon)
+    {
+        User to = otherSide(User.findUserByUsername(fromcon.username));
 
+        if (!to.username.equals("support")) return;
 
-
-        /*
-        else if (!EmailSent)
-        {
-            // if message arrives and recipient is not online then send an email
-            // but track it so that only one message is sent in this conversation
-            if (false)
-            {
-                User to = otherSide(User.findUserByUsername(fromcon.username));
-                U.sendemail(to.email, "New message from " + to.username(), 
+        // if message arrives and recipient is not online then send an email
+        // but track it so that only one message is sent in this conversation
+        
+        U.sendemail(to.email, 
+                            "New message from " + to.username(), 
                             to.username() + 
-                            " has sent you a new message on " + ProductName + ".chat. Please click this link to login and read your new message: " +
+                            " has sent you a new message on " + Main.ProductName + 
+                            ".chat. Please click this link to login and read your new message: " +
                             Main.Login);
-                EmailSent = true;
-            }
-        }
-        */
-       
 
+        //EmailSent = true;
+    }
 
-    
     Message findMessage(String mid) 
     {
         U.log("find message " + mid);

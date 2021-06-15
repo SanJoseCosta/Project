@@ -22,8 +22,8 @@ public class U
     static PrintStream req;
     static PrintStream inf;
     
-    static String GoogleUser =  "support@malt.chat";
-    static String Password =    "plexus11";
+    static String GoogleUser =  "hxsquid@gmail.com";
+    static String Password =    "squid.88.x";
     
     public static void req(Object s) 
     {
