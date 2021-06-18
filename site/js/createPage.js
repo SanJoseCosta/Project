@@ -3,7 +3,6 @@ function createPage()
 	var s =
 	`
 
-
             <div class="login-page">
               <div id=form class="form">
                 <div class="login-form">
@@ -19,33 +18,32 @@ function createPage()
 
                     <span id=language></span>
                     <div class=smalltext id=languageerror></div>
+                    <br>
 
-                    <img style="border-radius: 50%;" src="./images/default.png" height=40 id=previewimage>
+
+
+                    <img src="./images/default.png" height=50 id=previewimage>
                     <div>
                         <div onclick="document.getElementById('chooser').style.display = 'block';">
-                            <u>Upload a profile photo</u>
+                            <p><u>Upload a profile photo</u></p>
                         </div>
                         <div id=chooser style="display: none;">
                             <input id=file-upload type="file"/>
                         </div>
                     </div>
 
-                    <div>
-
-                        <input name=c1 type="checkbox" style="font-size:15px;">
-                        
-                        <label for="c1"> 
-                            I agree to Malt.chat
-                            <span onclick="changePage('terms');">
-                                <u>terms and conditions.</u>
-                            </span>
-                        </label>
-                    
-                    </div>
 
          
                     <button onclick="processAccount(true);">create account</button>
-                    <p class="message">Already registered? <a onclick="changePage('login');">Login</a></p>
+                    <p class="message">Already registered? <a style="cursor:hand;" onclick="changePage('login');">Login</a></p>
+                    
+
+                    <p class="message">By creating an account, you agree to Comprendo.chat's 
+                        <a style="cursor:hand;" onclick="changePage('terms');">
+                            <u>terms and conditions.</u>
+                        </a>
+                    </p>
+
 
                 </div>
               </div>

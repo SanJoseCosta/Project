@@ -1,0 +1,191 @@
+body {
+  font-family: 'Lexend', sans-serif;
+  color: #212121;
+}
+h1 {
+  font-size: 44px;
+  font-weight: 900;
+}
+h2 {
+  font-size: 44px;
+}
+h3 {
+  font-size: 20px;
+}
+figure img {
+  max-width: 100%;
+  height: auto;
+}
+.btn {
+  border-radius: 0;
+  padding: 0.9rem 2.5rem;
+}
+.navbar-light .navbar-nav .nav-link.login,
+.navbar-light .navbar-nav .nav-link.login:hover {
+  color: #0066e7;
+}
+.navbar-light .navbar-nav .nav-link.btn {
+  background-color: #0066e7;
+  color: #fff;
+  padding: 0.7rem 1.5rem;
+}
+.navbar-light .navbar-nav .nav-link.btn:hover {
+  background-color: #fff;
+  border-color: #0066e7;
+  color: #0066e7;
+}
+.navbar-brand img {
+  width: 130px;
+}
+.hero {
+  background-color: #f8f8ff;
+}
+.hero .btn {
+  background-color: #0066e7;
+  color: #fff;
+  font-weight: 600;
+  margin: 1.5rem 0;
+}
+.hero .btn:hover {
+  background-color: #fff;
+  border-color: #0066e7;
+  color: #0066e7;
+}
+.hero .underline-text-component {
+  display: inline-flex;
+  /* margin-left: -0.2em; */
+  margin-right: -0.2em;
+}
+.hero .underline-text-component .left-space {
+  background-image: url(./images/underline-left-yellow.png);
+  background-position: 0% 93.5%;
+  background-size: 0.7em 0.3em;
+  background-repeat: repeat-x;
+}
+.hero .underline-text-component .center {
+  background-image: url(./images/underline-middle-yellow.png);
+  background-position: 0% 87.5%;
+  background-size: 0.7em 0.225em;
+  background-repeat: repeat-x;
+}
+.hero .underline-text-component .right-space {
+  background-image: url(./images/underline-right-yellow.png);
+  background-position: 0% 87.5%;
+  background-size: 0.275em 0.225em;
+  background-repeat: repeat-x;
+  background-repeat: no-repeat;
+}
+.eliminate .message .intro {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.eliminate .message p {
+  font-size: 1.125rem;
+}
+.connect .message .intro {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.connect .message h2 {
+  margin: 0 auto 1rem;
+  max-width: 470px;
+}
+.connect .message p {
+  font-size: 1.125rem;
+  margin: 0 auto;
+  max-width: 690px;
+}
+.connect .row {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.connect .row .wrapper {
+  margin: 0 auto;
+  max-width: 370px;
+}
+.ready {
+  background-color: #0066e7;
+  color: #fff;
+  text-align: center;
+}
+.ready h2 {
+  font-size: 3.375rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+.ready .btn {
+  color: #0066e7;
+  font-weight: 600;
+}
+.ready .btn:hover {
+  background-color: #0066e7;
+  border-color: #fff;
+  color: #fff;
+}
+.footer {
+  color: #8a8eba;
+  font-size: 14px;
+  margin: 1.75rem 0;
+}
+.footer .links {
+  margin-bottom: 0.25rem;
+}
+.footer .link {
+  color: #8a8eba;
+  margin: 0 0.5rem;
+  text-decoration: none;
+}
+.footer .link:hover {
+  color: #0066e7;
+}
+
+@media screen and (max-width: 991px) {
+  section {
+    padding: 2.5rem 0;
+  }
+  .navbar-nav .login {
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (min-width: 992px) {
+  section {
+    padding: 4.75rem 0;
+    margin-bottom: 1.25rem;
+  }
+  section.hero {
+    margin-bottom: 1.25rem;
+  }
+  section.eliminate {
+    padding: 3.75rem 0 1.75rem;
+    margin-bottom: 0;
+  }
+  .navbar {
+    padding: 1.5rem 0 1.75rem;
+  }
+  .navbar-brand {
+    padding-top: 0;
+  }
+  .navbar-nav {
+    align-items: center;
+  }
+  .navbar-light .navbar-nav .nav-link {
+    color: #212121;
+    font-weight: 600;
+  }
+  .navbar-light .navbar-nav .login {
+    margin-left: 5rem;
+    margin-right: 2rem;
+  }
+  .hero-content-inner h1 {
+    margin-top: 2.25rem;
+  }
+  .eliminate .message {
+    padding-left: 3.125rem;
+    margin-top: 6.875rem;
+  }
+  .connect .message {
+    margin-bottom: 1.25rem;
+  }
+}

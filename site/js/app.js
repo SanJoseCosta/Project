@@ -222,8 +222,8 @@
     
     function languagePop()
     {
-        var s = "<select id=languageselect class=language select-css>";
-        s += "<option value='' class=lng>Choose Language</option>";
+        var s = "<select style='width:270px;' id=languageselect class=language select-css>";
+        s += "<option value='' class=lng>Choose your language</option>";
 
         for (var i = 0; i < languages.length; i = i + 2)
             s += "<option value=" + languages[i + 1] + " class=lng>" + languages[i] + "</option>"
