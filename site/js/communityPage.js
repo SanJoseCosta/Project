@@ -12,13 +12,11 @@ function communityPage()
             .column1 
             {
               flex: 20%;
-              background-color:#76b333;;
             }
 
             .column2
             {
               flex: 80%;
-              background-color:#76b333;;
             }
 
         </style>
@@ -61,18 +59,14 @@ function communityPage()
 
             .t1
             {
-                
-                background-color:#76b852;;
                 width:20%;
-                
+                background-color: #ffffff;
             }
 
             .t2
             {
-                
-                background-color:#76b852;;
                 width:75%;
-                
+                background-color: #ffffff;
             }
             
         </style>
@@ -82,12 +76,12 @@ function communityPage()
             <table style="width: 100%; height: 100%;">
 
                 <tr>
-                    <td class=t1>
+                    <td style="padding:4px;" class=t1>
                         <div id=chats-header>
                         </div>
                     </td>
 
-                    <td class=t2>
+                    <td style="padding:4px;" class=t2>
                         <div id=conversation-header>
                         </div>
                     </td>
@@ -107,12 +101,12 @@ function communityPage()
                 </tr>
 
                 <tr>
-                    <td class=t1 style="background-color:#96d872;">
+                    <td class=t1>
                         <div id=chats-footer>
                         </div>
                     </td>
-                    <td class=t2 style="background-color:#96d872;">
-                        <div id=conversation-footer style="background-color:#96d872; padding:15px;">
+                    <td class=t2>
+                        <div id=conversation-footer style="padding:7px;">
                             <textarea rows=1 onkeyup="messageBoxInput();" placeholder="New message ..." id=msg></textarea>
                         </div>
                     </td>

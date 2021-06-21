@@ -3,7 +3,7 @@ function chatsFooterDiv()
     var s = getMobile() ?
 
     `
-        <div style="padding: 0 0 0 20px; background-color: lightblue;">
+        <div style="padding: 0 0 0 20px;">
        
         </div>
     `

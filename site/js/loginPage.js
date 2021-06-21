@@ -3,8 +3,6 @@ function loginPage()
     var s = 
     `
 
-
-
         <div class="login-page">
           <div id=form class="form">
            
@@ -15,25 +13,12 @@ function loginPage()
                 <div id=emailerror></div>
                 <div id=passworderror></div>
 
-                <input id="checkbox-remember" type="checkbox" checked="">Remember me
-
               <button onclick="login();">login</button>
-              <p class="message">Not registered? <div onclick="changePage('create');"><b>Create an account</b></div></p>
+              <p class="message">Not registered? <a style="cursor:hand;" onclick="changePage('create');">Create an account</a></p>
             </div>
           </div>
         </div>
-
-        <script>
-
-        function onclick()
-        {   
-            document.getElementById("form").animate({height: "toggle", opacity: "toggle"}, "slow");
-        }
-
-        </script>
-
-
             
     `;
-    return s; // styleLoginCreate() + s;
+    return s; 
 }

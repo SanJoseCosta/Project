@@ -1,0 +1,932 @@
+<html><head>
+<title>MALT.chat</title>
+<link rel="icon" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<style>
+
+    html, body 
+    {
+    font-family: "Helvetica Neue";
+    xxxheight: 90vh;
+    margin: 0;
+    border-spacing: 0px;
+    border:0;
+    background-color:#ffffff;
+    xxxxxbackground: #76b852; /* fallback for old browsers */
+    xxxxxbackground: -webkit-linear-gradient(right, #76b852, #8DC26F);
+    xxxxxbackground: -moz-linear-gradient(right, #76b852, #8DC26F);
+    xxxxxbackground: -o-linear-gradient(right, #76b852, #8DC26F);
+    xxxxxbackground: linear-gradient(to left, #76b852, #8DC26F);
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;     
+    }
+
+    td, th, tr
+    {
+    padding:0
+    }
+
+    #messages-list
+    {
+    overflow-y: scroll;
+    height: 100%;
+    }
+
+    #chats-list
+    {
+        overflow-y: auto;
+    height: 100%;
+    }
+
+    .block
+    {
+    padding:10px;
+    
+    }
+
+    .summaryboxm
+    {
+      xxxalign-items: center; 
+      xxxjustify-content: center; 
+      color: white; 
+      background-color: #5845f0; 
+      padding: 10px; 
+      border-radius: 10px; 
+      cursor: pointer;
+      margin: 0 auto;
+      width:85%;
+    }
+
+
+          	 
+</style></head>
+
+
+
+<body>
+       
+            
+        
+
+            
+<div id="chats-header">
+            <div style="min-height: 50px; background-color: #ffffff;">
+               
+                <div>
+                    <span style="float:left; padding:5px;">
+                        <a href="index.html"><img height="30" style="padding: 5px; cursor: pointer;" src="images/logo.png"></a> 
+                        <b>Cjdknjdhkjhd</b> 
+                    </span>
+
+                    <span style="float:right; padding:5px;">
+                        <img onclick="newchat();" style="cursor: pointer" src="images/newchat.png" height="30">
+                        <img onclick="invitation();" style="cursor: pointer" src="images/invitation.png" height="30">
+                        <img onclick="edit();" style="cursor: pointer" src="images/edit.png" height="30">
+                    </span>
+                </div>
+
+            </div>
+    </div>
+               
+                
+
+
+
+
+
+              
+
+
+
+                
+
+
+
+                <div style="width:100%;" id="chats-list">
+
+
+
+
+                        <div onclick="talk('blah')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/blah.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            blah
+                            
+                        </div>
+                        
+                        <br>
+                        
+                    
+                        <div onclick="talk('mateo')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/mateo.png" height="30" width="30">
+
+                            <span style="background-color: yellow; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            mateo
+                            
+                        </div>
+                        
+                         <br>
+                    
+                        <div onclick="talk('oieuyouryoiuyer')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/oieuyouryoiuyer.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            oieuyou..
+                            
+                        </div>
+                        
+                         <br>
+                    
+                        <div onclick="talk('8739398739873')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/8739398739873.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            8739398..
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('99999')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            99999
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('username')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            usernam..
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('lucy')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            lucy
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('chuck')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/chuck.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            chuck
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('joe')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/joe.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            joe
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('sarah')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/sarah.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            sarah
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('erin')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/erin.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            erin
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('tim')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            tim
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('rob')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            rob
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('jeb')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            jeb
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('amigo')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            amigo
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('banana123')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            banana1..
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('banana')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            banana
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('tomaa')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/tomaa.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            tomaa
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('mandy')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/mandy.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            mandy
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('tortoise')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/tortoise.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            tortois..
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('zebra')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            zebra
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('z33')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            z33
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('z12')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            z12
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('yanny')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            yanny
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('xerry')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            xerry
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('zinnia')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            zinnia
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('robin')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/robin.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            robin
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('realspanishspeaker')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/realspanishspeaker.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            realspa..
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('mateo1')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/mateo1.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            mateo1
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('mandarin')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            mandari..
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('wendy')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/wendy.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            wendy
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('tamara')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/tamara.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            tamara
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('steve')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/steve.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            steve
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('tom')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/tom.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            tom
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('april')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/april.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            april
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('boo')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/boo.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            boo
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('wendy2')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/default.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            wendy2
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('melis')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/melis.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            melis
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('lisa')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/lisa.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            lisa
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('zoe')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/zoe.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            zoe
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('wendy1')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/wendy1.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            wendy1
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('amy')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/amy.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            amy
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('jen')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/jen.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            jen
+                            
+                        </div>
+                        
+                        
+                    
+                        <div onclick="talk('alice')" class="summaryboxm">
+                            
+                            
+                            
+                            <img style="border-radius: 50%;" src="https://comprendo.chat/images/alice.png" height="30" width="30">
+
+                            <span style="background-color: red; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
+                                abc &nbsp; &nbsp; &nbsp; 
+                            </span>
+                            
+                            
+
+                            alice
+                            
+                        </div>
+                        
+                        
+
+
+
+
+
+
+                </div>
+
+
+             
+
+
+
+                <div id="chats-footer"></div>
+    
+
+
+
+
+
+
+
+
+
+
+            </divzzz>
+    
+       
+   	</body></html>

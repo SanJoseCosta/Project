@@ -3,7 +3,7 @@ function chatsHeaderDiv()
     var s = getMobile() ?
 
     `
-            <div style="min-height: 50px; background-color: #96d872; ">
+            <div style="min-height: 50px; background-color: #ffffff;">
                
                 <div>
                     <span style="float:left; padding:5px;">
@@ -24,12 +24,11 @@ function chatsHeaderDiv()
     :
 
     `
-            <div style="min-height: 50px; background-color: #96d872; ">
+            <div style="min-height: 50px; background-color: #ffffff;">
                
                 <div>
                     <span style="float:left; padding:5px;">
                         <a href=index.html><img height=30 style="padding: 5px; cursor: pointer;" src=images/logo.png></a> 
-                        <br>
                         <b>Conversations</b> 
                     </span>
 

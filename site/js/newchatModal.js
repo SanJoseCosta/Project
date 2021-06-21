@@ -24,7 +24,7 @@ function newchatModal()
     `
     	<div id="myModal" class="modal">
 
-  		  <div class="modal-content" style="width: 35%;">
+  		  <div class="modal-content" style="width: 35%; background-color: white;">
   		    
   		    <textarea style="resize:none" placeholder=$$placeholder$$ id=txa></textarea>
 

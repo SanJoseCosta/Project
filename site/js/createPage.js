@@ -25,7 +25,7 @@ function createPage()
                     <img src="./images/default.png" height=50 id=previewimage>
                     <div>
                         <div onclick="document.getElementById('chooser').style.display = 'block';">
-                            <p><u>Upload a profile photo</u></p>
+                            <p><a style="cursor:hand;">Upload a profile photo</a></p>
                         </div>
                         <div id=chooser style="display: none;">
                             <input id=file-upload type="file"/>
@@ -48,15 +48,6 @@ function createPage()
                 </div>
               </div>
             </div>
-
-            <script>
-
-            function onclick()
-            {   
-                document.getElementById("form").animate({height: "toggle", opacity: "toggle"}, "slow");
-            }
-
-            </script>
 
 	`
     ;

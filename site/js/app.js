@@ -468,9 +468,6 @@
 
             var div = conversationHeaderDiv();
 
-            //if (getMobile())
-            //{
-                
 
                 div = replaceAll(div, "$$picurl$$", picturefile(ru));
                 div = replaceAll(div, "$$local$$", getLocalPic());
@@ -487,29 +484,7 @@
                 if (p != null)
                     p.innerHTML = div;
 
-                
-            //}
-            /*
-            else
-            {
-                
-
-                div = replaceAll(div, "$$picurl$$", picturefile(ru));
-                div = replaceAll(div, "$$local$$", getLocalPic());
-
-                div = replaceAll(div, "$$localusername$$", luser.username);
-
-                div = replaceAll(div, "$$name$$", ru.username);
-                div = replaceAll(div, "$$time$$", tds(ru.lastActivityTime));
-
-                div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
-
-                var p = document.getElementById("conversation-header");
-
-                if (p != null)
-                    p.innerHTML = div;
-            }
-            */
+             
 
         }
 

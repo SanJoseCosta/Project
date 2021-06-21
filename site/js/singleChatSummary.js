@@ -7,15 +7,14 @@ function singleChatSummary()
     `
         <div onclick=$$click$$ class=summaryboxm>
             
-            <center>
             
             <img style="border-radius: 50%;" src=$$picurl$$ height=30 width=30>
 
             <span style="background-color: $$color$$; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
-                &nbsp; &nbsp; &nbsp; 
+                abc &nbsp; &nbsp; &nbsp; 
             </span>
+
             
-            <br>
 
             $$name$$
             
@@ -27,21 +26,16 @@ function singleChatSummary()
     :
 
     `
-    
         <div onclick=$$click$$ style="font-size: 12px;" class=summarybox>
 
             <div style="width: 80px; float: left;">
-               
-
                     
                 <img style="border-radius: 50%; width: 60px; height: 60px;" src=$$picurl$$>
                     
-
                 <span style="background-color: $$color$$; min-width: 16px; min-height: 16px; border-radius: 50%; z-index: 1; opacity: 85%">
-                &nbsp; &nbsp; &nbsp; 
+                        &nbsp; &nbsp; &nbsp; 
                 </span>
 
-               
             </div>
             
             <div style="flex-grow: 1;">

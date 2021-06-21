@@ -53,10 +53,12 @@
             return;
         }
        
-        if (get("checkbox-remember").checked)
-            localStorage.setItem("token", token);
-        else
-            localStorage.setItem("token", null);
+        //if (get("checkbox-remember").checked)
+            
+        localStorage.setItem("token", token);
+        
+        //else
+        //    localStorage.setItem("token", null);
 
         signin(currentToken);
         changePage(getCommunityStartPage());
