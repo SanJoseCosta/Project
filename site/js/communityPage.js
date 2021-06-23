@@ -94,7 +94,7 @@ function communityPage()
                     </td>
 
                     <td class=t2>
-                        <div id=messages-list style="display: flex; flex-direction: column;">
+                        <div id=messages-list>
                             
                         </div>
                     </td>

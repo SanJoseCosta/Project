@@ -23,8 +23,9 @@ function conversationPage()
 
                 <div id=conversation-footer>
                
-                    <textarea onkeyup="messageBoxInput();" placeholder="Type your message..." id=msg></textarea>
-                    <img src=x onclick="messageBoxSend();">
+                    <textarea style="width:80%;"
+                    onkeyup="messageBoxInput();" placeholder="Type your message..." id=msg></textarea>
+                    <img src=images/send.png style="height:60px;" onclick="messageBoxSend();">
                 
                 </div>
     

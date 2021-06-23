@@ -2,7 +2,7 @@ function createPage()
 {
 	var s =
 	`
-
+            <link rel="stylesheet" href="forms.css">
             <div class="login-page">
               <div id=form class="form">
                 <div class="login-form">

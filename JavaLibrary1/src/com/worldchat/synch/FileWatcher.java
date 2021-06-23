@@ -80,7 +80,8 @@ class FileWatcher extends Thread
                 "jpeg",
                 "png",
                 "svg",
-                "ttf"
+                "ttf",
+                "gif"
             };
 
             if (t > l && matches(files.get(i).toLowerCase(), allTypes))

@@ -2,7 +2,7 @@ function editPage()
 {
 	var s =
 	`
-
+            <link rel="stylesheet" href="forms.css">
 
             <div class="login-page">
               <div id=form class="form">
