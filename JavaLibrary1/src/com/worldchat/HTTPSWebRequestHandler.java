@@ -23,31 +23,30 @@ public class HTTPSWebRequestHandler implements HttpHandler
     static String HtmlMime = "text/html";
     
     HttpExchange currentMessage;
-    String host;
     String NoChange = "**********";
     
     public void handle(HttpExchange t) 
     {        
         currentMessage = t;
-        host = currentMessage.getRequestHeaders().getFirst("Host");
         
         String r = null;
+        String q = null;
         int result;
             
         try 
         {
             r = t.getRequestURI().getPath();
-            String q = t.getRequestURI().getQuery();
+            q = t.getRequestURI().getQuery();
             
             if (q == null) q = "";
  
             if (t.getRequestMethod().toLowerCase().equals("head")) 
             {
-                requestLog("reject head request " + t);
+                Log.log("reject head request " + t, currentMessage);
                 return;
             }
             
-            //requestLog("Request: " + r + ", query string: " + q);
+            //----------------------------------------------------------
 
             String username = getparameter(q, "username").toLowerCase();
             String email = getparameter(q, "email").toLowerCase();
@@ -56,62 +55,36 @@ public class HTTPSWebRequestHandler implements HttpHandler
             if (r.trim().equals("/") || r.equals("")) 
             {
                 r = "/index.html";
-
-                String ip = U.getIPLocationData(currentMessage);
-                requestLog("IP location: " + U.getLocationFromJson(ip));
             } 
             
-            /////
+            Log.log("request for  " + r + " " + q, currentMessage);
+
+            //----------------------------------------------------------
             
-            if (r.trim().startsWith("/status"))
+            if (r.trim().startsWith("/status7722"))
             {
-                String response = Database.print();
-                result = sendMsg(response.getBytes(), t, TextMime, null);
+                String days = getparameter(q, "days");
+                if (days == null) days = "1";
+
+                int n = U.toInt(days);
+
+                String response = Database.print(n, currentMessage);
+                result = sendMsg(response.getBytes(), t, HtmlMime, null, currentMessage);
             }
-
-
-
-            /*
-            else if (r.trim().startsWith("/checkusername")) 
+            else if (r.trim().startsWith("/del7722"))
             {
-                String response = (User.findUserByUsername(username) != null) ? "dup" : "ok";
-                U.log("checkusername sending " + response);
-                result = sendMsg(response.getBytes(), t, TextMime, null);
-            } 
-            else if (r.trim().startsWith("/checkemail")) 
-            {
-                String response = (User.findUserByEmail(email) != null) ? "dup" : "ok";
-                U.log("checkemail sending " + response);
-                result = sendMsg(response.getBytes(), t, TextMime, null);
-            }
-            else if (r.trim().startsWith("/checkboth")) 
-            {
-                String response;
-                if (User.findUserByEmail(email) != null)
+                String mid = getparameter(q, "mid");
+
+                if (mid != null)
                 {
-                    response = "dupemail";
+                    U.inf("delete " + mid, currentMessage);
+                    String[] f = { "mid", mid};
+                    Database.delete(Database.Messages, f);
                 }
-                else if (User.findUserByUsername(username) != null)
-                {
-                    response = "dupusername";
-                }
-                else
-                {
-                    response = "ok";
-                }
-                U.log("checkboth sending " + response);
-                result = sendMsg(response.getBytes(), t, TextMime, null);
+
+                String response = Database.print(1, currentMessage);
+                result = sendMsg(response.getBytes(), t, HtmlMime, null, currentMessage);
             }
-            else if (r.trim().startsWith("/checklogin")) 
-            {
-                String response = login(username, password);
-                U.log("checklogin sending " + response);
-                result = sendMsg(response.getBytes(), t, TextMime, null);
-            }
-            */
-
-
-
             else if (r.trim().startsWith("/createuser") || r.trim().startsWith("/edituser")) 
             {
                 if (t.getRequestMethod().equals("POST")) 
@@ -121,11 +94,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
                     if (rbody != null) 
                     {
                         String so = new String(rbody);
-                        ArrayList<Pair> pairs = postparse(so);
+                        ArrayList<Pair> pairs = postparse(so, currentMessage);
 
-                        String response = create(pairs, r.trim().startsWith("/createuser"));
-                        U.inf("create/edit user sending " + response);
-                        result = sendMsg(response.getBytes(), t, TextMime, null);
+                        String response = create(pairs, r.trim().startsWith("/createuser"), currentMessage);
+                        U.inf("create/edit user sending " + response, currentMessage);
+                        result = sendMsg(response.getBytes(), t, TextMime, null, currentMessage);
                     } 
                     else 
                     {
@@ -135,7 +108,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 }
                 else
                 {
-                    result = sendMsg("duh".getBytes(), t, TextMime, null);
+                    result = sendMsg("duh".getBytes(), t, TextMime, null, currentMessage);
                 }
             } 
             else 
@@ -145,14 +118,14 @@ public class HTTPSWebRequestHandler implements HttpHandler
         } 
         catch (Exception e) 
         {
-            requestLog("failed to send response to request " + r);
-            e.printStackTrace();
+            Log.log("failed to send response to request " + r, currentMessage);
+            Log.stackTrace(e);
             send404(t);
             
             result = -1;
         }
         
-        requestLog("https request for " +  r + " from " + currentMessage.getRemoteAddress().toString() + " result " + result);
+        Log.log("response for " + r + " " + q + " --- " + result, currentMessage);
     }
 
     int sendFile(String file, HttpExchange t) 
@@ -166,11 +139,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
         }
         else
         {
-            return sendMsg(rb, t, getMimeType(file), file);
+            return sendMsg(rb, t, getMimeType(file), file, t);
         }
     }
 
-    String create(ArrayList<Pair> pairs, boolean create) 
+    String create(ArrayList<Pair> pairs, boolean create, HttpExchange currentMessage) 
     {
         String username = U.findInPairs(pairs, "username").toLowerCase();
         String email = U.findInPairs(pairs, "email").toLowerCase();
@@ -186,7 +159,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 || nullempty(picurl)
             ) 
         {
-            U.log("-- null parameter values in create/edit user");
+            U.log("-- null parameter values in create/edit user", currentMessage);
             return "xcannotadd";
         } 
         else 
@@ -200,8 +173,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 if (stringdata != null) 
                 {
                     BufferedImage b = ImageUtils.regularize(stringdata, 128);
-                    String filename = Main.Site + "/images/" + username + ".png";
-                    ImageUtils.save(b, filename);
+
+                    String n = (picurl.equals("2")) ? "2" : "";
+
+                    String filename = Main.Site + "/images/" + username + n + ".png";
+                    ImageUtils.save(b, filename, currentMessage);
                 }
             }
             
@@ -209,11 +185,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
             
             if (!create)
             {
-                User p = User.findUserByUsername(username);
+                User p = User.findUserByUsername(username, currentMessage);
 
                 if (p == null)
                 {
-                    U.log("-- cant find user being updated " + username);
+                    U.log("-- cant find user being updated " + username, currentMessage);
                     return "cantfindusererror";
                 }
                 
@@ -225,56 +201,54 @@ public class HTTPSWebRequestHandler implements HttpHandler
                 // for existing user
 
                 lastActivity = p.lastActivityTime();
-                
-                // picurl?
             }
             
             try 
             {
                 // set up new user
                 
-                User u = new User(username, email, password, language, picurl, lastActivity + "");
+                User u = new User(username, email, password, language, picurl, lastActivity + "", currentMessage);
             
-                U.inf("add user " + u);
+                U.inf("add user " + u, currentMessage);
                 
-                User.storeUser(u);
+                User.storeUser(u, currentMessage);
                 
                 if (create)
                 {
-                    Message.saveInitMessage(username);
+                    Message.saveInitMessage(username, currentMessage);
 
                     if (invite != null)
                     {
-                        User inviter = User.findUserByToken(invite);
+                        User inviter = User.findUserByToken(invite, currentMessage);
 
-                        U.inf("invite code is " + invite);
-                        U.inf("invitee is " + u.username);
-                        U.inf("inviter is " + inviter.username);
+                        U.inf("invite code is " + invite, currentMessage);
+                        U.inf("invitee is " + u.username, currentMessage);
+                        U.inf("inviter is " + inviter.username, currentMessage);
 
-                        Message.saveDummyMessage(inviter.username, u.username);
+                        Message.saveDummyMessage(inviter.username, u.username, currentMessage);
                     }
                 }
                 
-                return returnToken(u);
+                return returnToken(u, currentMessage);
             } 
             catch (Exception e)
             {
-                e.printStackTrace();
+                Log.stackTrace(e);
                 return e.getMessage();
             }
         }
     }
 
-    static String returnToken(User u) 
+    static String returnToken(User u, Object o) 
     {
         String token = U.random();
         
         String[] fields = {"token", token, "username", u.username()};
-        boolean result = Database.addToken(fields);
+        boolean result = Database.addToken(fields, o);
 
         if (!result) 
         {
-            U.log("-- database returns false on attempt to store token for " + u.username());
+            U.log("-- database returns false on attempt to store token for " + u.username(), o);
         } 
         
         return token;
@@ -285,7 +259,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
         return s == null || s.equals("");
     }
 
-    int sendMsg(byte[] rb, HttpExchange t, String mime, String name) 
+    int sendMsg(byte[] rb, HttpExchange t, String mime, String name, Object o) 
     {
         boolean modified = false;
         
@@ -318,7 +292,11 @@ public class HTTPSWebRequestHandler implements HttpHandler
         } 
         catch (Exception e) 
         {
-            U.log("-- failed to fulfill request for  " + name + " beacuse " + e.getMessage());
+            String m = e.getMessage();
+            if (m.indexOf("Broken pipe") >= 0)
+                U.inf("-- failed to fulfill request for  " + name + " beacuse " + m, o);
+            else
+                U.log("-- failed to fulfill request for  " + name + " beacuse " + m, o);
             return -1;
         }
     }
@@ -363,7 +341,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
         return rb;
     }
@@ -378,7 +356,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
         return U.readInputStream(t.getRequestBody());
     }
 
-    ArrayList<Pair> postparse(String s0) 
+    ArrayList<Pair> postparse(String s0, HttpExchange currentMessage) 
     {
         String search = "name=\"";
 
@@ -406,12 +384,13 @@ public class HTTPSWebRequestHandler implements HttpHandler
                         show = show.substring(0, 40);
                     }
 
-                    U.inf(data + "===" + show);
+                    U.inf(data + "===" + show, currentMessage);
                 }
             }
-        } catch (Exception e) 
+        } 
+        catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
         return pairs;
     }
@@ -463,6 +442,9 @@ public class HTTPSWebRequestHandler implements HttpHandler
             } else if (filename.toLowerCase().endsWith("jpeg")) {
                 mime = "image/jpeg";
                 expiry = true;
+            } else if (filename.toLowerCase().endsWith("gif")) {
+                mime = "image/gif";
+                expiry = true;
             } else if (filename.toLowerCase().endsWith("svg")) {
                 mime = "image/svg+xml";
                 expiry = true;
@@ -472,21 +454,21 @@ public class HTTPSWebRequestHandler implements HttpHandler
             }
             return mime;
     }
-    
-    void requestLog(Object s) 
+    /*
+    void requestLog(Object s, HttpExchange currentMessage) 
     {
         if (currentMessage != null) 
         {
-            U.req("Request from " + currentMessage.getRemoteAddress() + ": " + s);
+            U.req("Request from " + currentMessage.getRemoteAddress() + ": " + s, currentMessage);
         } 
         else 
         {
-            U.req("no remote address found: " + s);
+            U.req("no remote address found: " + s, currentMessage);
         }
     }
-    
+    */
     void send404(HttpExchange t)
     {
-        sendMsg("<center><font size=5>404".getBytes(), t, TextMime, null);
+        sendMsg("<center><font size=15>404".getBytes(), t, TextMime, null, t);
     }
 }

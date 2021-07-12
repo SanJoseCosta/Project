@@ -31,6 +31,43 @@
         }
     }
 
+    function sendResetRequest(email)
+    {
+        var m = JSON.stringify(
+            {
+                type: "reset",
+                email: email
+            });
+
+        try
+        {
+            socketsend(m);
+        } 
+        catch (err)
+        {
+            logError("*** error while sending reset request to server: " + err.message);
+        }
+    }
+
+    function changePassword(newpassword)
+    {
+        var m = JSON.stringify(
+            {
+                type: "changepassword",
+                token: currentToken,
+                password: newpassword
+            });
+
+        try
+        {
+            socketsend(m);
+        } 
+        catch (err)
+        {
+            logError("*** error while sending changepassword request to server: " + err.message);
+        }
+    }
+
     function searchUsers(token, username)
     {
         //var m = "F" + separator + t + separator + s;

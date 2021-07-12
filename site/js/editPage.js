@@ -18,11 +18,13 @@ function editPage()
 
                     <span id=language></span>
                     <div class=smalltext id=languageerror></div>
+                    <br>
+         
 
-                    <img style="border-radius: 50%;" src="./images/default.png" height=40 id=previewimage>
+                    <img src="./images/default.png" height=50 id=previewimage>
                     <div>
                         <div onclick="document.getElementById('chooser').style.display = 'block';">
-                            <u>Upload a profile photo</u>
+                            <p><a style="cursor:hand;">Upload a profile photo</a></p>
                         </div>
                         <div id=chooser style="display: none;">
                             <input id=file-upload type="file"/>
@@ -30,6 +32,7 @@ function editPage()
                     </div>
 
          
+
                     <button onclick="processAccount(false);">update account</button>
                     <br><br>
 

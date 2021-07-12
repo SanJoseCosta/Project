@@ -3,6 +3,7 @@ package com.worldchat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Collection;
+import com.sun.net.httpserver.HttpExchange;
 
 public class User 
 {
@@ -22,10 +23,10 @@ public class User
         return username;
     }
    
-    void lastActivityTime(long a)
+    void lastActivityTime(long a, Object o)
     {
         lastActivityTime = a;
-        storeUser(this);
+        storeUser(this, o);
     }
     
     long lastActivityTime()
@@ -38,7 +39,7 @@ public class User
         return username.equals(u.username); 
     }
 
-    static void storeUser(User n) 
+    static void storeUser(User n, Object o) 
     {
         try 
         {
@@ -55,16 +56,16 @@ public class User
                 "lastActivityTime", n.lastActivityTime + ""
             };
 
-            if (!Database.addUser(fields1, uname))
-                U.log("***** database returns false on attempt to store user " + uname);
+            if (!Database.addUser(fields1, uname, o))
+                U.log("***** database returns false on attempt to store user " + uname, o);
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
     }
     
-    User(Record r)
+    User(Record r, Object o)
     {
         username = r.get("username");
         email = r.get("email");
@@ -72,11 +73,7 @@ public class User
         language = r.get("language");
         picurl = r.get("picurl");
 
-        if (picurl == null) picurl ="0";
-        if (picurl.equals("null")) picurl ="0";
-
-        if (picurl.equals("undefined")) picurl ="0";
-        if (picurl.equals("true")) picurl ="1";
+        picurl = validate(picurl);
 
         try
         {
@@ -85,11 +82,11 @@ public class User
         catch(Exception exc)
         {
             lastActivityTime = 0;
-            U.log("lastActivityTime set to 0");
+            U.log("lastActivityTime set to 0", o);
         }  
     }
     
-    User(String u, String e, String p, String l, String pp, String t) 
+    User(String u, String e, String p, String l, String pp, String t, Object o) 
     {
         username = u;
         email = e;
@@ -97,9 +94,7 @@ public class User
         language = l;
         picurl = pp;
 
-        if (picurl.equals("null")) picurl ="0";
-        if (picurl.equals("undefined")) picurl ="0";
-        if (picurl.equals("true")) picurl ="1";
+        picurl = validate(picurl);
 
         try
         {
@@ -108,7 +103,7 @@ public class User
         catch(Exception exc)
         {
             lastActivityTime = 0;
-            U.log("lastActivityTime set to 0");
+            U.log("lastActivityTime set to 0", o);
         }  
     }
 
@@ -119,10 +114,6 @@ public class User
                         password + "," + 
                         language 
                         + ", picurl: " + picurl + 
-                        //", remote: " + 
-                        //isremoteuser + 
-                        //", local: " + 
-                        //islocaluser + 
                         ", lastActivityTime: " + 
                         lastActivityTime + "," + 
                         (lastMessage == null ? "no last message" : lastMessage.message) + 
@@ -161,88 +152,49 @@ public class User
 
         return j.get();
     }
-    /*
-    String userAnnounceString(boolean islocaluser, boolean isremoteuser) 
-    {
-         if (false) 
-                    U.log(     
-
-                    "[" +                  
-                 
-                        username                                                                    + "," + 
-                        language                                                                    + "," + 
-                        (lastMessage == null ? "no last message" : lastMessage.message)             + "," + 
-                        (lastMessage == null ? "no from" : lastMessage.fromUserName)                + "," +
-                        "isremote=" + isremoteuser                                                  + "," + 
-                        "islocal=" + islocaluser                                                    + "," +
-                        "picurl=" + picurl                                                          + "," + 
-                 
-                    "]")
-                 
-           
-                 ;
-         
-        return  picurl +                                                            WSServer.separator +
-                username +                                                          WSServer.separator +
-                lastActivityTime +                                                  WSServer.separator +
-                language +                                                          WSServer.separator +
-                (isremoteuser ? "true" : "false") +                                 WSServer.separator + 
-                (islocaluser ? "true" : "false") +                                  WSServer.separator +
-                ((lastMessage != null) ? lastMessage.message : "") +                WSServer.separator +
-                ((lastMessage != null) ? lastMessage.translation : "") +            WSServer.separator +
-                ((lastMessage != null) ? lastMessage.mid : "") +                    WSServer.separator +
-                ((lastMessage != null) ? lastMessage.status : "") +                 WSServer.separator +
-                ((lastMessage != null) ? lastMessage.fromUserName : "") +           WSServer.separator +
-                email +                                                             WSServer.separator
-                ;
-    }
-    */
-    static User findUserByToken(String token) 
+    
+    static User findUserByToken(String token, Object o) 
     {
         if (U.invalid(token))
         {
-            U.sendError("***** invalid token " + token);
+            U.sendError("***** invalid token " + token, o);
             return null;
         }
-        
-        //U.log("find user by token");
-        
+                
         String[] fields = {"token", token};
         ArrayList<Record> results = Database.getTokens(fields);
 
         if (results != null && results.size() == 1)
         {
             String username = (String) results.get(0).get("username");
-            return findUserByUsername(username);
+            return findUserByUsername(username, o);
         }
         else
             return null;
     }
 
-    static User findUserByUsername(String username) 
+    static User findUserByUsername(String username, Object o) 
     {
         if (username == null)
         {
-            U.log("*** trying to find null username");
+            //U.log("*** trying to find null username");
             return null;
         }
-        
-        //U.log("find user by username");
-        
+                
         String[] fields = {"username", username.toLowerCase()};
         ArrayList<Record> results = Database.getUsers(fields);
         
         if (results != null && results.size() > 0)
-            return  new User(results.get(0));
+            return  new User(results.get(0), o);
         else
             return null;
     }
 
-    static User findUserByEmail(String email) 
+    static User findUserByEmail(String email, Object o) 
     {
         if (email == null)
         {
-            U.log("*** trying to find null email");
+            //U.log("*** trying to find null email");
             return null;
         }
         
@@ -252,24 +204,36 @@ public class User
         ArrayList<Record> results = Database.getUsers(fields);
 
         if (results != null && results.size() == 1)
-            return new User(results.get(0));
+            return new User(results.get(0), o);
         else
             return null;
     }
 
-    static User findUserByUsernameOrEmail(String id) 
+    static User findUserByUsernameOrEmail(String id, Object o) 
     {
         if (id == null)
         {
-            U.log("*** trying to find null username");
+            //U.log("*** trying to find null username");
             return null;
         }
         
-        User u = findUserByUsername(id);
+        User u = findUserByUsername(id, o);
         
         if (u == null) 
-            u = findUserByEmail(id);
+            u = findUserByEmail(id, o);
         
         return u;
+    }
+
+    static String validate(String picurl)
+    {
+        if (picurl == null) picurl ="0";
+        
+        if (picurl.equals("null")) picurl ="0";
+        if (picurl.equals("undefined")) picurl ="0";
+
+        if (picurl.equals("true")) picurl ="1";
+
+        return picurl;
     }
 }

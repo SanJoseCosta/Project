@@ -2,6 +2,7 @@ package com.worldchat;
 
 import java.util.ArrayList;
 import org.java_websocket.WebSocket;
+import com.sun.net.httpserver.HttpExchange;
 
 public class Connection 
 {
@@ -11,7 +12,7 @@ public class Connection
 
     private static ArrayList<Connection> connections = new ArrayList<Connection>();
     
-    Connection(WebSocket s, String u, Conversation c) 
+    Connection(WebSocket s, String u, Conversation c, Object o) 
     {
         username = u;
         conversation = c;
@@ -19,8 +20,8 @@ public class Connection
         
         if (username != null)
         {
-            User a = User.findUserByUsername(username);
-            if (a != null) a.lastActivityTime(System.currentTimeMillis());
+            User a = User.findUserByUsername(username, o);
+            if (a != null) a.lastActivityTime(System.currentTimeMillis(), o);
         }
     }
     
@@ -29,7 +30,7 @@ public class Connection
         Connection c = findConnection(socket);
         if (c != null && c.username != null)
         {
-            User.findUserByUsername(c.username).lastActivityTime(System.currentTimeMillis());
+            User.findUserByUsername(c.username, socket).lastActivityTime(System.currentTimeMillis(), socket);
         }
     }
     
@@ -85,13 +86,13 @@ public class Connection
         return null;
     }
 
-    static void listx() 
+    static void listx(HttpExchange currentMessage) 
     {
-        U.log("all connections:");
+        U.log("all connections:", currentMessage);
         for (int i = 0; i < connections.size(); ++i) 
         {
             Connection c = connections.get(i);
-            U.log(c);
+            U.log(c, currentMessage);
         }
     }
 

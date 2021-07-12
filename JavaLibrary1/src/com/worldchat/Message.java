@@ -2,6 +2,7 @@ package com.worldchat;
 
 import java.util.ArrayList;
 import org.json.*;
+import com.sun.net.httpserver.HttpExchange;
 
 public class Message 
 {
@@ -81,7 +82,7 @@ public class Message
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
         
         return correspondents;
@@ -124,7 +125,7 @@ public class Message
         a.add(s);
     }
     
-    static void saveInitMessage(String nuser)
+    static void saveInitMessage(String nuser, Object o)
     {
         String from = Main.SupportUser;
         if (nuser.equals(from)) return;
@@ -133,11 +134,19 @@ public class Message
         
         String mid = timeRandomString();
         
-        // todo add the translation
-
         String m1 = "Welcome! Click the icons to Find a user, or, Invite someone new.";
+
+        User u = User.findUserByUsername(nuser, o);
+        if (u == null)
+        {
+            U.log("cannot find user " + nuser + " in saveInitMessage", o);
+        }
+
+        String m2 = U.requestTranslation(u.language, "en", m1, o);
+
+        if (m2 == null) m2 = "";
         
-        Message message = new Message(Main.SupportUser,  m1, m1, mid, 2, nuser);
+        Message message = new Message(Main.SupportUser,  m1, m2, mid, 2, nuser);
 
         try 
         {
@@ -152,20 +161,20 @@ public class Message
                 "status", 2 + ""
             };
             
-            boolean result = Database.addMessage(fields, mid);
+            boolean result = Database.addMessage(fields, mid, o);
 
             if (!result)
-                U.log("***** returns false on attempt to store message ");
+                U.log("***** returns false on attempt to store message ", o);
             else
-                U.log("stored message " + message);
+                U.inf("stored message " + message, o);
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
     }
     
-    static void saveDummyMessage(String from, String nuser)
+    static void saveDummyMessage(String from, String nuser, Object o)
     {
         if (nuser.equals(from)) return;
         
@@ -173,7 +182,7 @@ public class Message
                 
         Message message = new Message(from, "dummy", "", "0", 2, nuser);
 
-        U.log("new dummy message " +  message);
+        U.log("new dummy message " +  message, o);
         
         try 
         {
@@ -188,16 +197,16 @@ public class Message
                 "status", 2 + ""
             };
             
-            boolean result = Database.addMessage(fields, "0");
+            boolean result = Database.addMessage(fields, "0", o);
 
             if (!result)
-                U.log("***** returns false on attempt to store message ");
+                U.log("***** returns false on attempt to store message ", o);
             else
-                U.log("stored message " + message);
+                U.inf("stored message " + message, o);
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
     }
     
@@ -211,7 +220,7 @@ public class Message
         return mid;
     }
 
-    static void storeMessage(Message m, Conversation c) 
+    static void storeMessage(Message m, Conversation c, Object o) 
     {
         try 
         {
@@ -230,16 +239,16 @@ public class Message
                 "status", m.status + ""
             };
             
-            boolean result = Database.addMessage(fields, m.mid);
+            boolean result = Database.addMessage(fields, m.mid, o);
 
             if (!result)
-                U.log("*****database returns false on attempt to store message ");
+                U.log("*****database returns false on attempt to store message ", o);
             else
-                U.log("stored message ");
+                U.inf("stored message ", o);
         } 
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
     }
     

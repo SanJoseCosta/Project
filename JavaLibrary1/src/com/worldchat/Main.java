@@ -15,6 +15,7 @@ public class Main
     static String InfoLog;
     static String Site;
     static String Login = "https://" + ProductName + ".chat/base.html?a=create";
+    static String Reset = "https://" + ProductName + ".chat/base.html?a=reset";
     static String host = "0.0.0.0";
     static int port = 8887;
     static boolean Secure = true;
@@ -36,7 +37,7 @@ public class Main
         RequestLog = Home + "/logs/r";
         InfoLog = Home + "/logs/i";
         
-        U.log("STARTUP version 1.1");
+        U.log("STARTUP version 1.1", null);
 
         new StopDetector().start();
         
@@ -47,23 +48,23 @@ public class Main
             try 
             {
                 WebServer.startWebServer();
-                U.log("Web server started");
+                U.log("Web server started", null);
                 if (Secure)
                 {
                     new SecureServer();
-                    U.log("Secure server started");
+                    U.log("Secure server started", null);
                 }
                 new WSServer(new InetSocketAddress(host, port));
                 break;
             } 
             catch (Exception e) 
             {
-                e.printStackTrace();
+                Log.stackTrace(e);
                 
                 shutdown();
                 U.pause(10000);
                 
-                U.log("retrying ...");
+                U.log("retrying ...", null);
             }
         }
     }

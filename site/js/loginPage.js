@@ -15,6 +15,8 @@ function loginPage()
 
               <button onclick="login();">login</button>
               <p class="message">Not registered? <a style="cursor:hand;" onclick="changePage('create');">Create an account</a></p>
+
+              <p class="message">Forgot your password? <a style="cursor:hand;" onclick="changePage('reset');">Reset your password</a></p>
             </div>
           </div>
         </div>

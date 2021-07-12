@@ -10,9 +10,7 @@ public class HTTPWebRequestHandler implements HttpHandler
     public void handle(HttpExchange t) 
     {
         try
-        {          
-            //U.log("HTTPWebRequestHandler redirecting " + t.getRequestURI());
-            
+        {                      
             t.getResponseHeaders().add("Location", "https://" + Main.ProductName + ".chat" + t.getRequestURI()) ;
             t.sendResponseHeaders(302, 0);
             
@@ -22,7 +20,7 @@ public class HTTPWebRequestHandler implements HttpHandler
         }
         catch (IOException e)
         {
-            U.log("IO error on sending redirect");
+            U.inf("IO error on sending redirect", t);
         }
     }
 }

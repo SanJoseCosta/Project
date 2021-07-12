@@ -2,6 +2,10 @@ function communityPage()
 {
     var s = getMobile() ?
 
+
+     ` not used  `
+
+    /*
     `   
         <style>
 
@@ -50,7 +54,9 @@ function communityPage()
             
 
         </div>
+
     `
+    */
 
     :
 
@@ -106,9 +112,21 @@ function communityPage()
                         </div>
                     </td>
                     <td class=t2>
-                        <div id=conversation-footer style="padding:7px;">
-                            <textarea rows=1 onkeyup="messageBoxInput();" placeholder="New message ..." id=msg></textarea>
+
+
+
+                        <div id=conversation-footer style="width:600px; background-color: #eeeeee;">
+
+                            <div style="float:left; padding:15px; width:500px;">
+                                <textarea rows=1 placeholder="Type your message ..." id=msg></textarea>
+                            </div>
+
+                            <img src=images/send.png style="height:50px;" onclick="messageBoxSend();">
+                        
                         </div>
+
+
+                        
                     </td>
                 </tr>
 

@@ -41,12 +41,12 @@ public class MessageProcessingThread extends Thread
         catch (Exception e)
         {
             // do invalid message process
-            U.log("-- Exception processing message");
-            e.printStackTrace();
+            U.log("-- Exception processing message", j.conn);
+            Log.stackTrace(e);
         }
 
         time = System.currentTimeMillis() - time;
-        U.inf("processed the message in " + time + " ms");
+        U.inf("processed the message in " + time + " ms", j.conn);
 
         messageProcessedTimes.add(new Long(System.currentTimeMillis()));
         
@@ -58,10 +58,12 @@ public class MessageProcessingThread extends Thread
         //queue.add(j);
         process(j);
     }
+
+    // socket.getRemoteSocketAddress()
     
     static boolean processMessage(WebSocket socket, String message) 
     {
-        U.inf("received: " + message + " =========================================================\n");
+        U.inf("received: " + message, socket);
 
         try 
         {
@@ -83,7 +85,7 @@ public class MessageProcessingThread extends Thread
             else if (messageType.equals("checkusername"))
             {
                 String username = json.getString("username").toLowerCase();
-                String response = (User.findUserByUsername(username) != null) ? "dup" : "ok";
+                String response = (User.findUserByUsername(username, socket) != null) ? "dup" : "ok";
 
                 String[] m = {"type", "checkusername", "response", response};
                 sendx(socket, m);
@@ -93,7 +95,7 @@ public class MessageProcessingThread extends Thread
             else if (messageType.equals("checkemail"))
             {
                 String email = json.getString("email").toLowerCase();
-                String response = (User.findUserByEmail(email) != null) ? "dup" : "ok";
+                String response = (User.findUserByEmail(email, socket) != null) ? "dup" : "ok";
 
                 String[] m = {"type", "checkemail", "response", response};
                 sendx(socket, m);
@@ -105,12 +107,20 @@ public class MessageProcessingThread extends Thread
                 String username = json.getString("emailorusername").toLowerCase();
                 String password = json.getString("password");
 
-                String response = login(username, password);
+                String response = login(username, password, socket);
 
                 String[] m = {"type", "checklogin", "response", response};
                 sendx(socket, m);
 
                 //sendx(socket, "2" + WSServer.separator + response);
+            }
+            else if (messageType.equals("reset")) 
+            {
+                return sendReset(json, socket);
+            }
+            else if (messageType.equals("changepassword")) 
+            {
+                return changePassword(json, socket);
             }
             else if (connection == null)
             {
@@ -127,8 +137,8 @@ public class MessageProcessingThread extends Thread
         }
         catch (CommunicationsException e)
         {
-            U.log("-- exception message " + e.getMessage());
-            U.log("-- original message " + message);
+            U.log("-- exception message " + e.getMessage(), socket);
+            U.log("-- original message " + message, socket);
 
             String[] m = {"type", "error", "response", e.getMessage()};
             sendx(socket, m);
@@ -141,7 +151,7 @@ public class MessageProcessingThread extends Thread
     {
         String messageType = json.getString("type");
         if (messageType.equals("connect")) 
-            return startConversation(null, socket, json);
+            return startConversation(null, socket, json, socket);
         else if (messageType.equals("signin")) 
             return signIn(socket, json); 
         else
@@ -152,7 +162,7 @@ public class MessageProcessingThread extends Thread
     {
         String messageType = json.getString("type");
         if (messageType.equals("connect")) 
-            return startConversation(connection, null, json);
+            return startConversation(connection, null, json, connection.socket);
         else if (messageType.equals("find")) 
             return sendMatchingUsers(connection, json);
         else if (messageType.equals("refresh")) 
@@ -167,7 +177,7 @@ public class MessageProcessingThread extends Thread
     {
         String messageType = json.getString("type");
         if (messageType.equals("connect")) 
-            return startConversation(connection, null, json);
+            return startConversation(connection, null, json, connection.socket);
         else if (messageType.equals("message")) 
         {
             String message = json.getString("message").toLowerCase();
@@ -182,7 +192,7 @@ public class MessageProcessingThread extends Thread
             String mid = json.getString("mid").toLowerCase();
             String status = json.getString("status").toLowerCase();
 
-            connection.conversation.ackReceived(mid, new Integer(status).intValue(), connection);
+            connection.conversation.ackReceived(mid, new Integer(status).intValue(), connection, connection.socket);
             return false;
         }
         else if (messageType.equals("refresh")) 
@@ -199,14 +209,14 @@ public class MessageProcessingThread extends Thread
     {
         String token = json.getString("token").toLowerCase();
 
-        User u = User.findUserByToken(token);
+        User u = User.findUserByToken(token, socket);
 
         if (u == null) 
             throw new CommunicationsException("xuserNotFoundByToken");
         
-        U.inf("signing in " + u.username());
+        U.inf("signing in " + u.username(), socket);
         
-        Connection connection = new Connection(socket, u.username(), null);
+        Connection connection = new Connection(socket, u.username(), null, socket);
         Connection.addConnection(connection);
         
         sendLCU(connection);
@@ -214,26 +224,26 @@ public class MessageProcessingThread extends Thread
         return false;
     }
    
-    static boolean startConversation(Connection connection, WebSocket socket, JSONObject json) throws CommunicationsException
+    static boolean startConversation(Connection connection, WebSocket socket, JSONObject json, Object o) throws CommunicationsException
     {
         String username = json.getString("username").toLowerCase();
         String token = json.getString("token").toLowerCase();
 
-        User local = User.findUserByToken(token);
+        User local = User.findUserByToken(token, socket);
         
         if (local == null) 
             throw new CommunicationsException("xlocalUserNotFoundByToken");
         
-        User remote = User.findUserByUsernameOrEmail(username);
+        User remote = User.findUserByUsernameOrEmail(username, socket);
         
         if (remote == null) 
             throw new CommunicationsException("xremoteUserNotFoundByNameOrEmail");
         
-        U.inf("start conversation between " + local.username() + " and " + remote.username());
+        U.inf("start conversation between " + local.username() + " and " + remote.username(), o);
         
         if (connection == null)
         {
-            connection = new Connection(socket, local.username(), null);
+            connection = new Connection(socket, local.username(), null, socket);
             Connection.addConnection(connection);
         }
         
@@ -254,18 +264,16 @@ public class MessageProcessingThread extends Thread
             
             if (toclose != null)
             {
-                U.inf("Conversation already in progress for local user " + local.username() + " closing connection " + toclose);
+                U.inf("Conversation already in progress for local user " + local.username() + " closing connection " + toclose, toclose.socket);
                 
                 String[] m = {"type", "error", "response", "xlogoutPreviousConnectionInSameConversation"};
                 sendx(toclose.socket, m);
-                
-                //sendx(toclose.socket, );
             }
         }
         
-        U.inf("New conversation between " + local + " and " + remote);
+        U.inf("New conversation between " + local + " and " + remote, o);
 
-        connection.conversation = Conversation.createConversation(local.username(), remote.username());
+        connection.conversation = Conversation.createConversation(local.username(), remote.username(), socket);
         
         sendLCU(connection);
         connection.conversation.sendHistory(connection);
@@ -278,16 +286,16 @@ public class MessageProcessingThread extends Thread
         String token = json.getString("token").toLowerCase();;
         String username = json.getString("username").toLowerCase();
         
-        U.inf("search user ***" + username + "***");
+        U.inf("search user ***" + username + "***", connection.socket);
 
         ArrayList<User> list = new ArrayList<User>();
     
-        User user = User.findUserByUsernameOrEmail(username);
+        User user = User.findUserByUsernameOrEmail(username, connection.socket);
 
         if (user != null && !user.username().equals(connection.username))
         {
-            U.inf("found user " + user);
-            Message.saveDummyMessage(connection.username, user.username);
+            U.inf("found user " + user, connection.socket);
+            Message.saveDummyMessage(connection.username, user.username, connection.socket);
 
             list.add(user);
             sendUserList(connection, list, "find");
@@ -308,15 +316,15 @@ public class MessageProcessingThread extends Thread
         
         if (email != null && email.indexOf("@") > 0 && email.indexOf(".") > 0)
         {
-        	User u = User.findUserByUsername(connection.username);
-        	String invite = HTTPSWebRequestHandler.returnToken(u);
+        	User u = User.findUserByUsername(connection.username, connection.socket);
+        	String invite = HTTPSWebRequestHandler.returnToken(u, connection.socket);
         	
             boolean r = U.sendemail(email, "Invitation to chat on " + Main.ProductName + ".chat", 
                         connection.username + 
                         " has sent you an invitation to chat. " + 
                         "Please follow this link to login or create a new account and begin chatting: " +
-                        Main.Login + "&invite=" + invite
-
+                        Main.Login + "&invite=" + invite,
+                        connection.socket
             		);
             if (r)
             {
@@ -333,12 +341,82 @@ public class MessageProcessingThread extends Thread
 
         return false;
     }
+
+    static boolean changePassword(JSONObject json, WebSocket socket)
+    {
+        String token = json.getString("token");
+        String password = json.getString("password");
+
+        if (token == null || password == null || password.length() == 0)
+        {
+            U.inf("change password parameter error " + token + " " + password, socket);
+            return false;
+        }
+
+        User u = User.findUserByToken(token, socket);
+
+        if (u == null)
+        {
+            U.inf("change password user not found " + token, socket);
+            return false;
+        }
+
+        // new password
+                
+        u.password = password;
+             
+        try 
+        {
+            User.storeUser(u, socket);
+            U.inf("changed user " + u, socket);
+            return true;
+        } 
+        catch (Exception e)
+        {
+            Log.stackTrace(e);
+            return false;
+        }
+    }
+
+    static boolean sendReset(JSONObject json, WebSocket socket)
+    {
+        String email = json.getString("email").toLowerCase();
+        
+        if (email != null && email.indexOf("@") > 0 && email.indexOf(".") > 0)
+        {
+            User u = User.findUserByEmail(email, socket);
+            if (u != null)
+            {
+                String reset = HTTPSWebRequestHandler.returnToken(u, socket);
+                
+                boolean r = U.sendemail(email, "Reset password link for " + Main.ProductName + ".chat", 
+                           
+                            "Please follow this link to reset your password: " +
+                            Main.Reset + "&token=" + reset,
+                            socket
+                        );
+                if (r)
+                {
+                    //String[] m = {"type", "reset", "response", "ok"};
+                    //sendx(connection, m);
+                    return true;
+                }
+            }
+        }
+        
+        //String[] m = {"type", "reset", "response", "error"};
+        //sendx(connection, m);
+        
+        //sendx(connection, "I" + WSServer.separator + "error");
+
+        return false;
+    }
     
     static User remoteUser(Connection connection)
     {
         User remote = null;
         
-        User local = User.findUserByUsername(connection.username);
+        User local = User.findUserByUsername(connection.username, connection.socket);
 
         //U.inf("in remoteuser, connection.username = " + connection.username + ", local=" + local + ", conversation=" + connection.conversation);
         
@@ -354,7 +432,7 @@ public class MessageProcessingThread extends Thread
 
         if (Community)
         {
-            ArrayList<User> users = Database.allUsers();
+            ArrayList<User> users = Database.allUsers(connection.socket);
 
             for (int i = 0; i < users.size(); ++i)
             {   
@@ -368,16 +446,16 @@ public class MessageProcessingThread extends Thread
         {
             ArrayList<User> conversingUsers = new ArrayList<User>();
             
-            User local = User.findUserByUsername(connection.username);
+            User local = User.findUserByUsername(connection.username, connection.socket);
             conversingUsers.add(local);
             
             ArrayList<String> correspondents = Message.correspondents(connection.username);
             
             for (int i = 0; i < correspondents.size(); ++i)
             {   
-                User u = User.findUserByUsername(correspondents.get(i));
+                User u = User.findUserByUsername(correspondents.get(i), connection.socket);
                 if (u == null)
-                    U.log("-- cannot find in sendLCU " + correspondents.get(i));
+                    U.log("-- cannot find in sendLCU " + correspondents.get(i), connection.socket);
                 else
                 {
                     u.lastMessage = Conversation.getLastMessage(Conversation.conversationName(connection.username, u.username()));
@@ -410,8 +488,6 @@ public class MessageProcessingThread extends Thread
 
             String j2send = user.jsonToSend(isLocal, isRemote);
             users.add(j2send);
-
-            //U.log("sending user " + user);
         }
       
         String a = Json.array(type, "users", users);
@@ -444,40 +520,40 @@ public class MessageProcessingThread extends Thread
         try 
         {
             socket.send(msg);
-            U.inf("sendx sent the string " + U.truncate(msg, 30));
+            U.inf("sendx sent the string " + U.truncate(msg, 100), socket);
             return true;
         } 
         catch (Exception e) 
         {
-            U.log("-- FAILED to send string " + msg);
-            e.printStackTrace();
+            U.log("-- FAILED to send string " + msg, socket);
+            Log.stackTrace(e);
             return false;
         }
     }
 
-    static String login(String username, String password) 
+    static String login(String username, String password, WebSocket socket) 
     {
-        U.inf("login");
+        U.inf("login", socket);
         
         String r;
-        User u = User.findUserByUsername(username);
+        User u = User.findUserByUsername(username, socket);
         
         if (u == null) 
-            u = User.findUserByEmail(username);
+            u = User.findUserByEmail(username, socket);
         
         if (u == null) 
             r = "invaliduser";
         else
         {
-            U.inf("login " + u.password + " " + password);
+            U.inf("login " + u.password + " " + password, socket);
             if (!u.password.equals(password)) 
             {
                 r = "invalidpassword";
             }
             else
             {
-                String t = HTTPSWebRequestHandler.returnToken(u);
-                U.inf("token " + t);
+                String t = HTTPSWebRequestHandler.returnToken(u, socket);
+                U.inf("token " + t, socket);
                 r = t;
             }
         }

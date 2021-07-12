@@ -2,33 +2,29 @@ function conversationPage()
 {
 	var s =
 	`
-        <style>
-        
-            #messages-list
-            {
-                overflow: auto;
-                height: 70%;
-            }
-
-
-        </style>
-        
-		<div class="grid-container">
+		<div>
     
             <div id=conversation>
     
-                <div id=conversation-header></div>          
+                <div id=conversation-header style="height: 10%;"></div>          
 
-                <div id=messages-list></div>
+                <div id=messages-list style="overflow: auto; height: 80%;"></div>
 
-                <div id=conversation-footer>
-               
-                    <textarea style="width:80%;"
-                    onkeyup="messageBoxInput();" placeholder="Type your message..." id=msg></textarea>
-                    <img src=images/send.png style="height:60px;" onclick="messageBoxSend();">
-                
+
+
+                 <div id=conversation-footer style="background-color: #eeeeee;">
+
+                            <div style="float:left; padding:15px;">
+                                <textarea rows=1 placeholder="Type your message ..." id=msg></textarea>
+                            </div>
+
+                            <img src=images/send.png style="height:50px;" onclick="messageBoxSend();">
+                        
                 </div>
+
     
+
+
             </div>
     
         </div>

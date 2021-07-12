@@ -34,7 +34,7 @@ public class WebServer
 
     public static void stop() 
     {
-        U.log("http server stopping " + server);
+        U.log("http server stopping " + server, null);
         if (server != null) {
             server.stop(0);
         }

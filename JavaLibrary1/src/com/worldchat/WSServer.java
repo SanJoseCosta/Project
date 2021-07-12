@@ -28,8 +28,8 @@ public class WSServer extends WebSocketServer
             }
             catch (Exception e)
             {
-                U.log("Error starting simple server");
-                e.printStackTrace();
+                U.log("Error starting simple server", null);
+                Log.stackTrace(e);
             }
         }
         singleton = this;
@@ -60,15 +60,15 @@ public class WSServer extends WebSocketServer
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) 
     {
-        U.log("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+        U.inf("closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason, conn);
         closeConnection(conn);
     }
 
     @Override
-    public void onError(WebSocket conn, Exception ex) 
+    public void onError(WebSocket conn, Exception e) 
     {
-        U.log("***** an error occurred on connection " + ":" + ex);
-        ex.printStackTrace();
+        U.log("***** an error occurred on connection " + ":" + e, conn);
+        Log.stackTrace(e);
 
         if (conn.isOpen())
             closeConnection(conn);
@@ -77,19 +77,18 @@ public class WSServer extends WebSocketServer
     //@Override
     public void onStart() 
     {
-        U.log("WS server started successfully " + this.getAddress());
+        U.log("WS server started successfully at " + this.getAddress(), null);
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) 
     {
-        U.inf("new connection to " + conn.getRemoteSocketAddress());
+        U.inf("new connection opened", conn);
     }
 
     static void stopserver() 
     {
-        U.log("stop server");
-        U.log("connections stopped");
+        U.log("stop WebSocket server", null);
 
         WebServer.stop();
 
@@ -97,8 +96,8 @@ public class WSServer extends WebSocketServer
             if (singleton != null) {
                 singleton.stop();
             }
-        } catch (Exception ee) {
-            ee.printStackTrace();
+        } catch (Exception e) {
+            Log.stackTrace(e);
         }
 
         System.exit(0);

@@ -1,6 +1,8 @@
 
 package com.worldchat;
+
 import java.io.*;
+import java.util.ArrayList;
 
 public class SystemData
 {
@@ -27,11 +29,13 @@ public class SystemData
             float max = -1;
             
             int k = 0;
-            
+
+            ArrayList<String> lines = new ArrayList<String>();
+
             while (true)
             {
                 if (k++ > 1000)
-                    U.log("loop counter " + k);
+                    U.log("loop counter " + k, null);
                 
                 line = in.readLine();
                 if (line == null) break;
@@ -39,6 +43,7 @@ public class SystemData
                 String n = line.substring(45, 49);
                 
                 float f = 0;
+                
                 try
                 {
                     f = Float.parseFloat(n);
@@ -50,16 +55,26 @@ public class SystemData
                 
                 if (f > max)
                     max = f;
+
+                if (f > 40)
+                {
+                    lines.add(line);
+                }
             }
-            
-            //U.log(max);
 
             if (max > 40)
+            {
+                for (int i = 0; i < lines.size(); ++i)
+                {
+                    U.log(lines.get(i), null);
+                }
+                
                 return true;
+            }
         }
         catch (Exception e)
         { 
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
         return false;
     }

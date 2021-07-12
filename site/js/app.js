@@ -35,7 +35,7 @@
     var RefreshTimeout = 5000;
     var initTime = 0;
     var Secure = true;
-    var DomainName = "comprendo.chat"; //"malt.chat"
+    var DomainName = "comprendo.chat";
 
     // where to go up on receiving a 2 type response to a 1 type request
 
@@ -135,6 +135,12 @@
                 alert("there was an error while trying to send the invitation email");
 
             document.getElementById("search").style.visibilityState = "hidden";
+            return;
+        }
+        else if (obj.type == "reset")
+        {
+            log("reset response: " + obj.response);
+            
             return;
         }
         else if (obj.type == "find")
@@ -262,6 +268,15 @@
             pageMode = 0;  
             accountStart(true);
         }
+        else if (url == "changepassword")
+        {
+            currentToken = getUrlVars("token");
+            signin(currentToken);
+
+            // this waits until we know the local user info
+
+            waitForLocalUser();
+        }
         else if (url == "community") 
         {
             body.innerHTML = communityPage();
@@ -291,6 +306,24 @@
         else if (url == "terms") 
         {
             body.innerHTML = termsPage();
+        }
+    }
+
+    function waitForLocalUser()
+    {
+        var local = findLocalUser();
+
+        if (local == null)
+        {
+            setTimeout(waitForLocalUser, 50);
+        }
+        else
+        {
+            var body = document.getElementsByTagName("BODY")[0];
+            body.innerHTML = changePassPage();
+            
+            pageMode = 0;  
+            changePass();
         }
     }
 
@@ -400,6 +433,14 @@
 
     function ChatsUpdate()
     {
+        var luser = findLocalUser();
+
+        if (luser.username == "support1")
+        {
+            ChatsUpdate1();
+            return;
+        }
+
         var t = "";
 
         var gu = sortedUsersExceptLocal();
@@ -562,44 +603,21 @@
     // put on right side
     function rmsg(msg, translation, status, pic, time)
     {
-        var statusImage;
+        var statusMessage = "sent";
 
-        if (status == 4)
-            statusImage = "images/status4.png";
-        else if (status == 3)
-            statusImage = "images/status3.png";
-        else
-            statusImage = "images/status0.png";
+        if (status == 4) statusMessage = "read";
+        if (status == 3) statusMessage = "delivered";
 
         var m = messageDisplayedRight();
 
         m = replaceAll(m, "$$pic$$", pic);
-        m = replaceAll(m, "$$status$$", statusImage);
-        m = replaceAll(m, "$$time$$", time);
+        //m = replaceAll(m, "$$status$$", statusMessage);
+        m = replaceAll(m, "$$time$$", time + ", " + statusMessage);
 
         m = replaceAll(m, "$$msg$$", msg);
         m = replaceAll(m, "$$translation$$", translation);
 
         return m;
-    }
-
-    function messageBoxInput(e)
-    {
-        var textarea = document.getElementById("msg");
-        var n = textarea.value.charCodeAt(textarea.value.length - 1);
-
-        if (n == 10)
-        {
-            localInput(textarea.value.substring(0, textarea.value.length - 1));
-            ConversationUpdate();
-
-            textarea.value = "";
-            textarea.blur();
-
-            return false;
-        }
-
-        return true;
     }
 
     function messageBoxSend()
@@ -667,30 +685,6 @@
         changePage("terms");
     }
 
-    /*
-    // this handles community and chat
-
-    function setUnload()
-    {
-        window.addEventListener("beforeunload", function (event)
-        {
-            //if (socket != null)
-             //   socket.close();
-            //socket = null;
-        }
-        );
-        window.addEventListener("unload", function (event)
-        {
-            //if (socket != null)
-            //    socket.close();
-            //socket = null;
-        }
-        );
-    
-        pageSetup()
-    }
-    */
-    
     function checkboxclicked()
     {
         var pcheck = true;
@@ -700,24 +694,184 @@
         log("checkbox enabled = " + !pcheck);
     }
 
-    var autoExpand = function (field) 
+    function keyUpHandler(event) 
     {
-        // Reset field height
-        field.style.height = 'inherit';
+        var field = event.target;
 
-        // Get the computed styles for the element
+        if (field.id != "msg") return;
+
+        var value = htmlEncode(field.value);
+
+        if (event.code == 'Enter')
+        {
+            field.value = "";
+            field.blur();
+        }
+
+        field.style.height = 'inherit';
+        var fieldheight = getFieldHeight(field);
+        field.style.height = fieldheight + 'px';
+
+        var footer = document.getElementById("conversation-footer");
+
+        footer.style.height = 'inherit';
+        var footerheight = getFieldHeight(footer);
+
+        ////////////////////////////////
+        // this ia a bug fix for iphone
+
+        footerheight = fieldheight + 30;
+
+        ////////////////////////////////
+
+        footer.style.height = footerheight + 'px';
+
+        log("field: " + fieldheight + " footer: " + footerheight);
+
+        if (event.code == 'Enter')
+        {
+            localInput(value);
+            ConversationUpdate();
+        }
+    }
+
+    function showString(s)
+    {
+        log(s);
+        var t = "";
+        for (var i = 0; i < s.length; ++i) t += s.charCodeAt(i) + "-";
+        log(t);
+    }
+
+    function htmlEncode(s)
+    {
+        // remove cr/lf
+
+        var t = "";
+        for (var i = 0; i < s.length; ++i) 
+            if (s.charCodeAt(i) != 10 && s.charCodeAt(i) != 13) t += s[i];
+
+        s = t;
+
+        s = s.replace("&", "&amp;");
+        s = s.replace(">", "&gt;");
+        s = s.replace("<", "&lt;");
+
+        s = s.replace("\`", "&#96;");
+        s = s.replace("\"", "&quot;");
+        s = s.replace("\'", "&apos;");
+        
+        return s;
+    }
+    
+    function getFieldHeight(field)
+    {
         var computed = window.getComputedStyle(field);
 
-        // Calculate the height
-        var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+        var height = 
+
+            parseInt(computed.getPropertyValue('border-top-width'), 10)
             + parseInt(computed.getPropertyValue('padding-top'), 10)
             + field.scrollHeight
             + parseInt(computed.getPropertyValue('padding-bottom'), 10)
             + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
 
-        field.style.height = height + 'px';
+        //log("clientheight: " + field.getBoundingClientRect().height);
 
-    };
+        return height;
+    }
+
+    /// new stuff
+
+
+    function ChatsUpdate1()
+    {
+        var t = "<table style='width:100%'>";
+
+        var gu = sortedUsersExceptLocal();
+
+        log("ChatsUpdate1 with " + gu.length + " users");
+
+        var Cols = 3;
+
+        for (var i = 0; i < gu.length; ++i)
+        {
+            if ((i % Cols) == 0)
+                t += "<tr>";
+
+            var u = gu[i];
+ 
+             /*
+            if (u.lastMessage == "null")
+            {
+                //t += makebox(u, "", "", false);
+            }
+            else
+            {
+               
+                var ts = "(" + timeDisplayStringFromUnixTime(u.lastMessageId.substring(0, u.lastMessageId.length - 10)) +")";
+
+                // todo might need to use translation !!!!!!!!!!!!!!!!!!!!!
+
+                var unread = false;
+
+                if (findLocalUser().username != u.lastMessageSender)
+                    if (u.lastStatus != "4")
+                    {
+                        log("unread message: " + u.lastMessage + " status " + u.lastStatus + " from " + u.lastMessageSender);
+                        unread = true;
+                    }
+
+                var b1 = unread ? "<b><i>" : "";
+                var b2 = unread ? "</b></i>" : "";
+
+                var lm = u.lastMessage;
+                if (lm.length > 18)
+                    lm = lm.substring(0, 18) + "..";
+
+                var m = b1 + u.lastMessageSender + ": " + lm + b2;
+
+                t += makebox(u, m, ts, u.lastMessage == "dummy");
+                
+            }
+            */
+
+            t += "<td style='width:30%; overflow:hidden;'>";
+
+
+            var un = u.username;
+            if (un.length > 10) un = un.substring(0, 10) + "..";
+
+
+            var picfile = picturefile(u);
+            t += 
+
+                un + 
+                "<br>" +
+                "<img height=50 src=" + 
+                    picfile +
+                ">" +
+                "<br>";
+
+
+
+
+
+            t += "</td>";
+
+            if ((i % Cols) == 2)
+                t += "</tr>";
+        }
+
+        t += "</table>";
+
+        document.getElementById("chats-list").innerHTML = t;
+
+        //pageHeader();
+
+        chatsHeader();
+    }
+
 
     ////////////////////////////////////////////////////////////////////
 

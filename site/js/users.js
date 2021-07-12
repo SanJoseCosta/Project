@@ -44,10 +44,13 @@
 
     function picturefile(user)
     {
-        if (user.picurl != "0")
-            return picturepath(user.username); 
+        if (user.picurl == "1")
+            return imageRequest("/images/" + user.username + ".png"); 
+        else if (user.picurl == "2")
+            return imageRequest("/images/" + user.username + "2.png"); 
         else
             return defaultPic();
+
     }
 
     function defaultPic()
@@ -55,10 +58,10 @@
         return imageRequest(DefaultProfilePic);
     }
 
-    function picturepath(username)
-    {
-        return imageRequest("/images/" + username + ".png"); 
-    }
+    //function picturepath(username)
+    //{
+    //    return imageRequest("/images/" + username + ".png"); 
+    //}
 
     function addOrUpdateUser(json)
     {
@@ -92,6 +95,10 @@
             updatePage = true;
         else if (Math.random() < 0.1)
             updatePage = true;
+
+        // try updating on every refresh
+
+        updatePage = true;
             
         lastListlen = len;
 

@@ -51,7 +51,7 @@ public class SecureServer
                         params.setSSLParameters(sslParameters);
                     } 
                     catch (Exception ex) {
-                        System.out.println("Failed to create HTTPS port");
+                        Log.log("Failed to create HTTPS port", null);
                     }
                 }
             });
@@ -63,12 +63,12 @@ public class SecureServer
             
             httpsServer.start();
 
-            System.out.println("Started HTTPS server on port " + Port);
+            Log.log("Started HTTPS server on port " + Port, null);
         } 
         catch (Exception exception) 
         {
-            System.out.println("Failed to create HTTPS server on port " + Port);
-            exception.printStackTrace();
+            Log.log("Failed to create HTTPS server on port " + Port, null);
+            Log.stackTrace(exception);
         }
     }
 
@@ -95,7 +95,7 @@ public class SecureServer
     
     static void stop() 
     {
-        U.log("https server stopping");
+        U.log("https server stopping", null);
         if (httpsServer != null) {
             httpsServer.stop(0);
         }

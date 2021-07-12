@@ -53,12 +53,11 @@
             return;
         }
        
-        //if (get("checkbox-remember").checked)
+        
             
         localStorage.setItem("token", token);
         
-        //else
-        //    localStorage.setItem("token", null);
+       
 
         signin(currentToken);
         changePage(getCommunityStartPage());
@@ -260,6 +259,8 @@
         
         var imageSrc = get("previewimage").src;
 
+        // ???
+
         if (get("username").tagName == "H4")
         {
             log("password value is [" + password1 + "]");
@@ -270,11 +271,43 @@
             log("password value is [" + password1 + "]");
         }
 
-        // todo add logic for changed picture
+
+        // logic for changed picture
 
         var picurl2send = "0";
-        if (imageChanged)
-            picurl2send = "1";
+        
+        if (isCreating)
+        {
+            if (imageChanged)
+                picurl2send = "1";
+        }
+        else
+        {
+             var local = findLocalUser();
+
+            if (local == null)
+            {
+                log("!!!!!!!! cannot get current picurl -- no local user");
+                if (imageChanged)
+                    picurl2send = "1";
+            }
+            else
+            {
+                var lp = local.picurl;
+        
+                if (imageChanged)
+                {
+                    if (lp == "0")
+                        picurl2send = "1";
+                    else if (lp == "1")
+                        picurl2send = "2";
+                    else if (lp == "2")
+                        picurl2send = "1";
+                }
+                else
+                    picurl2send = lp;
+            }
+        }
 
         var userdata = ["username", username, "email", email, "password", password1, "language", language, "picurl", picurl2send];
 
@@ -451,5 +484,47 @@
 
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    function reset()
+    {
+        var email = get("email").value.trim();
+        sendResetRequest(email);
+        changePage("login");
+    }
+
+    function changePass()
+    {
+        log("change password with token " + currentToken);
+
+        pageMode = 0; 
+
+        var local = findLocalUser();
+
+        if (local == null)
+        {
+            log("cannot change password -- no local user");
+            return;
+        }
+
+        var username =  get("username");
+        get("username").innerText = local.username;
+
+        pageMode = 99;
+    }
+
+    function newPassword()
+    {
+        var p = get("p1").value.trim();
+        log("new password " + p);
+
+        changePassword(p);
+        logout();
+        loadHomePage();
+    }
+
+    function loadHomePage()
+    {
+        window.location.href = Protocol() + Domain();
     }
 

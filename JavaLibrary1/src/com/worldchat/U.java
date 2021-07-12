@@ -22,46 +22,35 @@ public class U
     static PrintStream req;
     static PrintStream inf;
     
-    static String GoogleUser =  "hxsquid@gmail.com";
-    static String Password =    "squid.88.x";
-    
-    public static void req(Object s) 
+    static String GoogleUser =  "support@comprendo.chat";
+    static String PasswordSave = null;
+
+    static String Password()
     {
-        try
+        if (PasswordSave == null)
         {
-            if (req == null) req = new PrintStream(Main.RequestLog);
-            req.append(new Date() + ": " + s + "\n");
+            PasswordSave = readString("/home/ec2-user/ep");
+            PasswordSave = PasswordSave.substring(0, 8);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void inf(Object s) 
-    {
-        try 
-        {
-            if (inf == null) inf = new PrintStream(Main.InfoLog);
-            inf.append(new Date() + ": " + s + "\n");
-            //log(s);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        return PasswordSave;
     }
 
-    public static void log(Object s) 
+    static String getIpAddress(InetSocketAddress i)
     {
-        long now = System.currentTimeMillis();
-        if (now - lastlog > 3000)
-            System.out.println("");
-        lastlog = now;
-        System.out.println(new Date() + ": " + s);
+        String a = i.toString();
+        
+        int k;
+        
+        k = a.indexOf("/");
+        if (k > 0) a = a.substring(k + 1);
+        
+        k = a.indexOf(":");
+        if (k > 0) a = a.substring(0, k);
+
+        return a;
     }
 
-    static String getIPLocationData(HttpExchange currentMessage)
+    static String getIpAddress(HttpExchange currentMessage)
     {
         String a = currentMessage.getRemoteAddress().toString();
         
@@ -72,8 +61,14 @@ public class U
         
         k = a.indexOf(":");
         if (k > 0) a = a.substring(0, k);
-        
+
+        return a;
+    }
+
+    static String getIPLocationData(HttpExchange currentMessage)
+    {   
         String base = "https://json.geoiplookup.io/"; ///191.235.224.185
+        String a = getIpAddress(currentMessage);
         String url = base + a;
         
         //U.req("remote address " +  a + " url: " + url);
@@ -116,9 +111,10 @@ public class U
         }
         return s;
     }
-    static void sendError(String s) 
+    
+    static void sendError(String s, Object o) 
     {
-        log("send error: " + s);
+        log("should send error: " + s, o);
         // send error
     }
     
@@ -126,7 +122,7 @@ public class U
         try {
             Thread.sleep(n);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.stackTrace(e);
         }
     }
 
@@ -243,7 +239,6 @@ public class U
                 a.add(string.substring(s));
                 break;
             }
-            //System.out.println(string + " "  + string.length() + " " + s + " " + k);
             a.add(string.substring(s, k));
             s = k + 1;
         }
@@ -266,44 +261,15 @@ public class U
 
             InputStream is = connection.getInputStream();
             
-            //DataInputStream input = new DataInputStream(is);
-
-            /*
-            int t = 0;
-            
-            byte[] pbuffer = getxxxBuffer();
-            
-            while ((r = input.read(pbuffer, t, Size - t)) > 0) 
-            {
-                t += r;
-                if (t > Size - 1000) 
-                {
-                    throw new Exception("Overflow of buffer on read in getPage()");
-                }
-            }
-            */
-            
             byte[] pbuffer = readInputStream(is);
             s = new String(pbuffer, 0, pbuffer.length, "UTF-8");
         } 
         catch (Exception e) 
         {
-            //if (rs != 200 && rs != 404 && rs != 500)
-	    //			;//Utils.log("GetPage of " + url + " throws " + e.getMessage());
-            //stackTrace(e);
+            
         }
-
-        //U.log("getPage " + url + " response code " + rs);
         
         return s;
-    }
-
-    public static void stackTrace(Exception e) {
-        StringWriter s = new StringWriter();
-        PrintWriter p = new PrintWriter(s);
-        e.printStackTrace(p);
-
-        log(s.toString());
     }
 
     public static void saveObject(byte[] b, String name) throws Exception {
@@ -314,10 +280,22 @@ public class U
             f.flush();
             f.close();
         } catch (Exception e) {
-            e.printStackTrace();;
+            Log.stackTrace(e);
         }
     }
-    
+
+    public static String readString(String file)
+    {
+        try
+        {
+            return new String(read(file));
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
     public static byte[] read(String file) throws Exception 
     {
         long len = new File(file).length();
@@ -339,7 +317,7 @@ public class U
                 } 
                 catch (IOException ee) 
                 {
-                    ee.printStackTrace();
+                    Log.stackTrace(ee);
                 }
                 throw new Exception("***** Overflow of buffer on read in read()");
             }
@@ -360,7 +338,7 @@ public class U
                     f.close();
                 }
             } catch (IOException ee) {
-                ee.printStackTrace();
+                Log.stackTrace(ee);
             }
             return null;
         }
@@ -408,11 +386,11 @@ public class U
         return s == null || s.equals("");
     }
     
-    static boolean sendemail(String to, String subject, String content)
+    static boolean sendemail(String to, String subject, String content, Object o)
     {
         try 
         {
-            String fromAddress = GoogleUser;    // + "@gmail.com";
+            String fromAddress = GoogleUser;
             String host = "smtp.gmail.com";
 
             // Get system properties
@@ -427,11 +405,11 @@ public class U
             {
                 protected javax.mail.PasswordAuthentication getPasswordAuthentication() 
                 {
-                    return new javax.mail.PasswordAuthentication(fromAddress, Password);
+                    return new javax.mail.PasswordAuthentication(fromAddress, Password());
                 }
             });
             
-            session.setDebug(true);
+            session.setDebug(false);
             session.setProvider(new Provider(Provider.Type.TRANSPORT, "smtp", "com.sun.mail.smtp.SMTPSSLTransport", "Oracle", "1.0"));
 
             MimeMessage message = new MimeMessage(session);
@@ -447,15 +425,16 @@ public class U
             
             Transport transport = session.getTransport("smtp");
             
-            transport.connect(host, GoogleUser, Password);
+            transport.connect(host, GoogleUser, Password());
             transport.send(message, addresses);
             
-            System.out.println("Sent message successfully....");
+            U.inf("Sent message successfully....", o);
             return true;
         } 
-        catch (Exception mex) 
+        catch (Exception e) 
         {
-            mex.printStackTrace();
+            U.inf("Exception on sending email message", o);
+            Log.stackTrace(e);
             return false;
         }
     }
@@ -503,7 +482,7 @@ public class U
         }
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
             return null;
         }
     }
@@ -514,5 +493,139 @@ public class U
             return s;
         else
             return s.substring(0, n) + " ...";
-    } 
+    }
+
+    static String requestTranslation(String tolang, String fromlang, String text, Object o)
+    {
+        if (tolang.equals(fromlang))
+            return text;
+
+        String base = "https://translation.googleapis.com/language/translate/v2?";
+        String params = "target=" + tolang + "&source=" + fromlang + 
+                "&key=" + "AIzaSyC3" +
+                "1GV2BJqC" +
+                "IoXCM6Nj" +
+                "OtLohY-l" +
+                "WV1bQ3Q" + "=&q=" + URLEncoder.encode(text);
+
+        U.inf("translation request " + (base + params), o);
+        
+        String r = null;
+
+        try
+        {
+            r = getPageDirect(base + params);
+        }
+        catch (Exception e)
+        {
+            U.inf("Exception on get of " + (base + params), o);
+            return text;
+        }
+
+        r = parseTranslationResponse(r);
+
+        U.inf("translation response " + r, o);
+
+        return r;
+    }
+
+    static String parseTranslationResponse(String r)
+    {
+        String search = "\"translatedText\": \"";
+        int k = r.indexOf(search);
+
+        if (k >= 0)
+        {
+            r = r.substring(k + search.length());
+            k = r.indexOf("\"");
+            if (k > 0)
+            {
+                return r.substring(0, k);
+            }
+        }
+
+        return null;
+    }
+
+    static int toInt(String s)
+    {
+        int n = -1;
+        try
+        {
+            n = new Integer(s);
+        } 
+        catch (Exception e)
+        {
+
+        }
+        return n;
+    }
+
+    public static void req(Object s, Object c) 
+    {
+        Log.log(s, c);
+    }
+
+    public static void inf(Object s, Object c) 
+    {
+        Log.log(s, c);
+    }
+
+    public static void log(Object s, Object c) 
+    {
+        Log.log(s, c);
+    }
 }
+
+
+
+    /*
+    public static void req(Object s, Object c) 
+    {
+        Log.log(s, c);
+
+        
+        try
+        {
+            if (req == null) req = new PrintStream(Main.RequestLog);
+            req.append(new Date() + ": " + s + "\n");
+        }
+        catch (Exception e)
+        {
+            e.printxxxStackTrace();
+        }
+        
+    }
+    
+    public static void inf(Object s, Object c) 
+    {
+        Log.log(s, c);
+
+        
+        try 
+        {
+            if (inf == null) inf = new PrintStream(Main.InfoLog);
+            inf.append(new Date() + ": " + s + "\n");
+        }
+        catch (Exception e)
+        {
+            e.printxxxStackTrace();
+        }
+        
+    }
+
+    public static void log(Object s, Object c) 
+    {
+        // add to log info for ip
+
+        Log.log(s, c);
+
+        
+        long now = System.currentTimeMillis();
+        if (now - lastlog > 3000)
+            System.out.println("");
+        lastlog = now;
+        System.out.println(new Date() + ": " + s);
+        
+    }
+    */

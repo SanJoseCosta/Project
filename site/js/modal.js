@@ -1,7 +1,9 @@
 
-    function popModal(p1, p2, p3)
+    function popModal(t, p1, p2, p3)
     {
         var r = newchatModal();
+
+        r = replaceAll(r, "$$header$$", t);
 
         r = replaceAll(r, "$$okclick$$", p1);
 
@@ -33,7 +35,7 @@
     function newchat()
     {
         log("newchat");
-        popModal("onclick='searchForNewChat();'", "onclick='xModal();'", "username or email");
+        popModal("Search for a user", "onclick='searchForNewChat();'", "onclick='xModal();'", "username or email");
     }
 
     function searchForNewChat()
@@ -45,7 +47,7 @@
     function invitation()
     {
         log("invitation");
-        popModal("onclick='sendInvitation();'", "onclick='xModal();'", "email");
+        popModal("Send an invitation", "onclick='sendInvitation();'", "onclick='xModal();'", "email");
     }
 
     function sendInvitation()

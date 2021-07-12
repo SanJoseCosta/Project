@@ -1,6 +1,7 @@
 package com.worldchat;
 
 import java.util.*;
+import com.sun.net.httpserver.HttpExchange;
 
 public class Conversation 
 {
@@ -14,15 +15,13 @@ public class Conversation
     
     private static HashMap<String, Conversation> conversations = new HashMap<String, Conversation>();
     
-    private Conversation(String id1, String id2) 
+    private Conversation(String id1, String id2, Object o) 
     {
         username1 = id1;
         username2 = id2;
-        
-        //U.log("new conversation");
-        
-        user1 = User.findUserByUsername(username1);
-        user2 = User.findUserByUsername(username2);
+                
+        user1 = User.findUserByUsername(username1, o);
+        user2 = User.findUserByUsername(username2, o);
         
         conversations.put(conversationName(), this);
     }
@@ -32,13 +31,13 @@ public class Conversation
         conversations.remove(c.conversationName());
     }
     
-    static Conversation createConversation(String u1, String u2)
+    static Conversation createConversation(String u1, String u2, Object o)
     {
         Conversation c = conversations.get(conversationName(u1, u2));
         
         if (c == null)
         {
-            c = new Conversation(u1, u2);        
+            c = new Conversation(u1, u2, o);        
             conversations.put(c.conversationName(), c);
         }
         
@@ -86,7 +85,7 @@ public class Conversation
     
     void newMessage(String msg, String translation, String mid, Connection fromcon) 
     {
-        U.log("received new message " + msg + " from " + fromcon.username);
+        U.inf("received new message " + msg + " from " + fromcon.username, fromcon.socket);
         
         Connection tocon = Connection.findOtherConnection(fromcon);
         int status = 1;
@@ -103,53 +102,64 @@ public class Conversation
             messages.add(message);
 
             String mstring = Json.array("message", "messages", messages);
-            U.log("******** message: " + mstring);
+            U.log("******** message: " + mstring, fromcon.socket);
 
             boolean r = MessageProcessingThread.sendx(tocon, mstring);
-            U.log((r ? "Successfuly " : "Failed to ") + "forward message " + U.truncate(mstring, 30) + " to " + tocon.username);
+            U.log((r ? "Successfuly " : "Failed to ") + "forward message " + U.truncate(mstring, 30) + " to " + tocon.username, fromcon.socket);
             
             if (r) status = 2;
         }
        
-        String oside = otherSide(User.findUserByUsername(fromcon.username)).username();
+        String oside = otherSide(User.findUserByUsername(fromcon.username, fromcon.socket)).username();
         
         Message m = new Message(fromcon.username, msg, translation, mid, status, oside);
         
-        U.log("storing new message " + m);
+        U.inf("storing new message " + m, fromcon.socket);
         
-        Message.storeMessage(m, this);
+        Message.storeMessage(m, this, fromcon.socket);
         
-        // update the other person's chat list info if that person is online
-        
+        /* previous logic:
         User ouser = User.findUserByUsername(oside);
         Connection oconn = Connection.findConnection(ouser);
         if (oconn != null) MessageProcessingThread.sendLCU(oconn);
+        */
 
-        notifyRecipient(fromcon);
+        if (tocon != null) 
+        {
+            // update the other person's chat list info if that person is online
+            MessageProcessingThread.sendLCU(tocon);
+        }
+        else
+        {
+            // notify if other person is not online
+            // this should be done only once per conversation
+            notifyRecipient(fromcon, fromcon.socket);
+        }
     }
 
-    void notifyRecipient(Connection fromcon)
+    void notifyRecipient(Connection fromcon, Object o)
     {
-        User to = otherSide(User.findUserByUsername(fromcon.username));
+        User to = otherSide(User.findUserByUsername(fromcon.username, o));
 
-        if (!to.username.equals("support")) return;
+        //if (!to.username.equals("support")) return;
 
         // if message arrives and recipient is not online then send an email
-        // but track it so that only one message is sent in this conversation
+        // but todo ***track it*** so that only one message is sent in this conversation
         
-        U.sendemail(to.email, 
-                            "New message from " + to.username(), 
-                            to.username() + 
-                            " has sent you a new message on " + Main.ProductName + 
-                            ".chat. Please click this link to login and read your new message: " +
-                            Main.Login);
+        U.sendemail(    to.email, 
+                        "You have a new message from " + fromcon.username, 
+
+                        "You have a new message from " + 
+                        fromcon.username +
+                        ". Please login and read your new message: " + Main.Login,
+                        o
+                    );
 
         //EmailSent = true;
     }
 
     Message findMessage(String mid) 
     {
-        U.log("find message " + mid);
         String[] fields = {"mid", mid};
         ArrayList<Record> ms = Database.getMessages(fields);
         if (ms.size() > 0)
@@ -158,15 +168,15 @@ public class Conversation
             return null;
     }
     
-    void ackReceived(String mid, int userstatus, Connection fromcon) 
+    void ackReceived(String mid, int userstatus, Connection fromcon, Object o) 
     {
-        U.log("Ack received for " + mid + " from " + fromcon.username + " with status " + userstatus);
+        U.inf("Ack received for " + mid + " from " + fromcon.username + " with status " + userstatus, o);
         
         Message m = findMessage(mid);
 
         if (m == null) 
         {
-            U.log("***** no message found " + mid);
+            U.log("***** no message found " + mid, o);
             return;
         }
         
@@ -186,23 +196,21 @@ public class Conversation
             messages.add(message);
 
             String mstring = Json.array("ack", "messages", messages);
-            U.log("******** ack: " + mstring);
-
-            //String t = Message.formatToSend("A", m.message, m.translation, mid, userstatus, false);
+            U.inf("******** ack: " + mstring, o);
             
             boolean r = MessageProcessingThread.sendx(tocon, mstring);
-            U.log((r ? "Successfuly " : "Failed to ") + "forward ack " + mid + " from " + fromcon.username + " to " + tocon.username);
+            U.inf((r ? "Successfuly " : "Failed to ") + "forward ack " + mid + " from " + fromcon.username + " to " + tocon.username, o);
         }
         else
         {
-            U.log("Cannot forward ack " + mid + " from " + fromcon.username + " other user not online ");
+            U.inf("Cannot forward ack " + mid + " from " + fromcon.username + " other user not online, notifying recipient ", o);
         }
         
         if (m.status() != userstatus)
         {
-            U.log("Message " + mid + " status updated to  " + userstatus + " storing");
+            U.inf("Message " + mid + " status updated to  " + userstatus + ", storing", o);
             m.status(userstatus);
-            Message.storeMessage(m, this);
+            Message.storeMessage(m, this, o);
         }
     }
 
@@ -233,11 +241,7 @@ public class Conversation
       
         String a = Json.array("history", "messages", messages);
         
-        //U.log("******** history: " + a);
-
         boolean r = MessageProcessingThread.sendx(tocon, a);
-        
-        //U.log((r ? "Successfuly " : "Failed to ") + "send history message " + U.truncate(a, 30) + " to " + tocon.username);
     }
   
     public String toString() 

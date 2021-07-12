@@ -10,6 +10,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.WriteResult;
 import java.util.logging.*;
 import java.util.ArrayList;
+import com.sun.net.httpserver.HttpExchange;
 
 public class Database 
 {
@@ -22,7 +23,7 @@ public class Database
     
     static
     {
-        U.log("database startup");
+        U.inf("database startup", null);
         
         mongoClient = new MongoClient("localhost", 27017);
         database = mongoClient.getDB("malt10");
@@ -32,12 +33,12 @@ public class Database
 
         mongoClient.getDatabaseNames().forEach(name -> 
         {
-            U.log("database: " + name);
+            U.inf("database: " + name, null);
         });
 
         database.getCollectionNames().forEach(name -> 
         {
-            U.log("collection: " + name);
+            U.inf("collection: " + name, null);
         });
         
         String[] fields1 = {"username", Main.SupportUser};
@@ -50,15 +51,15 @@ public class Database
                 "email", "support@gmail.com", 
                 "password", "plexus11", 
                 "language", "en", 
-                "picurl", "false", 
+                "picurl", "0", 
                 "lastActivityTime", "" + System.currentTimeMillis()
             };
-            Database.addUser(fields2, "support");
+            Database.addUser(fields2, "support", null);
         }
         
-        U.log("database startup complete =======================================");
+        U.inf("database startup complete =======================================", null);
         
-        print();
+        print(1, null);
     }
     
     static DBCollection getCollection(String tablename)
@@ -66,7 +67,7 @@ public class Database
         DBCollection collection = database.getCollection(tablename);
         if (collection == null)
         {
-            U.inf("create " + tablename);
+            U.inf("create " + tablename, null);
 
             database.createCollection(tablename, null);
             collection = database.getCollection(tablename);
@@ -84,7 +85,7 @@ public class Database
         return document;
     }
 
-    private static boolean add(String tablename, String[] fields)
+    private static boolean add(String tablename, String[] fields, Object o)
     {
         try 
         {
@@ -98,14 +99,14 @@ public class Database
         }
         catch (Exception e) 
         {
-            U.log("-- error adding record " + e.getMessage());
+            U.log("-- error adding record " + e.getMessage(), o);
             return false;
         }
 
         return true;
     }
     
-    static boolean addMessage(String[] fields, String mid)
+    static boolean addMessage(String[] fields, String mid, Object o)
     {
         /////////////////////////
         // assuming id is index 3: { "conversation", "x-y", "mid", "1661626712881819172", ... }
@@ -119,9 +120,9 @@ public class Database
             delete(Messages, f);
         }
        
-        return add(Messages, fields);
+        return add(Messages, fields, o);
     }
-    static boolean addUser(String[] fields, String username)
+    static boolean addUser(String[] fields, String username, Object o)
     {
         String[] f = { "username", username};
         ArrayList<Record> result = getUsers(f);
@@ -133,11 +134,11 @@ public class Database
             delete(Users, f);
         }
         
-        return add(Users, fields);
+        return add(Users, fields, o);
     }
-    static boolean addToken(String[] fields)
+    static boolean addToken(String[] fields, Object o)
     {
-        return add(Tokens, fields);
+        return add(Tokens, fields, o);
     }
     
     static ArrayList<Record> getMessages(String[] fields)
@@ -153,7 +154,7 @@ public class Database
         return get(Tokens, fields);
     }
     
-    private static WriteResult delete(String tablename, String[] fields)
+    static WriteResult delete(String tablename, String[] fields)
     {
         //U.log("delete from " +  tablename);
         
@@ -191,12 +192,12 @@ public class Database
         }
         catch (Exception e) 
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
             return null;
         }
     }
 
-    static ArrayList<User> allUsers()
+    static ArrayList<User> allUsers(Object o)
     {
         DBCollection collection;
         DBCursor cursor1;
@@ -211,23 +212,24 @@ public class Database
         while(cursor1.hasNext()) 
         {
             Record r = new Record((DBObject) cursor1.next(), Users);
-            User u = new User(r);
+            User u = new User(r, o);
             users.add(u);
         }
 
         return users;
     }
 
-    static String print()
+    static String print(int days, Object o)
     {
         DBCollection collection;
         DBCursor cursor1;
-        int k;
+        long k;
         
-        String status = "";
+        String status = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\"></head><body>";
         
         collection = database.getCollection(Messages);
         cursor1 = collection.find();
+
         k = 0;
         
         long Day = 24 * 3600;
@@ -244,34 +246,53 @@ public class Database
             }
             catch(Exception e)
             {
-                //U.log("*** invalid time " + m.mid);
                 time = -1;
             }
             
             long t = (System.currentTimeMillis() / 1000) - time;
-            if (t < Day)
-                status += (m + " " + t) + "<br>"; // + " " + time + " " + System.currentTimeMillis());
+
+            if (t < Day * days)
+            {
+                float ft = t;
+                ft = ft / Day;
+                ft = ((int) (100 * ft)) / 100f;
+                    
+                status += m + " (" + ft + " days) " + 
+
+                "<a href=https://comprendo.chat/del7722?mid=" + m.mid + ">del</a>" +
+
+                "<br>"; 
+            }
         }
 
-        status += ("========================"); 
+        status += ("<br><br>========================<br><br>"); 
         
-        collection = database.getCollection(Users);
-        cursor1 = collection.find();
-        k = 0;
-        
-        while(cursor1.hasNext()) 
+        k = 1;
+
+        while (true)
         {
-            Record r = new Record((DBObject) cursor1.next(), Users);
-            User u = new User(r);
-            long time = u.lastActivityTime();
-            
-            long t = (System.currentTimeMillis() - time) / 1000;
-            if (t < Day)
-                status += (u + " " + t) + "<br>";
-        }
+            collection = database.getCollection(Users);
+            cursor1 = collection.find();
 
-        status += ("========================"); 
-        
+            while(cursor1.hasNext()) 
+            {
+                Record r = new Record((DBObject) cursor1.next(), Users);
+                User u = new User(r, o);
+                long time = u.lastActivityTime();
+                
+                long t = (System.currentTimeMillis() - time) / 1000;
+                
+                if (t < k && t >= k/10)
+                    status += (u + " ::: " + t) + "<br>";
+            }
+
+            status += ("<br>"); 
+
+            k *= 10;
+
+            if (k >= 1000000000)
+                break;
+        }
         
         ArrayList<Long> z = MessageProcessingThread.messageProcessedTimes;
 
@@ -286,6 +307,10 @@ public class Database
             status += "<br>messages in last " + l + " seconds: " + count + "<br>";
             l = l * 10;
         }
+
+        status += ("<br><br>========================<br><br>");
+
+        status += Log.dump();
         
         return status;
     }

@@ -154,24 +154,23 @@
 
     function whenOpened()
     {
-        if (getUrlVars("a") == "create")
-            changePage("create");
-        else
-            changePage("login");
-
         if (!CommunityPageRefreshStarted) setInterval(CommunityPageRefresh, RefreshTimeout);
         CommunityPageRefreshStarted = true;
 
-        document.addEventListener("visibilitychange", function() 
-        {
-            statusUpdate();
-        });
+        document.addEventListener("visibilitychange", 
+            function() 
+            {
+                statusUpdate();
+            });
 
-        document.addEventListener('input', function (event) 
-        {
-            if (event.target.tagName.toLowerCase() !== 'textarea') return;
-            autoExpand(event.target);
-        }, false);
+        document.addEventListener('keyup', keyUpHandler);
+
+         if (getUrlVars("a") == "create")
+            changePage("create");
+        else if (getUrlVars("a") == "reset")
+            changePage("changepassword");
+        else
+            changePage("login");
     }
 
     function socketsend(msg)

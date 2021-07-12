@@ -26,7 +26,7 @@ public class ImageUtils
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.stackTrace(e);
             return null;
         }
     }
@@ -77,7 +77,7 @@ public class ImageUtils
             bim = cropToSquare(bim);
             try
             {
-                U.log("resize " + side);
+                //U.log("resize " + side);
                 
                 if (side > 0)
                     bim = resize(bim, side, side);
@@ -86,7 +86,7 @@ public class ImageUtils
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                Log.stackTrace(e);
             }
         }
         
@@ -97,7 +97,7 @@ public class ImageUtils
     {
         BufferedImage out = new BufferedImage(w, h, bim.getType());
         
-        U.log("resize " + w + " " + h);
+        //U.log("resize " + w + " " + h);
  
         Graphics2D g2d = out.createGraphics();
         g2d.drawImage(bim, 0, 0, w, h, null);
@@ -106,20 +106,20 @@ public class ImageUtils
         return out;
     }
     
-    static boolean save(BufferedImage bim, String filename)
+    static boolean save(BufferedImage bim, String filename, Object o)
     {
         if (bim != null)
         {
             try
             {
                 ImageIO.write(bim, "png", new File(filename));
-                U.log("saved image at " + filename);
+                U.inf("saved image at " + filename, o);
                 return true;
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                 U.log("*** image not saved " + filename);
+                Log.stackTrace(e);
+                U.log("*** image not saved " + filename, o);
                 return false;
             }
         }
@@ -162,10 +162,10 @@ public class ImageUtils
             BufferedImage br = resize(b, 200, 200);
             ImageIO.write(br, "png", new File("/Users/matt/Desktop/22.png"));
         }
-        catch (IOException ex) 
+        catch (IOException e) 
         {
             System.out.println("Error resizing the image.");
-            ex.printStackTrace();
+            Log.stackTrace(e);
         }
     }
     
@@ -180,7 +180,7 @@ public class ImageUtils
       }
       catch (Exception e)
       {
-        e.printStackTrace();
+        Log.stackTrace(e);
       }
       
       return null;

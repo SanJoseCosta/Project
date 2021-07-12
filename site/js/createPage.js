@@ -21,7 +21,6 @@ function createPage()
                     <br>
 
 
-
                     <img src="./images/default.png" height=50 id=previewimage>
                     <div>
                         <div onclick="document.getElementById('chooser').style.display = 'block';">
@@ -53,3 +52,7 @@ function createPage()
     ;
 	return s;
 }
+
+
+
+
