@@ -59,7 +59,7 @@ public class Database
         
         U.inf("database startup complete =======================================", null);
         
-        print(1, null);
+        print(1, null, null);
     }
     
     static DBCollection getCollection(String tablename)
@@ -219,7 +219,7 @@ public class Database
         return users;
     }
 
-    static String print(int days, Object o)
+    static String print(int days, String ip, Object o)
     {
         DBCollection collection;
         DBCursor cursor1;
@@ -310,7 +310,21 @@ public class Database
 
         status += ("<br><br>========================<br><br>");
 
-        status += Log.dump();
+
+        String list;
+
+        if (ip == null || ip.trim().equals(""))
+        {
+            //System.out.println("ip is null!");
+            list = Log.list();
+        }
+        else
+        {
+            //System.out.println("ip is " + ip);
+            list = Log.dumpIp(ip);
+        }
+        
+        status = list + status;
         
         return status;
     }

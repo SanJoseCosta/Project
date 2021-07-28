@@ -1,0 +1,5 @@
+cd /Users/matt/Dropbox/Project/JavaLibrary1/src/
+javac -proc:none -classpath /Users/matt/Desktop/jars/*:. ./com/worldchat/*.java
+javac -proc:none -classpath /Users/matt/Desktop/jars/*:. ./com/worldchat/newyorker/*.java
+java -classpath /Users/matt/Desktop/jars/*:. com.worldchat.newyorker.Main
+sleep 100

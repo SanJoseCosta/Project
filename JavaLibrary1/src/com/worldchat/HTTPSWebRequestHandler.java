@@ -21,6 +21,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
 {    
     static String TextMime = "text/html";
     static String HtmlMime = "text/html";
+    static int SecondsTillExpire = 1;
     
     HttpExchange currentMessage;
     String NoChange = "**********";
@@ -31,10 +32,13 @@ public class HTTPSWebRequestHandler implements HttpHandler
         
         String r = null;
         String q = null;
-        int result;
+        int result = -1;
             
         try 
         {
+            //if (Log.isGarbage(currentMessage))
+            //    return;
+
             r = t.getRequestURI().getPath();
             q = t.getRequestURI().getQuery();
             
@@ -55,20 +59,47 @@ public class HTTPSWebRequestHandler implements HttpHandler
             if (r.trim().equals("/") || r.equals("")) 
             {
                 r = "/index.html";
-            } 
+            }
+
+            if (r.trim().startsWith("/nym"))
+            {
+                r = "/stories/index.html";
+            }
             
             Log.log("request for  " + r + " " + q, currentMessage);
 
             //----------------------------------------------------------
+
+            String language = "en";
+            String l = getparameter(q, "language");
+
+            if (l != null && !l.equals(""))
+            {
+                language = l;
+                Log.setLanguage(currentMessage, language);
+            }
+            else
+            {
+                language = Log.getLanguage(currentMessage);
+            }
+
+            System.out.println("request for  " + r + " " + q + " language is " + language + " " + (Log.isGarbage(currentMessage) ? "garbage" : ""));
+
+             if (Log.isGarbage(currentMessage))
+                return;
             
+            // todo: check that it is in the 
+            // list of langauges
+
             if (r.trim().startsWith("/status7722"))
             {
                 String days = getparameter(q, "days");
                 if (days == null) days = "1";
-
                 int n = U.toInt(days);
 
-                String response = Database.print(n, currentMessage);
+                String ip = getparameter(q, "ip");
+
+                String response = Database.print(n, ip, currentMessage);
                 result = sendMsg(response.getBytes(), t, HtmlMime, null, currentMessage);
             }
             else if (r.trim().startsWith("/del7722"))
@@ -82,7 +113,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
                     Database.delete(Database.Messages, f);
                 }
 
-                String response = Database.print(1, currentMessage);
+                String response = Database.print(1, null, currentMessage);
                 result = sendMsg(response.getBytes(), t, HtmlMime, null, currentMessage);
             }
             else if (r.trim().startsWith("/createuser") || r.trim().startsWith("/edituser")) 
@@ -113,7 +144,8 @@ public class HTTPSWebRequestHandler implements HttpHandler
             } 
             else 
             {
-                result = sendFile(r, t);
+                //String tolanguage = language; // getAcceptLanguage(currentMessage);
+                result = sendFile(r, language, t);
             }
         } 
         catch (Exception e) 
@@ -128,7 +160,12 @@ public class HTTPSWebRequestHandler implements HttpHandler
         Log.log("response for " + r + " " + q + " --- " + result, currentMessage);
     }
 
-    int sendFile(String file, HttpExchange t) 
+    String getAcceptLanguage(HttpExchange currentMessage)
+    {
+        return "es";
+    }
+
+    int sendFile(String file, String tolanguage, HttpExchange t) 
     {
         byte[] rb = getFile(Main.Site + file);
 
@@ -139,6 +176,8 @@ public class HTTPSWebRequestHandler implements HttpHandler
         }
         else
         {
+            if (file.toLowerCase().endsWith(".js") || file.toLowerCase().endsWith(".html"))
+                rb = Translator.languageReplace(new String(rb), tolanguage, t).getBytes();
             return sendMsg(rb, t, getMimeType(file), file, t);
         }
     }
@@ -260,27 +299,21 @@ public class HTTPSWebRequestHandler implements HttpHandler
     }
 
     int sendMsg(byte[] rb, HttpExchange t, String mime, String name, Object o) 
-    {
-        boolean modified = false;
-        
+    {        
         try 
         {
             t.getResponseHeaders().set("Content-Type", mime);
             t.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             
-            
-            //==//============ expires in 200 secs
-            
-            
-            t.getResponseHeaders().set("Expires", httpDate(200000));
-            
-            if (!modified && mime.indexOf("image") >= 0 && false)
+            if (mime.indexOf("image") >= 0 && false)
             {
+                t.getResponseHeaders().set("Expires", httpDate(300 * 1000));
                 t.sendResponseHeaders(304, 0);
                 rb = "ok".getBytes();
             }
             else
             {
+                t.getResponseHeaders().set("Expires", httpDate(SecondsTillExpire * 1000));
                 t.sendResponseHeaders(200, 0);
             }
             
@@ -467,6 +500,7 @@ public class HTTPSWebRequestHandler implements HttpHandler
         }
     }
     */
+
     void send404(HttpExchange t)
     {
         sendMsg("<center><font size=15>404".getBytes(), t, TextMime, null, t);

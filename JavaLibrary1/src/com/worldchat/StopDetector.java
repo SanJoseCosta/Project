@@ -18,7 +18,7 @@ public class StopDetector extends Thread
         {
             //if (k % 30 == 0)
                 if (SystemData.looping())
-                    U.log("*********************** warning: unusually high cpu usage!!!", null);
+                    U.log("warning: unusually high cpu usage!!!", null);
             
             k++;
             

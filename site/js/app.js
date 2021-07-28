@@ -45,6 +45,7 @@
     // last user list
 
     var lastListlen = 0;
+    var languageSelected = "en";
 
     function localInput(t)
     {
@@ -58,7 +59,7 @@
         if (fromlang == tolang)
             completeTranslation(text);
         else
-            requestTranslation(tolang, fromlang, text) //, completeTranslation);
+            requestTranslation(tolang, fromlang, text);
     }
 
     function remoteMessage(t)
@@ -130,9 +131,9 @@
              // todo make better notification boxes
 
             if (obj.response == "ok")
-                alert("the invitation email was sent successfully");
+                alert("<blah>The invitation email was sent successfully.</blah>");
             else
-                alert("there was an error while trying to send the invitation email");
+                alert("<blah>There was an error while trying to send the invitation email.</blah>");
 
             document.getElementById("search").style.visibilityState = "hidden";
             return;
@@ -148,7 +149,7 @@
             var json = obj.users;
 
             if (json.length == 0)
-                alert("that username was not found");
+                alert("<blah>That username was not found.</blah>");
             else
             {
                 var user = addOrUpdateUser(json[0]); 
@@ -225,11 +226,24 @@
 
         // todo not ready until server sends full local user info
     }
-    
-    function languagePop()
+
+    function languageSelect()
     {
-        var s = "<select style='width:270px;' id=languageselect class=language select-css>";
-        s += "<option value='' class=lng>Choose your language</option>";
+        var languageElement = get("languageselect");
+        var n = languageElement.options[languageElement.selectedIndex].value.trim();
+        //if (n != languageSelected)
+        {
+            languageSelected = n;
+            console.log("chose language " + languageSelected);
+            loadHomePage(languageSelected);
+        }
+    }
+    
+    function languagePop(rsp)
+    {
+        var s = "<select style='width:270px;' " + (rsp ? "onchange='languageSelect()'" : "") + " id=languageselect class=language select-css>";
+
+        s += "<option value='' class=lng><blah>Choose your language</blah></option>";
 
         for (var i = 0; i < languages.length; i = i + 2)
             s += "<option value=" + languages[i + 1] + " class=lng>" + languages[i] + "</option>"
@@ -250,21 +264,19 @@
     {
         log("go to " + url + " with token " + currentToken);
 
-        var body = document.getElementsByTagName("BODY")[0];
-
         if (url == "login") 
         {
-            loginStart(body);
+            loginStart();
         }
         else if (url == "edit") 
         {
-            body.innerHTML = editPage();
+            makeBody(editPage());
             pageMode = 0;
             accountStart(false);
         }
         else if (url == "create") 
         {
-            body.innerHTML = createPage();
+            makeBody(createPage());
             pageMode = 0;  
             accountStart(true);
         }
@@ -279,33 +291,33 @@
         }
         else if (url == "community") 
         {
-            body.innerHTML = communityPage();
+            makeBody(communityPage());
             pageMode = 1;
             remoteUsername = null;
         }
         else if (url == "chats") 
         {
-            body.innerHTML = chatsPage();
+            makeBody(chatsPage());
             pageMode = 2;
             remoteUsername = null;
         }
         else if (url == "conversation") 
         {
-            body.innerHTML = conversationPage();
+            makeBody(conversationPage());
             log("start conversation with " + remoteUsername);
             pageMode = 3;
         }
         else if (url == "support") 
         {
-            body.innerHTML = supportPage();
+            makeBody(supportPage());
         }
         else if (url == "reset") 
         {
-            body.innerHTML = resetPage();
+            makeBody(resetPage());
         }
         else if (url == "terms") 
         {
-            body.innerHTML = termsPage();
+            makeBody(termsPage());
         }
     }
 
@@ -319,9 +331,7 @@
         }
         else
         {
-            var body = document.getElementsByTagName("BODY")[0];
-            body.innerHTML = changePassPage();
-            
+            makeBody(changePassPage());
             pageMode = 0;  
             changePass();
         }
@@ -331,7 +341,7 @@
     {
         var p = document.getElementById("chats-header");
         if (p != null)
-            p.innerHTML = chatsHeaderDiv();
+            setInnerHTML(p, chatsHeaderDiv());
     }
 
     function makebox(user, msg, time, isdummy)
@@ -366,7 +376,7 @@
 
         if (isdummy)
         {
-            box = replaceAll(box, "$$msg$$", "NEW!");
+            box = replaceAll(box, "$$msg$$", "<blah>NEW!</blah>");
             box = replaceAll(box, "$$time$$", "");
         }
         else
@@ -483,9 +493,7 @@
             }
         }
 
-        document.getElementById("chats-list").innerHTML = t;
-
-        //pageHeader();
+        setInnerHTML(document.getElementById("chats-list"), t);
 
         chatsHeader();
     }
@@ -510,23 +518,20 @@
             var div = conversationHeaderDiv();
 
 
-                div = replaceAll(div, "$$picurl$$", picturefile(ru));
-                div = replaceAll(div, "$$local$$", getLocalPic());
+            div = replaceAll(div, "$$picurl$$", picturefile(ru));
+            div = replaceAll(div, "$$local$$", getLocalPic());
 
-                div = replaceAll(div, "$$localusername$$", luser.username);
+            div = replaceAll(div, "$$localusername$$", luser.username);
 
-                div = replaceAll(div, "$$name$$", ru.username);
-                div = replaceAll(div, "$$time$$", tds(ru.lastActivityTime));
+            div = replaceAll(div, "$$name$$", ru.username);
+            div = replaceAll(div, "$$time$$", tds(ru.lastActivityTime));
 
-                div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
+            div = replaceAll(div, "$$click$$", "onclick=\"edit();\"");
 
-                var p = document.getElementById("conversation-header");
+            var p = document.getElementById("conversation-header");
 
-                if (p != null)
-                    p.innerHTML = div;
-
-             
-
+            if (p != null)
+                setInnerHTML(p, div);
         }
 
         var s = "";
@@ -544,7 +549,8 @@
 
         var ml = document.getElementById("messages-list");
 
-        ml.innerHTML = s;
+        setInnerHTML(ml, s);
+
         ml.scrollTop = ml.scrollHeight;
     }
 
@@ -603,11 +609,10 @@
     // put on right side
     function rmsg(msg, translation, status, pic, time)
     {
-        var statusMessage = "sent";
-
-        if (status == 4) statusMessage = "read";
-        if (status == 3) statusMessage = "delivered";
-
+        var statusMessage =                 "<blah>sent</blah>";
+        if (status == 3) statusMessage =    "<blah>delivered</blah>";
+        if (status == 4) statusMessage =    "<blah>message was read</blah>";
+        
         var m = messageDisplayedRight();
 
         m = replaceAll(m, "$$pic$$", pic);
@@ -629,10 +634,12 @@
         textarea.value = "";
     }
 
+    /*
     function chatSettings()
     {
         alert("not available yet");
     }
+    */
    
     function backButton()
     {
@@ -673,16 +680,6 @@
             return "chats";
         else
             return "community";
-    }
-
-    function forgot()
-    {
-        alert("hi");
-    }
-
-    function terms()
-    {
-        changePage("terms");
     }
 
     function checkboxclicked()
@@ -865,18 +862,49 @@
 
         t += "</table>";
 
-        document.getElementById("chats-list").innerHTML = t;
-
-        //pageHeader();
+        setInnerHTML(document.getElementById("chats-list"), t);
 
         chatsHeader();
     }
 
+    function makeBody(c)
+    {
+        c = convertText(c);
+        var body = document.getElementsByTagName("BODY")[0];
+        body.innerHTML = c;
+    }
+
+    function setInnerHTML(e, c)
+    {
+        c = convertText(c);
+        e.innerHTML = c;
+    }
+
+    function convertText(c)
+    {
+        while (true)
+        {
+            var k = c.indexOf("$$", k);
+            // if no more $$----$$ then return
+            if (k < 0)
+                break;
+            var l = c.indexOf("$$", k + 1);
+            if (l < 0)
+            {
+                log("no matching $$ " + c);
+                break;
+            }
+            var z = c.substring(k + 2, l).toUpperCase();
+            c = c.substring(0, k) + z + c.substring(l + 2, c.length);
+        }
+        return c;
+    }
 
     ////////////////////////////////////////////////////////////////////
 
     function run()
     {
+        console.log("start/run");
         initWebSocket();
     }
 

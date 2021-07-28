@@ -35,7 +35,15 @@
     function newchat()
     {
         log("newchat");
-        popModal("Search for a user", "onclick='searchForNewChat();'", "onclick='xModal();'", "username or email");
+        popModal(
+
+            "<blah>Search for a user</blah>", 
+
+            "onclick='searchForNewChat();'", "onclick='xModal();'", 
+
+            "<blah>username or email address</blah>"
+
+            );
     }
 
     function searchForNewChat()
@@ -47,7 +55,15 @@
     function invitation()
     {
         log("invitation");
-        popModal("Send an invitation", "onclick='sendInvitation();'", "onclick='xModal();'", "email");
+        popModal(
+
+            "<blah>Send an invitation</blah>", 
+
+            "onclick='sendInvitation();'", "onclick='xModal();'", 
+
+            "<blah>email address</blah>"
+
+            );
     }
 
     function sendInvitation()

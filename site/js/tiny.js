@@ -109,6 +109,26 @@
         }
     }
 
+    function setLanguage(lan)
+    {
+        //var m = "I" + separator + email + separator;
+
+        var m = JSON.stringify(
+            {
+                type: "language",
+                language: lan,
+            });
+
+        try
+        {
+            socketsend(m);
+        } 
+        catch (err)
+        {
+            logError("*** error while sending language to server: " + err.message);
+        }
+    }
+
     function sendSignOutMessage()
     {
         //var msg = "s" + separator;
@@ -253,29 +273,83 @@
     {
         time = Date.now() - time;
         time = time / 1000;
+
         if (time < 1)
+        {
             return "just now";
+        }
+
+        var timelens = [60, 60, 24, 30];
+
+        for (var i = 0; i < timelens.length; ++i)
+        {
+            if (time < timelens[i])
+                return maketimestring(i, time);
+            time = time / timelens[i];
+        }
+
+        return maketimestring(i, timelens.length);
+
+
+        /*
         if (time < 60)
-            return t2(time, "sec");
+        {
+            if (Math.floor(time) > 1) end = "s";
+            units = "second" + end;
+        }
         time = time / 60;
-        if (time < 200)
-            return t2(time, "min");
+
+        if (time < 60)
+        {
+            if (Math.floor(time) > 1) end = "s";
+            units = "minute" + end;
+        }
         time = time / 60;
-        if (time < 50)
-            return t2(time, "hr");
+
+        if (time < 24)
+        {
+            if (Math.floor(time) > 1) end = "s";
+            units = "hour" + end;
+        }
         time = time / 24;
-        if (time < 25)
-            return t2(time, "day");
-        time = time / 7;
-            return t2(time, "week");
-        
-        //else
-        //{
-        //    var d = new Date(time);
-        //    return d.toLocaleDateString() + " " + d.toLocaleTimeString();
-        //}
+
+        if (time < 30)
+        {
+            if (Math.floor(time) > 1) end = "s";
+            units = "day" + end;
+        }
+        time = time / 30;
+
+        if (Math.floor(time) > 1) end = "s";
+        units = "month" + end;
+        */
     }
 
+    function maketimestring(i, time)
+    {
+        var units = "";
+        var t = Math.floor(time);
+        if (t > 1)
+            units = timestrings[5 + i];
+        else
+            units = timestrings[i];
+        return t + " " + units + " <blah>previously</blah>";
+    }
+
+    var timestrings =   [   
+                        "<blah>second</blah>", 
+                        "<blah>minute</blah>", 
+                        "<blah>hour</blah>", 
+                        "<blah>day</blah>", 
+                        "<blah>month</blah>", 
+
+                        "<blah>seconds</blah>", 
+                        "<blah>minutes</blah>", 
+                        "<blah>hours</blah>", 
+                        "<blah>days</blah>", 
+                        "<blah>months</blah>"
+                        ];
+    /*
     function t2(t, s)
     {
         t = Math.floor(t);
@@ -284,7 +358,8 @@
         else
             return t + " " + s + "s ago";
     }
-
+    */
+    
     function replaceAll(base, find, rep)
     {
         while (base.indexOf(find) >= 0)

@@ -7,12 +7,30 @@ function resetPage()
           <div id=form class="form">
            
             <div class="login-form">
-              <input id=email type="text" placeholder="username or email address"/>
+              <input id=email type="text" placeholder=
+
+                  "<blah>username or email address</blah>"
+
+              />
 
                 <div id=emailerror></div>
 
-              <button onclick="reset();">reset</button>
-              <p class="message">Not registered? <a style="cursor:hand;" onclick="changePage('create');">Create an account</a></p>
+                <button onclick="reset();">
+
+                  <blah>Reset</blah>
+
+                </button>
+
+              <p class="message">
+
+                <blah>Not registered?</blah>
+
+                <a style="cursor:hand;" onclick="changePage('create');">
+
+                  <blah>Create an account</blah>
+
+                </a>
+              </p>
 
             </div>
           </div>

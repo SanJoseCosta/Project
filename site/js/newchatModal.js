@@ -41,28 +41,35 @@ function newchatModal()
     text-decoration: none;
     cursor: pointer;
     }
+
     </style>
 
-    	<div id="myModal" class="modal">
-      
+	<div id="myModal" class="modal">
+  
         <div class="modal-content">
           
-          <div>
-            <b>$$header$$</b>
-          </div>
-          <br>
+            <div>
+                <b>$$header$$</b>
+            </div>
+            <br>
 
-          <textarea style="resize:none" placeholder=$$placeholder$$ id=txa></textarea>
-          <br><br>
+            <textarea style="resize:none" placeholder=$$placeholder$$ id=txa></textarea>
+            <br><br>
 
-          <div style="height:50px;">
-            <button style="padding:10px;margin:10px;" $$cancelclick$$ class="close">Cancel</button>
-            <button style="padding:10px;margin:10px;" $$okclick$$ class="close">OK</button>
-         </div>
+            <div style="height:50px;">
+                <button style="padding:10px;margin:10px;" $$cancelclick$$ class="close">
 
+                    <blah>Cancel</blah>
+
+                </button>
+                <button style="padding:10px;margin:10px;" $$okclick$$ class="close">
+
+                    <blah>OK</blah>
+
+                </button>
+            </div>
         </div>
-
-      </div>
+    </div>
 
     `
 
@@ -108,23 +115,27 @@ function newchatModal()
     }
     </style>
 
-    	<div id="myModal" class="modal">
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div>
+                <b>$$header$$</b>
+            </div>
+            <br>
 
-  		  <div class="modal-content">
-  		    
-          <div>
-            <b>$$header$$</b>
-          </div>
-          <br>
+            <textarea style="resize:none" placeholder=$$placeholder$$ id=txa></textarea>
 
-  		    <textarea style="resize:none" placeholder=$$placeholder$$ id=txa></textarea>
+            <button style="padding:10px;margin:10px;" $$cancelclick$$ class="close">
 
-          <button style="padding:10px;margin:10px;" $$cancelclick$$ class="close">Cancel</button>
-          <button style="padding:10px;margin:10px;" $$okclick$$ class="close">OK</button>
-         
-  		  </div>
+                <blah>Cancel</blah>
 
-  		</div>
+            </button>
+            <button style="padding:10px;margin:10px;" $$okclick$$ class="close">
+
+                <blah>OK</blah>
+
+            </button>
+        </div>
+    </div>
     `
 
     ;

@@ -13,12 +13,20 @@
         if (email == null || email == (""))
         {
             stop = true;
-            get("emailerror").innerText = "please enter your username or email address";
+            get("emailerror").innerText = 
+
+                "<blah>please enter your username or email address</blah>"
+
+            ;
         } 
         else if (password== null || password == (""))
         {
             stop = true;
-            get("passworderror").innerText = "please enter your password";
+            get("passworderror").innerText = 
+
+                "<blah>please enter your password</blah>"
+
+            ;
         }
 
         if (stop)
@@ -49,21 +57,21 @@
 
         if (token.startsWith("invalid"))
         {
-            inputError("emailerror", "Sorry, that email / username and password aren't correct");
+            inputError("emailerror", 
+
+                "<blah>Sorry, that email / username and password aren't correct</blah>"
+
+            );
             return;
         }
-       
-        
-            
+
         localStorage.setItem("token", token);
         
-       
-
         signin(currentToken);
         changePage(getCommunityStartPage());
     }
 
-    function loginStart(body)
+    function loginStart()
     {
         pageMode = 99;
 
@@ -82,7 +90,7 @@
             return;
         }
 
-        body.innerHTML = loginPage();
+        makeBody(loginPage());
 
         get("email").addEventListener("onfocus", function(){ allclear(); });
         get("password").addEventListener("onfocus", function(){ allclear(); });
@@ -139,30 +147,48 @@
         if (creating && (username == null || username == ("") || username.length < 3))
         {
             stop = true;
-            inputError("usernameerror", "username should have at least 3 characters");
+            inputError("usernameerror", 
+
+                "<blah>username should have at least 3 characters</blah>"
+
+            );
         } 
         else if (creating && (username.indexOf(" ") >= 0))
         {
             stop = true;
-            inputError("usernameerror", "user name cannot contain space characters");
+            inputError("usernameerror", 
+
+                "<blah>username cannot contain space characters</blah>"
+
+            );
         } 
         else if (email.indexOf("@") < 0 || email.indexOf(" ") >= 0)
         {
             stop = true;
-            inputError("emailerror", "please enter a valid email address");
+            inputError("emailerror", 
+
+                "<blah>please enter a valid email address</blah>"
+
+            );
         } 
         else if (pcheck && (password1 == null || password1 == ("") || password1.length < 8 || password1.indexOf(" ") >= 0))
         {
             stop = true;
-            inputError("p1error", "password should have at least 8 characters");
+            inputError("p1error", 
+
+                "<blah>password should have at least 8 characters</blah>"
+
+            );
         } 
         else if (language == null || language == ("") || language.length < 2)
         {
             stop = true;
-            inputError("languageerror", "please choose a language");
-        }
+            inputError("languageerror", 
 
-        //log("errors on page = " + stop);
+                "<blah>please choose a language</blah>"
+
+            );
+        }
 
         if (stop)
             return;
@@ -212,7 +238,11 @@
 
         if (r == "dup")
         {
-            inputError("usernameerror", "that username is already taken, please choose another");
+            inputError("usernameerror", 
+
+                "<blah>that username is already taken, please choose another</blah>"
+
+            );
             return;
         }
 
@@ -232,7 +262,11 @@
 
         if (r == "dup")
         {
-            inputError("emailerror", "that email already has an account, please choose another or login");
+            inputError("emailerror", 
+
+                "<blah>that email already has an account, please choose another</blah>"
+
+            );
             return;
         }
 
@@ -259,7 +293,7 @@
         
         var imageSrc = get("previewimage").src;
 
-        // ???
+        // ??? todo how is this working
 
         if (get("username").tagName == "H4")
         {
@@ -270,7 +304,6 @@
 
             log("password value is [" + password1 + "]");
         }
-
 
         // logic for changed picture
 
@@ -351,7 +384,7 @@
             });
         }
 
-        languageElement.innerHTML = languagePop();
+        setInnerHTML(languageElement, languagePop(false));
 
         pageMode = 99;
 
@@ -520,11 +553,10 @@
 
         changePassword(p);
         logout();
-        loadHomePage();
+        loadHomePage(languageSelected);
     }
 
-    function loadHomePage()
+    function loadHomePage(l)
     {
-        window.location.href = Protocol() + Domain();
+        window.location.href = Protocol() + Domain() + "/index.html?language=" + l;
     }
-

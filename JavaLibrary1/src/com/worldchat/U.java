@@ -42,7 +42,7 @@ public class U
         int k;
         
         k = a.indexOf("/");
-        if (k > 0) a = a.substring(k + 1);
+        if (k >= 0) a = a.substring(k + 1);
         
         k = a.indexOf(":");
         if (k > 0) a = a.substring(0, k);
@@ -52,8 +52,9 @@ public class U
 
     static String getIpAddress(HttpExchange currentMessage)
     {
-        String a = currentMessage.getRemoteAddress().toString();
+        return getIpAddress(currentMessage.getRemoteAddress());
         
+        /*
         int k;
         
         k = a.indexOf("/");
@@ -63,6 +64,7 @@ public class U
         if (k > 0) a = a.substring(0, k);
 
         return a;
+        */
     }
 
     static String getIPLocationData(HttpExchange currentMessage)
@@ -251,6 +253,8 @@ public class U
         String s = null;
         int rs = -1;
 
+        //System.out.println(url);
+
         try 
         {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -259,6 +263,8 @@ public class U
 
             rs = connection.getResponseCode();
 
+            //System.out.println(rs);
+
             InputStream is = connection.getInputStream();
             
             byte[] pbuffer = readInputStream(is);
@@ -266,7 +272,7 @@ public class U
         } 
         catch (Exception e) 
         {
-            
+            e.printStackTrace();
         }
         
         return s;
@@ -332,7 +338,8 @@ public class U
 
             return rb;
         } 
-        catch (IOException e) {
+        catch (IOException e) 
+        {
             try {
                 if (f != null) {
                     f.close();
@@ -454,7 +461,7 @@ public class U
         return false;
     }
     
-    static byte[] readInputStream(InputStream stream)
+    public static byte[] readInputStream(InputStream stream)
     {
         ArrayList<Buffer> list = new ArrayList<Buffer>();
         try
@@ -509,6 +516,8 @@ public class U
                 "WV1bQ3Q" + "=&q=" + URLEncoder.encode(text);
 
         U.inf("translation request " + (base + params), o);
+
+        //System.out.println("translation request " + (base + params));
         
         String r = null;
 

@@ -8,12 +8,26 @@ function changePassPage()
               <div id=form class="form">
                 <div class="login-form">
 
-                    <h4 id=username placeholder="Username" size=50>&nbsp;</h4>
+                    <h4 id=username placeholder=
 
-                    <input id=p1 type="password" placeholder="your new password"/>
+                        "<blah>Username</blah>" 
+
+                    size=50>
+                        &nbsp;
+                    </h4>
+
+                    <input id=p1 type="password" placeholder=
+
+                        "<blah>your new password</blah>"
+                    />
+
                     <div id=p1error></div>
 
-                    <button onclick="newPassword();">change password</button>
+                    <button onclick="newPassword();">
+
+                        <blah>change password</blah>
+
+                    </button>
                     <br><br>
                
                 </div>

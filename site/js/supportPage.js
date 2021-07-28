@@ -1,3 +1,4 @@
+
 function supportPage()
 {
     // should have a back button
@@ -5,9 +6,9 @@ function supportPage()
     var s =
     `
         <div>
-            <img src="assets/images/malt-logo.svg" alt="MALT">
+            <img src="assets/images/malt-logo.svg">
         </div>
-        <h1>Support</h1>
+        <h1><blah>Help</blah></h1>
     `;
     return s;
 }

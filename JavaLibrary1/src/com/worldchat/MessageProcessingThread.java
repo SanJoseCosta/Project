@@ -75,7 +75,7 @@ public class MessageProcessingThread extends Thread
 
             if (messageType.equals("signout"))
             {
-               if (connection != null)
+                if (connection != null)
                 {
                     Connection.stopConnection(socket);
                     if (connection.conversation != null)
@@ -114,6 +114,10 @@ public class MessageProcessingThread extends Thread
 
                 //sendx(socket, "2" + WSServer.separator + response);
             }
+            //else if (messageType.equals("language")) 
+            //{
+            //   return setLanguage(json, socket);
+            //}
             else if (messageType.equals("reset")) 
             {
                 return sendReset(json, socket);
@@ -155,7 +159,7 @@ public class MessageProcessingThread extends Thread
         else if (messageType.equals("signin")) 
             return signIn(socket, json); 
         else
-            throw new CommunicationsException("xinvalidMessageType");
+            throw new CommunicationsException("xinvalidMessageType1");
     }
     
     static boolean handleCommunityMessage(JSONObject json, Connection connection) throws CommunicationsException
@@ -169,8 +173,10 @@ public class MessageProcessingThread extends Thread
             return sendRefreshUsers(connection, json);
         else if (messageType.equals("invite")) 
             return sendInvite(connection, json);
+        else if (messageType.equals("signin")) 
+            return signIn(connection.socket, json); 
         else
-            throw new CommunicationsException("invalidMessageType");
+            throw new CommunicationsException("invalidMessageType2");
     }
     
     static boolean handleChatMessage(JSONObject json, Connection connection) throws CommunicationsException
@@ -207,6 +213,17 @@ public class MessageProcessingThread extends Thread
     
     static boolean signIn(WebSocket socket, JSONObject json) throws CommunicationsException
     {
+        Connection connection = Connection.findConnection(socket);
+
+        if (connection != null)
+        {
+            Connection.stopConnection(socket);
+            if (connection.conversation != null)
+                Conversation.deleteConversation(connection.conversation);
+        }
+
+        ///////////////////
+
         String token = json.getString("token").toLowerCase();
 
         User u = User.findUserByToken(token, socket);
@@ -216,7 +233,7 @@ public class MessageProcessingThread extends Thread
         
         U.inf("signing in " + u.username(), socket);
         
-        Connection connection = new Connection(socket, u.username(), null, socket);
+        connection = new Connection(socket, u.username(), null, socket);
         Connection.addConnection(connection);
         
         sendLCU(connection);
@@ -377,6 +394,11 @@ public class MessageProcessingThread extends Thread
             return false;
         }
     }
+
+    //static boolean setLanguage(JSONObject json, WebSocket socket)
+    //{
+    //    String lan = json.getString("language").toLowerCase();
+    //}
 
     static boolean sendReset(JSONObject json, WebSocket socket)
     {

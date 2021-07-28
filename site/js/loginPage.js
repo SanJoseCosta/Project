@@ -7,16 +7,47 @@ function loginPage()
           <div id=form class="form">
            
             <div class="login-form">
-              <input id=email type="text" placeholder="username or email address"/>
-              <input id=password type="password" placeholder="password"/>
+              <input id=email type="text" placeholder=
 
-                <div id=emailerror></div>
-                <div id=passworderror></div>
+                "<blah>Username or email address</blah>"
 
-              <button onclick="login();">login</button>
-              <p class="message">Not registered? <a style="cursor:hand;" onclick="changePage('create');">Create an account</a></p>
+              />
+              <input id=password type="password" placeholder=
 
-              <p class="message">Forgot your password? <a style="cursor:hand;" onclick="changePage('reset');">Reset your password</a></p>
+                "<blah>Password</blah>"
+
+              />
+
+              <div id=emailerror></div>
+              <div id=passworderror></div>
+
+              <button onclick="login();">
+
+                <blah>login</blah>
+
+              </button>
+
+              <p class="message">
+
+                <blah>Not registered?</blah>
+
+              <a style="cursor:hand;" onclick="changePage('create');">
+
+                <blah>Create an account</blah>
+
+              </a></p>
+
+              <p class="message">
+
+                <blah>Forgot your password?</blah>
+
+                <a style="cursor:hand;" onclick="changePage('reset');">
+
+                  <blah>Reset your password</blah>
+
+                </a>
+
+              </p>
             </div>
           </div>
         </div>

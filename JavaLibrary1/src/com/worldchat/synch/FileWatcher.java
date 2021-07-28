@@ -87,7 +87,7 @@ class FileWatcher extends Thread
             if (t > l && matches(files.get(i).toLowerCase(), allTypes))
             {
                 tosend.add(files.get(i));
-                U.log("add " + files.get(i));
+                System.out.println("add " + files.get(i));
             }
         }
 
@@ -136,7 +136,7 @@ class FileWatcher extends Thread
 
         while (true) 
         {
-            U.log(Thread.currentThread().getId() + " periodic check");
+            System.out.println(Thread.currentThread().getId() + " periodic check");
             
             if (waitingForAcks > 0) 
             { 
@@ -155,12 +155,12 @@ class FileWatcher extends Thread
             pause(3000);
             if (stop)
             {
-                U.log("*** returning from run()");
+                System.out.println("*** returning from run()");
                 return;
             }
         }
 
-        U.log("run returning");
+        System.out.println("run returning");
     }
     
     public static void pause(int n) {
